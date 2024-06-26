@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 import discord
 from discord.ext import commands
 import threading
-import logging
 
 # Nest_asyncio 적용
 nest_asyncio.apply()
@@ -21,28 +20,27 @@ CORS(app)
 
 # Discord 설정
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
-CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
+CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
 
-intents = discord.Intents.all()
-intents.message_content = True
-bot = commands.Bot(command_prefix='', intents=intents)
+intents = discord.Intents.default()
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
-    data = request.json
-    stock_name = data.get('stock_name')
-    print(f"Received request to send ping with stock name: {stock_name}")
     try:
+        data = request.json
+        stock_name = data.get('stock_name', 'default_stock')
+        print(f"Received request to send ping with stock name: {stock_name}")
         future = asyncio.run_coroutine_threadsafe(send_ping_command(stock_name), bot.loop)
-        result = future.result()  # Wait for the result
-        print(f"Ping sent successfully: {result}")
+        future.result()  # Wait for the result
+        return jsonify({'success': True})
     except Exception as e:
         print(f"Error sending ping: {e}")
-    return jsonify({'success': True})
+        return jsonify({'success': False, 'error': str(e)})
 
 async def send_ping_command(stock_name):
     print(f"Sending ping with stock name: {stock_name}")
-    channel = bot.get_channel(int(CHANNEL_ID))
+    channel = bot.get_channel(CHANNEL_ID)
     if channel:
         await channel.send(f'ping: {stock_name}')
         print(f"Message sent to channel: {CHANNEL_ID}")
@@ -52,19 +50,18 @@ async def send_ping_command(stock_name):
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
-    channel = bot.get_channel(int(CHANNEL_ID))
+    channel = bot.get_channel(CHANNEL_ID)
     if channel:
         asyncio.run_coroutine_threadsafe(channel.send(f'Bot has successfully logged in: {bot.user.name}'), bot.loop)
 
 def run_discord_bot():
-    if not getattr(bot, 'is_running', False):
-        bot.is_running = True
-        bot.run(TOKEN)
+    bot.run(TOKEN)
 
 if __name__ == '__main__':
     discord_thread = threading.Thread(target=run_discord_bot)
     discord_thread.start()
     app.run()
+
 """
 flutter run
 
