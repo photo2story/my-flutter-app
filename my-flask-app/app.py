@@ -226,6 +226,7 @@ if __name__ == '__main__':
 
 """
 .\.venv\Scripts\activate
+cd..
 cd my-flutter-app/my-flask-app
 python app.py 
 
