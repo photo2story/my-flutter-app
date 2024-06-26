@@ -214,7 +214,7 @@ if not hasattr(threading, 'discord_thread'):
 def execute_discord_command():
     data = request.json
     stock_name = data.get('stock_name')
-    asyncio.run(send_discord_command(stock_name))
+    asyncio.create_task(send_discord_command(stock_name))
     return jsonify({'success': True})
 
 async def send_discord_command(stock_name):
@@ -226,6 +226,7 @@ if __name__ == '__main__':
 
 """
 .\.venv\Scripts\activate
+cd my-flutter-app/my-flask-app
 python app.py 
 
 npm run build
