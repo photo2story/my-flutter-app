@@ -216,7 +216,7 @@ if not hasattr(threading, 'discord_thread'):
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
-    asyncio.run(send_ping_command())
+    asyncio.create_task(send_ping_command())
     return jsonify({'success': True})
 
 async def send_ping_command():
