@@ -71,3 +71,21 @@ if __name__ == '__main__':
     discord_thread = threading.Thread(target=run_discord_bot)
     discord_thread.start()
     app.run()
+
+
+"""
+flutter run -d chrome
+
+.\.venv\Scripts\activate
+cd..
+cd my-flutter-app/my-flask-app
+python app.py 
+
+npm run build
+heroku login
+git init
+heroku git:remote -a he-react-app
+
+git commit -m "react build"
+git push heroku main
+"""
