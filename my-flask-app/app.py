@@ -212,14 +212,13 @@ if not hasattr(threading, 'discord_thread'):
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
-    data = request.json
-    stock_name = data.get('stock_name')
-    asyncio.create_task(send_discord_command(stock_name))
+    asyncio.run(send_ping_command())
     return jsonify({'success': True})
 
-async def send_discord_command(stock_name):
+async def send_ping_command():
     channel = bot.get_channel(int(CHANNEL_ID))
-    await channel.send(f'!stock {stock_name}')
+    await channel.send('ping')
+
 
 if __name__ == '__main__':
     app.run()

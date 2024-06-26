@@ -218,3 +218,25 @@ flutter_*/**/.lock
 *.iml
 .idea/
 
+# Flutter 관련 파일
+*.iml
+*.metadata
+*.lock
+*.flutter-plugins
+*.flutter-plugins-dependencies
+*.packages
+*.pub-cache/
+*.pub/
+*.build/
+*.ios/
+*.android/
+*.macos/
+*.web/
+*.linux/
+*.windows/
+*.fuchsia/
+*.vscode/
+*.vscode/
+
+# Flutter build 디렉토리
+my_flutter_app/build/
