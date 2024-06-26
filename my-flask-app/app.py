@@ -57,3 +57,22 @@ if __name__ == '__main__':
     bot_thread.start()
 
     app.run(port=5000)
+
+
+
+"""
+flutter run -d chrome
+
+.\.venv\Scripts\activate
+cd..
+cd my-flutter-app/my-flask-app
+python app.py 
+
+npm run build
+heroku login
+git init
+heroku git:remote -a he-react-app
+
+git commit -m "react build"
+git push heroku main
+"""
