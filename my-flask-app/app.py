@@ -1,62 +1,53 @@
 import os
-import json
-from flask import Flask, request, jsonify
+import discord
 from discord.ext import commands
-from discord_slash import SlashCommand, SlashContext
+from discord import app_commands
+import nest_asyncio
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
+
+# nest_asyncio 적용
+nest_asyncio.apply()
+
+intents = discord.Intents.default()
+client = discord.Client(intents=intents)
+tree = app_commands.CommandTree(client)
 
 app = Flask(__name__)
+CORS(app)
 
-TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-GUILD_ID = os.getenv('DISCORD_GUILD_ID')
+@tree.command(name="ping", description="Responds with pong")
+async def ping(interaction: discord.Interaction):
+    await interaction.response.send_message("pong")
 
-bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
-slash = SlashCommand(bot, sync_commands=True)
-
-@app.route('/interactions', methods=['POST'])
-def interactions():
-    data = request.json
-
-    if data['type'] == 1:
-        return jsonify({
-            "type": 1
-        })
-    
-    if data['type'] == 2:
-        if data['data']['name'] == 'ping':
-            return jsonify({
-                "type": 4,
-                "data": {
-                    "content": "pong"
-                }
-            })
-
-    return jsonify({
-        "type": 4,
-        "data": {
-            "content": "Unknown command"
-        }
-    })
-
-@bot.event
+@client.event
 async def on_ready():
-    print(f'Bot has successfully logged in as {bot.user}')
+    await tree.sync()
+    print(f'Logged in as {client.user}')
 
-@slash.slash(name="ping", guild_ids=[GUILD_ID])
-async def _ping(ctx: SlashContext):
-    await ctx.send(content="pong")
+@app.route('/')
+def serve():
+    return send_from_directory(app.static_folder, 'index.html')
 
-def run_bot():
-    bot.run(TOKEN)
+@app.route('/execute_discord_command', methods=['POST'])
+def execute_discord_command():
+    data = request.json
+    asyncio.run_coroutine_threadsafe(send_ping_command(), client.loop)
+    return jsonify({'success': True})
+
+async def send_ping_command():
+    channel = client.get_channel(int(os.getenv('DISCORD_CHANNEL_ID')))
+    if channel:
+        await channel.send('ping')
+    else:
+        print(f"Channel not found: {os.getenv('DISCORD_CHANNEL_ID')}")
+
+def run_discord_bot():
+    client.run(os.getenv('DISCORD_APPLICATION_TOKEN'))
 
 if __name__ == '__main__':
-    from threading import Thread
-    import nest_asyncio
-    nest_asyncio.apply()
-
-    bot_thread = Thread(target=run_bot)
-    bot_thread.start()
-
-    app.run(port=5000)
+    run_discord_bot()
+    app.run()
 
 
 
