@@ -23,12 +23,13 @@ TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
 
 intents = discord.Intents.default()
+intents.messages = True
+intents.guilds = True
 bot = commands.Bot(command_prefix='', intents=intents)
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
     try:
-        data = request.json
         print("Received request to send ping")
         future = asyncio.run_coroutine_threadsafe(send_ping_command(), bot.loop)
         future.result()  # Wait for the result
@@ -41,21 +42,27 @@ async def send_ping_command():
     print("Sending ping")
     channel = bot.get_channel(CHANNEL_ID)
     if channel:
-        await channel.send('ping')
+        await channel.send('ping\n')  # 줄 바꿈 추가
         print(f"Message sent to channel: {CHANNEL_ID}")
     else:
         print(f"Channel not found: {CHANNEL_ID}")
-
-@bot.command()
-async def ping(ctx):
-    await ctx.send('pong')
 
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
     channel = bot.get_channel(CHANNEL_ID)
     if channel:
-        asyncio.run_coroutine_threadsafe(channel.send(f'Bot has successfully logged in: {bot.user.name}'), bot.loop)
+        asyncio.run_coroutine_threadsafe(channel.send(f'Bot has successfully logged in: {bot.user.name}\n'), bot.loop)
+
+@bot.command()
+async def ping(ctx):
+    print("Received ping command")
+    await ctx.send('pong')
+
+@bot.event
+async def on_message(message):
+    print(f"Message from {message.author}: {message.content}")
+    await bot.process_commands(message)
 
 def run_discord_bot():
     bot.run(TOKEN)
@@ -64,21 +71,3 @@ if __name__ == '__main__':
     discord_thread = threading.Thread(target=run_discord_bot)
     discord_thread.start()
     app.run()
-
-
-"""
-flutter run -d chrome
-
-.\.venv\Scripts\activate
-cd..
-cd my-flutter-app/my-flask-app
-python app.py 
-
-npm run build
-heroku login
-git init
-heroku git:remote -a he-react-app
-
-git commit -m "react build"
-git push heroku main
-"""
