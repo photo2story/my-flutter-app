@@ -199,17 +199,6 @@ async def on_ready():
 async def ping(ctx):
     await ctx.send(f'pong: {bot.user.name}')
 
-@app.route('/execute_discord_command', methods=['POST'])
-def execute_discord_command():
-    data = request.json
-    stock_name = data.get('stock_name')
-    asyncio.run(send_discord_command(stock_name))
-    return jsonify({'success': True})
-
-async def send_discord_command(stock_name):
-    channel = bot.get_channel(int(DISCORD_CHANNEL_ID))
-    await channel.send(f'!stock {stock_name}')
-    
 def run_discord_bot():
     if not getattr(bot, 'is_running', False):
         bot.is_running = True
@@ -220,6 +209,17 @@ if not hasattr(threading, 'discord_thread'):
     discord_thread = threading.Thread(target=run_discord_bot)
     discord_thread.start()
     threading.discord_thread = discord_thread
+
+@app.route('/execute_discord_command', methods=['POST'])
+def execute_discord_command():
+    data = request.json
+    stock_name = data.get('stock_name')
+    asyncio.run(send_discord_command(stock_name))
+    return jsonify({'success': True})
+
+async def send_discord_command(stock_name):
+    channel = bot.get_channel(int(CHANNEL_ID))
+    await channel.send(f'!stock {stock_name}')
 
 if __name__ == '__main__':
     app.run()
