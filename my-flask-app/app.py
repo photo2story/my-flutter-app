@@ -224,15 +224,18 @@ async def send_ping_command():
     channel = bot.get_channel(int(CHANNEL_ID))
     await channel.send('ping')
 
+# 비동기 함수로 변경된 run_discord_bot
+async def run_discord_bot():
+    bot.run(TOKEN)
+
 # Flask 서버와 Discord 봇을 동시에 실행하기 위한 메인 함수
 async def main():
     bot_task = asyncio.create_task(run_discord_bot())
-    await asyncio.gather(bot_task)
+    flask_task = asyncio.create_task(run_flask())
+    await asyncio.gather(bot_task, flask_task)
 
-def run_discord_bot():
-    if not getattr(bot, 'is_running', False):
-        bot.is_running = True
-        bot.run(TOKEN)
+def run_flask():
+    app.run()
 
 if __name__ == '__main__':
     try:
@@ -243,6 +246,7 @@ if __name__ == '__main__':
     finally:
         logging.info('\n[+] Bye...')
         print('\n[+] Bye...')
+
 
 """
 .\.venv\Scripts\activate
