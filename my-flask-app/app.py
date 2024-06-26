@@ -29,23 +29,26 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 def execute_discord_command():
     try:
         data = request.json
-        stock_name = data.get('stock_name', 'default_stock')
-        print(f"Received request to send ping with stock name: {stock_name}")
-        future = asyncio.run_coroutine_threadsafe(send_ping_command(stock_name), bot.loop)
+        print("Received request to send ping")
+        future = asyncio.run_coroutine_threadsafe(send_ping_command(), bot.loop)
         future.result()  # Wait for the result
         return jsonify({'success': True})
     except Exception as e:
         print(f"Error sending ping: {e}")
         return jsonify({'success': False, 'error': str(e)})
 
-async def send_ping_command(stock_name):
-    print(f"Sending ping with stock name: {stock_name}")
+async def send_ping_command():
+    print("Sending ping")
     channel = bot.get_channel(CHANNEL_ID)
     if channel:
-        await channel.send(f'ping: {stock_name}')
+        await channel.send('ping')
         print(f"Message sent to channel: {CHANNEL_ID}")
     else:
         print(f"Channel not found: {CHANNEL_ID}")
+
+@bot.command()
+async def ping(ctx):
+    await ctx.send('pong')
 
 @bot.event
 async def on_ready():
@@ -61,6 +64,7 @@ if __name__ == '__main__':
     discord_thread = threading.Thread(target=run_discord_bot)
     discord_thread.start()
     app.run()
+
 
 """
 flutter run
