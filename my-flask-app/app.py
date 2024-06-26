@@ -23,7 +23,7 @@ TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
 
 intents = discord.Intents.default()
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='', intents=intents)
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
@@ -67,7 +67,7 @@ if __name__ == '__main__':
 
 
 """
-flutter run
+flutter run -d chrome
 
 .\.venv\Scripts\activate
 cd..
