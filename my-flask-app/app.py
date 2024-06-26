@@ -216,39 +216,38 @@ if not hasattr(threading, 'discord_thread'):
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(send_ping_command())
+    data = request.json
+    stock_name = data.get('stock_name')
+    asyncio.run_coroutine_threadsafe(send_ping_command(stock_name), bot.loop)
     return jsonify({'success': True})
 
-async def send_ping_command():
+async def send_ping_command(stock_name):
     channel = bot.get_channel(int(CHANNEL_ID))
-    await channel.send('ping')
+    await channel.send(f'ping: {stock_name}')
 
-# 비동기 함수로 변경된 run_discord_bot
-async def run_discord_bot():
-    bot.run(TOKEN)
+@bot.event
+async def on_ready():
+    if not hasattr(bot, 'is_logged_in'):
+        bot.is_logged_in = True
+        print(f'Logged in as {bot.user.name}')
+        channel = bot.get_channel(int(CHANNEL_ID))
+        if channel:
+            asyncio.run_coroutine_threadsafe(channel.send(f'Bot has successfully logged in: {bot.user.name}'), bot.loop)
 
-# Flask 서버와 Discord 봇을 동시에 실행하기 위한 메인 함수
-async def main():
-    bot_task = asyncio.create_task(run_discord_bot())
-    flask_task = asyncio.create_task(run_flask())
-    await asyncio.gather(bot_task, flask_task)
-
-def run_flask():
-    app.run()
+def run_discord_bot():
+    if not getattr(bot, 'is_running', False):
+        bot.is_running = True
+        bot.run(TOKEN)
 
 if __name__ == '__main__':
-    try:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(main())
-    except Exception as error:
-        logging.error("Error", exc_info=True)
-    finally:
-        logging.info('\n[+] Bye...')
-        print('\n[+] Bye...')
+    discord_thread = threading.Thread(target=run_discord_bot)
+    discord_thread.start()
+    app.run()
 
 
 """
+flutter run
+
 .\.venv\Scripts\activate
 cd..
 cd my-flutter-app/my-flask-app
