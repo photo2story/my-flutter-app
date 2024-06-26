@@ -216,17 +216,33 @@ if not hasattr(threading, 'discord_thread'):
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
-    asyncio.create_task(send_ping_command())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(send_ping_command())
     return jsonify({'success': True})
 
 async def send_ping_command():
     channel = bot.get_channel(int(CHANNEL_ID))
     await channel.send('ping')
 
+# Flask 서버와 Discord 봇을 동시에 실행하기 위한 메인 함수
+async def main():
+    bot_task = asyncio.create_task(run_discord_bot())
+    await asyncio.gather(bot_task)
 
+def run_discord_bot():
+    if not getattr(bot, 'is_running', False):
+        bot.is_running = True
+        bot.run(TOKEN)
 
 if __name__ == '__main__':
-    app.run()
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main())
+    except Exception as error:
+        logging.error("Error", exc_info=True)
+    finally:
+        logging.info('\n[+] Bye...')
+        print('\n[+] Bye...')
 
 """
 .\.venv\Scripts\activate
