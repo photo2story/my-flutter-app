@@ -166,3 +166,55 @@ node_modules/
 .env
 # React 빌드 폴더 무시 해제
 !build/
+
+# Flutter 관련 파일
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache
+.pub/
+/build/
+
+# 웹 관련 파일
+web/renderer/
+build/web/
+
+# macOS 관련 파일
+macos/Flutter/ephemeral/
+
+# iOS 관련 파일
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/.symlinks/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Flutter/GeneratedPluginRegistrant.*
+
+# Android 관련 파일
+.android/
+app/**/flutter_export_environment.sh
+
+# VS Code 관련 파일
+.vscode/
+
+# 임시 파일
+*.swp
+*.log
+*.lock
+*.tmp
+*.DS_Store
+
+# 환경 변수 파일
+.env
+
+# Flutter 및 Dart 패키지 관련 파일
+.idea/
+.dart_tool/
+flutter_*/**/.lock
+**/.dart_tool/
+
+# JetBrains 관련 파일
+*.iml
+.idea/
+
