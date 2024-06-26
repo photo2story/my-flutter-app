@@ -212,10 +212,12 @@ if not hasattr(threading, 'discord_thread'):
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
-    loop = asyncio.new_event_loop()
+    loop = asyncio.new_event_loop()  # 이벤트 루프를 명시적으로 생성
     asyncio.set_event_loop(loop)
     loop.run_until_complete(send_ping_command())
+    loop.close()  # 이벤트 루프를 닫음
     return jsonify({'success': True})
+
 
 async def send_ping_command():
     channel = bot.get_channel(int(CHANNEL_ID))
