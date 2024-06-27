@@ -92,6 +92,8 @@ async def on_ready():
     channel = bot.get_channel(int(CHANNEL_ID))
     if channel:
         await channel.send("Bot has logged in successfully!")
+        # 테스트를 위해 직접 /ping 메시지 전송
+        await channel.send("/ping")
 
 @bot.event
 async def on_message(message):
@@ -145,6 +147,7 @@ async def main():
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
+
 
 
 """
