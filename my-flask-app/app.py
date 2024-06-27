@@ -2,6 +2,7 @@ import os
 import discord
 import asyncio
 from flask import Flask, request
+from flask_cors import CORS
 from dotenv import load_dotenv
 from threading import Thread
 import logging
@@ -13,6 +14,7 @@ logging.basicConfig(level=logging.DEBUG)
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)  # CORS 설정 추가
 
 # 환경 변수에서 디스코드 토큰과 채널 ID 가져오기
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
@@ -62,7 +64,6 @@ if __name__ == '__main__':
     else:
         Thread(target=run_discord_bot).start()
         app.run(host=socket.gethostbyname(socket.gethostname()), port=5000)
-
 
 
 """
