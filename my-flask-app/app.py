@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 from flask import Flask, request, jsonify
 import nest_asyncio
+import socket  # 추가된 부분
 
 nest_asyncio.apply()
 
@@ -12,6 +13,7 @@ TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
 
 intents = discord.Intents.default()
+intents.message_content = True  # Privileged message content intent 추가
 bot = commands.Bot(command_prefix='/', intents=intents)
 
 @bot.event
