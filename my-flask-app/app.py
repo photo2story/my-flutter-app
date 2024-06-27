@@ -3,67 +3,50 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from flask import Flask, request
-from flask_cors import CORS
-from dotenv import load_dotenv
-from threading import Thread
-import asyncio
-import socket
+import threading
 
-# .env 파일에서 환경 변수 로드
-load_dotenv()
-
-app = Flask(__name__)
-CORS(app)  # CORS 설정 추가
-
-# 환경 변수에서 디스코드 토큰과 채널 ID 가져오기
+# 환경 변수에서 Discord 토큰 및 채널 ID 가져오기
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
-GUILD_ID = os.getenv('DISCORD_GUILD_ID')
+CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
 
-bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
+# Flask 앱 초기화
+app = Flask(__name__)
+
+# Discord 봇 초기화
+intents = discord.Intents.default()
+bot = commands.Bot(command_prefix='/', intents=intents)
+tree = app_commands.CommandTree(bot)
 
 @bot.event
 async def on_ready():
-    print(f'Bot has logged in as {bot.user.name}')
-    await tree.sync(guild=discord.Object(id=GUILD_ID))
-    print(f'Synced slash commands for guild ID {GUILD_ID}')
-
-@bot.command()
-async def ping(ctx):
-    await ctx.send('pong')
-
-# 슬래시 커맨드 등록
-tree = app_commands.CommandTree(bot)
-
-@tree.command(name="ping", description="Responds with pong", guild=discord.Object(id=GUILD_ID))
-async def slash_ping(interaction: discord.Interaction):
-    await interaction.response.send_message('pong')
+    print(f'Bot has logged in as {bot.user}')
+    # 명령 트리 동기화
+    await tree.sync()
+    print('Command tree synced.')
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
     data = request.json
-    print(f"Received data: {data}")
+    message_content = data.get('message')
 
-    async def send_message():
-        channel = bot.get_channel(int(CHANNEL_ID))
-        if channel:
-            await channel.send(data['message'])
-            print(f"Message sent to Discord: {data['message']}")
-        else:
-            print(f"Channel not found: {CHANNEL_ID}")
+    if message_content:
+        send_message(message_content)
 
-    asyncio.run_coroutine_threadsafe(send_message(), bot.loop)
-    return 'Message sent', 200
+    return 'Message sent to Discord', 200
+
+def send_message(message_content):
+    channel = bot.get_channel(CHANNEL_ID)
+    if channel:
+        asyncio.run_coroutine_threadsafe(channel.send(message_content), bot.loop)
+    else:
+        print(f"Channel not found: {CHANNEL_ID}")
 
 def run_discord_bot():
     bot.run(TOKEN)
 
 if __name__ == '__main__':
-    if not TOKEN or not GUILD_ID:
-        print("Discord bot token or guild ID is not set")
-    else:
-        Thread(target=run_discord_bot).start()
-        app.run(host=socket.gethostbyname(socket.gethostname()), port=5000)
-
+    threading.Thread(target=run_discord_bot).start()
+    app.run(host='0.0.0.0', port=5000)
 
 """
 flutter run -d chrome
