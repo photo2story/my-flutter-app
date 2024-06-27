@@ -4,6 +4,10 @@ from discord.ext import commands
 from flask import Flask, request, jsonify
 import threading
 import asyncio
+from dotenv import load_dotenv
+
+# .env 파일 로드
+load_dotenv()
 
 # Flask 설정
 app = Flask(__name__)
@@ -35,14 +39,12 @@ async def send_ping_command():
 def run_flask_app():
     app.run(host='0.0.0.0', port=5000)
 
-def run_discord_bot():
-    asyncio.set_event_loop(asyncio.new_event_loop())
-    bot.loop.create_task(bot.start(TOKEN))
-    bot.loop.run_forever()
+async def run_discord_bot():
+    await bot.start(TOKEN)
 
 if __name__ == "__main__":
     threading.Thread(target=run_flask_app).start()
-    threading.Thread(target=run_discord_bot).start()
+    asyncio.run(run_discord_bot())
 
 
 """
