@@ -3,6 +3,7 @@ import 'package:dotenv/dotenv.dart' as dotenv;
 import 'package:discord_logger/discord_logger.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   dotenv.load();
   runApp(const MyApp());
 }
@@ -69,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: _sendDiscordMessage,
         tooltip: 'Send Message',
         child: const Icon(Icons.send),
-      ), 
+      ),
     );
   }
 }
