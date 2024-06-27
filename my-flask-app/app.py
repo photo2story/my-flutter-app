@@ -1,54 +1,43 @@
 import os
 import discord
 from discord.ext import commands
-from flask import Flask, request
-import threading
-import asyncio
+from discord import app_commands
+from flask import Flask, request, jsonify
+import requests
 
-# 환경 변수에서 Discord 토큰 및 채널 ID 가져오기
-TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
-CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
-
-# Flask 앱 초기화
 app = Flask(__name__)
 
-# Discord 봇 초기화
+TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
+CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
+
 intents = discord.Intents.default()
-bot = commands.Bot(command_prefix='/', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
     print(f'Bot has logged in as {bot.user}')
-    try:
-        synced = await bot.tree.sync()
-        print(f"Synced {len(synced)} commands")
-    except Exception as e:
-        print(f"Failed to sync commands: {e}")
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
-    data = request.json
-    message_content = data.get('message')
+    data = request.get_json()
+    command = data.get('command')
 
-    if message_content:
-        send_message(message_content)
+    if command == '/ping':
+        asyncio.run_coroutine_threadsafe(send_ping_command(), bot.loop)
+        return jsonify({'status': 'success'})
+    else:
+        return jsonify({'status': 'invalid command'}), 400
 
-    return 'Message sent to Discord', 200
-
-def send_message(message_content):
-    channel = bot.get_channel(CHANNEL_ID)
+async def send_ping_command():
+    channel = bot.get_channel(int(CHANNEL_ID))
     if channel:
-        asyncio.run_coroutine_threadsafe(channel.send(message_content), bot.loop)
+        await channel.send('/ping')
     else:
         print(f"Channel not found: {CHANNEL_ID}")
 
-def run_discord_bot():
-    bot.run(TOKEN)
-
 if __name__ == '__main__':
-    threading.Thread(target=run_discord_bot).start()
-    app.run(host='0.0.0.0', port=5000)
-
+    bot.loop.create_task(bot.start(TOKEN))
+    app.run(debug=False, host='0.0.0.0')
 
 """
 flutter run -d chrome
