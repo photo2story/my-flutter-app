@@ -46,15 +46,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  void _sendDiscordMessage() async {
-    final discord = DiscordLogger.instance;
-    debugPrint('Sending message to Discord...'); // 디버그 로그 추가
-    try {
-      await discord.sendMessage("This is a test message from Flutter");
-      debugPrint('Message sent successfully!');
-    } catch (e) {
-      debugPrint('Error sending message: $e');
-    }
+  final discord = DiscordLogger.instance;
+
+  void _sendMessage() {
+    discord.sendMessage('/ping');
+    debugPrint('Message sent to Discord: /ping');
   }
 
   @override
@@ -70,14 +66,13 @@ class _MyHomePageState extends State<MyHomePage> {
             const Text(
               'Press the button to send a message to Discord:',
             ),
-            SizedBox(height: 20),
-            FloatingActionButton(
-              onPressed: _sendDiscordMessage,
-              tooltip: 'Send Message',
-              child: const Icon(Icons.send),
-            ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _sendMessage,
+        tooltip: 'Send Message',
+        child: const Icon(Icons.send),
       ),
     );
   }
