@@ -5,7 +5,11 @@ from discord import app_commands
 from flask import Flask, request, jsonify
 import asyncio
 
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app)
+
 
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
