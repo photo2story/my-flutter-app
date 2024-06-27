@@ -44,14 +44,16 @@ async def send_ping_command():
 async def ping_command(interaction: discord.Interaction):
     await interaction.response.send_message("pong")
 
-async def main():
+async def run_discord_bot():
     async with bot:
         await bot.start(TOKEN)
 
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.create_task(main())
+def start_flask_app():
     app.run(debug=False, host='0.0.0.0')
+
+if __name__ == '__main__':
+    asyncio.run(run_discord_bot())
+    start_flask_app()
 
 """
 flutter run -d chrome
