@@ -59,3 +59,21 @@ if __name__ == '__main__':
 
     flask_thread = threading.Thread(target=start_flask_app)
     flask_thread.start()
+
+
+"""
+flutter run -d chrome
+
+.\.venv\Scripts\activate
+cd..
+cd my-flutter-app/my-flask-app
+python app.py 
+
+npm run build
+heroku login
+git init
+heroku git:remote -a he-react-app
+
+git commit -m "react build"
+git push heroku main
+"""
