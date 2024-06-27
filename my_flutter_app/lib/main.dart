@@ -1,44 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:discord_logger/discord_logger.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // .env 파일을 로드
-  await dotenv.load(fileName: 'assets/.env');
-
-  runApp(const MyApp());
+void main() async {
+  await dotenv.load();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 환경 변수에서 Discord 자격 증명 로드
-    final channelId = dotenv.env['DISCORD_CHANNEL_ID'] ?? '';
-    final botToken = dotenv.env['DISCORD_APPLICATION_TOKEN'] ?? '';
-
-    // DiscordLogger 초기화
-    DiscordLogger(
-      channelId: channelId,
-      botToken: botToken,
-    );
-
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
+  const MyHomePage({super.key, required this.title});
   final String title;
 
   @override
@@ -46,11 +32,27 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final discord = DiscordLogger.instance;
+  Future<void> sendMessageToDiscord(String message) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:5000/execute_discord_command'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'command': message,
+        }),
+      );
 
-  void _sendMessage() {
-    discord.sendMessage('/ping');
-    debugPrint('Message sent to Discord: /ping');
+      if (response.statusCode == 200) {
+        print('Message sent to Discord: $message');
+      } else {
+        print('Failed to send message to Discord. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+      }
+    } catch (error) {
+      print('Error sending message to Discord: $error');
+    }
   }
 
   @override
@@ -66,13 +68,15 @@ class _MyHomePageState extends State<MyHomePage> {
             const Text(
               'Press the button to send a message to Discord:',
             ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                sendMessageToDiscord('/ping');
+              },
+              child: const Icon(Icons.send),
+            ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _sendMessage,
-        tooltip: 'Send Message',
-        child: const Icon(Icons.send),
       ),
     );
   }
