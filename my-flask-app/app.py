@@ -6,10 +6,10 @@ import discord
 from discord.ext import commands
 import asyncio
 import nest_asyncio
-import threading
 import socket
 import sys
 import certifi
+import threading
 
 # 콘솔 출력 인코딩을 UTF-8로 설정
 sys.stdout.reconfigure(encoding='utf-8')
@@ -85,6 +85,17 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix='/', intents=intents)
 
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user.name}')
+    app_info = await bot.application_info()
+    if app_info:
+        print(f'Bot has applications.commands scope: {app_info.flags.applications_commands}')
+    # 로그인되었을 때 메시지 전송
+    channel = bot.get_channel(int(CHANNEL_ID))
+    if channel:
+        await channel.send("Bot has logged in successfully!")
+
 @bot.command()
 async def ping(ctx):
     await ctx.send('pong')
@@ -129,6 +140,7 @@ async def main():
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
+
 
 
 
