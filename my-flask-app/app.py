@@ -1,9 +1,9 @@
 import os
 import discord
 from discord.ext import commands
-from discord import app_commands
 from flask import Flask, request
 import threading
+import asyncio
 
 # 환경 변수에서 Discord 토큰 및 채널 ID 가져오기
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
@@ -15,14 +15,15 @@ app = Flask(__name__)
 # Discord 봇 초기화
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix='/', intents=intents)
-tree = app_commands.CommandTree(bot)
 
 @bot.event
 async def on_ready():
     print(f'Bot has logged in as {bot.user}')
-    # 명령 트리 동기화
-    await tree.sync()
-    print('Command tree synced.')
+    try:
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} commands")
+    except Exception as e:
+        print(f"Failed to sync commands: {e}")
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
@@ -47,6 +48,7 @@ def run_discord_bot():
 if __name__ == '__main__':
     threading.Thread(target=run_discord_bot).start()
     app.run(host='0.0.0.0', port=5000)
+
 
 """
 flutter run -d chrome
