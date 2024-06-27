@@ -4,17 +4,22 @@ import asyncio
 from flask import Flask, request
 from dotenv import load_dotenv
 from threading import Thread
-
-# 필요한 라이브러리 추가
 import logging
+import socket
+
 logging.basicConfig(level=logging.DEBUG)
 
+# .env 파일에서 환경 변수 로드
 load_dotenv()
 
 app = Flask(__name__)
 
+# 환경 변수에서 디스코드 토큰과 채널 ID 가져오기
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
+CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
+
+logging.debug(f'TOKEN: {TOKEN}')
+logging.debug(f'CHANNEL_ID: {CHANNEL_ID}')
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -25,7 +30,7 @@ bot = discord.Client(intents=intents)
 @bot.event
 async def on_ready():
     logging.info(f'Bot has logged in as {bot.user.name}')
-    channel = bot.get_channel(CHANNEL_ID)
+    channel = bot.get_channel(int(CHANNEL_ID))
     if channel:
         await channel.send('Bot has logged in successfully!')
         logging.info(f'Message sent to channel: {CHANNEL_ID}')
@@ -38,7 +43,7 @@ def execute_discord_command():
     logging.debug(f"Received data: {data}")
 
     async def send_message():
-        channel = bot.get_channel(CHANNEL_ID)
+        channel = bot.get_channel(int(CHANNEL_ID))
         if channel:
             await channel.send(data['message'])
             logging.info(f"Message sent to Discord: {data['message']}")
@@ -52,8 +57,11 @@ def run_discord_bot():
     bot.run(TOKEN)
 
 if __name__ == '__main__':
-    Thread(target=run_discord_bot).start()
-    app.run(host='0.0.0.0', port=5000)
+    if not TOKEN or not CHANNEL_ID:
+        logging.error("Discord bot token or channel ID is not set")
+    else:
+        Thread(target=run_discord_bot).start()
+        app.run(host=socket.gethostbyname(socket.gethostname()), port=5000)
 
 
 """
