@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from flask import Flask, request, jsonify
-import requests
+import asyncio
 
 app = Flask(__name__)
 
@@ -12,10 +12,16 @@ CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
 
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix='!', intents=intents)
+tree = app_commands.CommandTree(bot)
 
 @bot.event
 async def on_ready():
     print(f'Bot has logged in as {bot.user}')
+    try:
+        await tree.sync()
+        print('Synced commands successfully.')
+    except Exception as e:
+        print(f'Failed to sync commands: {e}')
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
@@ -35,8 +41,17 @@ async def send_ping_command():
     else:
         print(f"Channel not found: {CHANNEL_ID}")
 
+@tree.command(name="ping", description="Responds with pong")
+async def ping_command(interaction: discord.Interaction):
+    await interaction.response.send_message("pong")
+
+async def main():
+    async with bot:
+        await bot.start(TOKEN)
+
 if __name__ == '__main__':
-    bot.loop.create_task(bot.start(TOKEN))
+    loop = asyncio.get_event_loop()
+    loop.create_task(main())
     app.run(debug=False, host='0.0.0.0')
 
 """
