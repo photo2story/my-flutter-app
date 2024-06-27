@@ -1,65 +1,48 @@
 import os
 import discord
 from discord.ext import commands
-from discord import app_commands
 from flask import Flask, request, jsonify
-from flask_cors import CORS
-import asyncio
 import threading
+import asyncio
 
+# Flask 설정
 app = Flask(__name__)
-CORS(app)
 
-TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
-CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
-
+# Discord 봇 설정
 intents = discord.Intents.default()
-intents.message_content = True  # Message content intent 활성화
+intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-@bot.event
-async def on_ready():
-    print(f'Bot has logged in as {bot.user}')
-    tree = app_commands.CommandTree(bot)
-    @tree.command(name="ping", description="Responds with pong")
-    async def ping_command(interaction: discord.Interaction):
-        await interaction.response.send_message("pong")
-
-    await tree.sync()
-    print("Synced commands successfully.")
+TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
+CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
     data = request.get_json()
     command = data.get('command')
 
-    if command == '/ping':
-        asyncio.run_coroutine_threadsafe(send_ping_command(), bot.loop)
-        return jsonify({'status': 'success'})
+    if command == 'ping':
+        asyncio.run(send_ping_command())
+        return jsonify({'status': 'success', 'message': 'Command executed successfully'}), 200
     else:
-        return jsonify({'status': 'invalid command'}), 400
+        return jsonify({'status': 'error', 'message': 'Unknown command'}), 400
 
 async def send_ping_command():
     channel = bot.get_channel(int(CHANNEL_ID))
-    if channel:
-        await channel.send('/ping')
-    else:
-        print(f"Channel not found: {CHANNEL_ID}")
+    await channel.send('pong')
+
+def run_flask_app():
+    app.run(host='0.0.0.0', port=5000)
 
 def run_discord_bot():
-    asyncio.run(bot.start(TOKEN))
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    bot.loop.create_task(bot.start(TOKEN))
+    bot.loop.run_forever()
 
-def start_flask_app():
-    app.run(debug=False, host='0.0.0.0')
-
-if __name__ == '__main__':
-    discord_thread = threading.Thread(target=run_discord_bot)
-    discord_thread.start()
-
-    flask_thread = threading.Thread(target=start_flask_app)
-    flask_thread.start()
-
+if __name__ == "__main__":
+    threading.Thread(target=run_flask_app).start()
+    threading.Thread(target=run_discord_bot).start()
 
 
 """
