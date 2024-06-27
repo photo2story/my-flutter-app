@@ -12,13 +12,12 @@ CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
 
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix='!', intents=intents)
-tree = app_commands.CommandTree(bot)
 
 @bot.event
 async def on_ready():
     print(f'Bot has logged in as {bot.user}')
     try:
-        await tree.sync()
+        await bot.tree.sync()
         print('Synced commands successfully.')
     except Exception as e:
         print(f'Failed to sync commands: {e}')
@@ -41,7 +40,7 @@ async def send_ping_command():
     else:
         print(f"Channel not found: {CHANNEL_ID}")
 
-@tree.command(name="ping", description="Responds with pong")
+@bot.tree.command(name="ping", description="Responds with pong")
 async def ping_command(interaction: discord.Interaction):
     await interaction.response.send_message("pong")
 
