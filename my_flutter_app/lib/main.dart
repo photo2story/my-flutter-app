@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:discord_logger/discord_logger.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // .env 파일을 문자열로 로드
-  String envString = await rootBundle.loadString('assets/.env');
-  // dotenv 패키지를 사용하여 로드된 문자열을 파싱
-  await dotenv.load(fileContent: envString);
+  // .env 파일을 로드
+  await dotenv.load(fileName: 'assets/.env');
 
   runApp(const MyApp());
 }
@@ -67,13 +64,14 @@ class _MyHomePageState extends State<MyHomePage> {
             const Text(
               'Press the button to send a message to Discord:',
             ),
+            SizedBox(height: 20),
+            FloatingActionButton(
+              onPressed: _sendDiscordMessage,
+              tooltip: 'Send Message',
+              child: const Icon(Icons.send),
+            ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _sendDiscordMessage,
-        tooltip: 'Send Message',
-        child: const Icon(Icons.send),
       ),
     );
   }
