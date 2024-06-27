@@ -1,22 +1,20 @@
 name: my_flutter_app
 description: A new Flutter project.
 
-publish_to: 'none'
+publish_to: 'none' # Remove this line if you want to publish to pub.dev
 
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.17.0 <3.0.0'
+  sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.3
-  discord_logger: ^1.0.0 # 최신 버전으로 업데이트
+  discord_logger: ^1.0.0
   dotenv: ^4.2.0
   flutter_dotenv: ^5.0.2
-  assets:
-    - assets/.env
 
 dev_dependencies:
   flutter_test:
@@ -25,3 +23,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  assets:
+    - assets/.env
