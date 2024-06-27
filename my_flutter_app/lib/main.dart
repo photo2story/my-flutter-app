@@ -46,9 +46,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  void _sendDiscordMessage() {
+  void _sendDiscordMessage() async {
     final discord = DiscordLogger.instance;
-    discord.sendMessage("This is a test message from Flutter");
+    debugPrint('Sending message to Discord...'); // 디버그 로그 추가
+    try {
+      await discord.sendMessage("This is a test message from Flutter");
+      debugPrint('Message sent successfully!');
+    } catch (e) {
+      debugPrint('Error sending message: $e');
+    }
   }
 
   @override
