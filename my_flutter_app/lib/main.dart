@@ -4,7 +4,7 @@ import 'package:discord_logger/discord_logger.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  dotenv.load();
+  dotenv.load();  // .env 파일 로드
   runApp(const MyApp());
 }
 
@@ -13,16 +13,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Load Discord credentials from environment variables
-    final discordCredentials = {
-      'channel_id': dotenv.env['DISCORD_CHANNEL_ID'],
-      'token': dotenv.env['DISCORD_APPLICATION_TOKEN'],
-    };
+    // 환경 변수에서 Discord 자격 증명 로드
+    final channelId = dotenv.env['DISCORD_CHANNEL_ID'] ?? '';
+    final botToken = dotenv.env['DISCORD_APPLICATION_TOKEN'] ?? '';
 
-    // Initialize DiscordLogger
+    // DiscordLogger 초기화
     DiscordLogger(
-      channelId: discordCredentials['channel_id'] ?? '',
-      botToken: discordCredentials['token'] ?? '',
+      channelId: channelId,
+      botToken: botToken,
     );
 
     return MaterialApp(
