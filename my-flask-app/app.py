@@ -96,6 +96,14 @@ async def on_ready():
     if channel:
         await channel.send("Bot has logged in successfully!")
 
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    if message.content == "/ping":
+        await message.channel.send("pong")
+
 @bot.command()
 async def ping(ctx):
     await ctx.send('pong')
@@ -114,7 +122,7 @@ def execute_discord_command():
 async def send_ping_command():
     channel = bot.get_channel(int(CHANNEL_ID))
     if channel:
-        await channel.send('/ping')
+        await channel.send("/ping")
     else:
         print(f"Channel not found: {CHANNEL_ID}")
 
@@ -140,6 +148,7 @@ async def main():
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
+
 
 
 
