@@ -143,7 +143,7 @@ cython_debug/
 # Node.js
 node_modules/
 
-# Flutter related files
+# Flutter 관련 파일
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
@@ -152,15 +152,17 @@ node_modules/
 .pub/
 /build/
 */build/
+# 예외 처리
+!my_flutter_app/lib/
 
-# Web related files
+# 웹 관련 파일
 web/renderer/
 build/web/
 
-# macOS related files
+# macOS 관련 파일
 macos/Flutter/ephemeral/
 
-# iOS related files
+# iOS 관련 파일
 ios/Flutter/Flutter.framework
 ios/Flutter/Flutter.podspec
 ios/.symlinks/
@@ -168,32 +170,26 @@ ios/Flutter/Generated.xcconfig
 ios/Flutter/flutter_export_environment.sh
 ios/Flutter/GeneratedPluginRegistrant.*
 
-# Android related files
+# Android 관련 파일
 .android/
 app/**/flutter_export_environment.sh
 
-# VS Code related files
+# VS Code 관련 파일
 .vscode/
 
-# Temporary files
+# 임시 파일
 *.swp
 *.log
 *.lock
 *.tmp
 *.DS_Store
 
-# Environment variable files
+# 환경 변수 파일
 .env
 
-# JetBrains related files
+# JetBrains 관련 파일
 *.iml
 .idea/
 
 # Flutter build directory
-# 예외 적용 - lib 폴더는 포함
-!lib/**
-
-# 기타 예외 처리
-# 만약 특정 파일을 무시해야 한다면 예시처럼 추가:
-# lib/some_file_to_ignore.dart
-# lib/some_directory_to_ignore/
+my_flutter_app/build/
