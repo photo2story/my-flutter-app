@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:dotenv/dotenv.dart' as dotenv;
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // dotenv 패키지 불러오기
 import 'package:discord_logger/discord_logger.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  dotenv.load();  // .env 파일 로드
+  await dotenv.load(fileName: ".env"); // .env 파일 로드
   runApp(const MyApp());
 }
 
