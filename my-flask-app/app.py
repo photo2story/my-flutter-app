@@ -3,13 +3,12 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from flask import Flask, request, jsonify
-import asyncio
-
 from flask_cors import CORS
+import asyncio
+import threading
 
 app = Flask(__name__)
 CORS(app)
-
 
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
@@ -55,9 +54,14 @@ async def run_discord_bot():
 def start_flask_app():
     app.run(debug=False, host='0.0.0.0')
 
+def start_both():
+    loop = asyncio.get_event_loop()
+    loop.create_task(run_discord_bot())
+    threading.Thread(target=start_flask_app).start()
+    loop.run_forever()
+
 if __name__ == '__main__':
-    asyncio.run(run_discord_bot())
-    start_flask_app()
+    start_both()
 
 """
 flutter run -d chrome
