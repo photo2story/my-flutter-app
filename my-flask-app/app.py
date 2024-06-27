@@ -15,7 +15,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # 환경 변수에서 디스코드 토큰과 채널 ID 가져오기
-TOKEN = os.getenv('DISCORD_BOT_TOKEN')
+TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
 
 logging.debug(f'TOKEN: {TOKEN}')
@@ -62,6 +62,7 @@ if __name__ == '__main__':
     else:
         Thread(target=run_discord_bot).start()
         app.run(host=socket.gethostbyname(socket.gethostname()), port=5000)
+
 
 
 """
