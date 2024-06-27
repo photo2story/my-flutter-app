@@ -17,11 +17,15 @@ intents = discord.Intents.default()
 intents.message_content = True  # Message content intent 활성화
 
 bot = commands.Bot(command_prefix='!', intents=intents)
-tree = app_commands.CommandTree(bot)
 
 @bot.event
 async def on_ready():
     print(f'Bot has logged in as {bot.user}')
+    tree = app_commands.CommandTree(bot)
+    @tree.command(name="ping", description="Responds with pong")
+    async def ping_command(interaction: discord.Interaction):
+        await interaction.response.send_message("pong")
+
     await tree.sync()
     print("Synced commands successfully.")
 
@@ -43,12 +47,8 @@ async def send_ping_command():
     else:
         print(f"Channel not found: {CHANNEL_ID}")
 
-@tree.command(name="ping", description="Responds with pong")
-async def ping_command(interaction: discord.Interaction):
-    await interaction.response.send_message("pong")
-
 def run_discord_bot():
-    bot.run(TOKEN)
+    asyncio.run(bot.start(TOKEN))
 
 def start_flask_app():
     app.run(debug=False, host='0.0.0.0')
