@@ -14,16 +14,16 @@ TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
 
 intents = discord.Intents.default()
+intents.message_content = True  # Message content intent 활성화
+
 bot = commands.Bot(command_prefix='!', intents=intents)
+tree = app_commands.CommandTree(bot)
 
 @bot.event
 async def on_ready():
     print(f'Bot has logged in as {bot.user}')
-    try:
-        await bot.tree.sync()
-        print('Synced commands successfully.')
-    except Exception as e:
-        print(f'Failed to sync commands: {e}')
+    await tree.sync()
+    print("Synced commands successfully.")
 
 @app.route('/execute_discord_command', methods=['POST'])
 def execute_discord_command():
@@ -43,39 +43,19 @@ async def send_ping_command():
     else:
         print(f"Channel not found: {CHANNEL_ID}")
 
-@bot.tree.command(name="ping", description="Responds with pong")
+@tree.command(name="ping", description="Responds with pong")
 async def ping_command(interaction: discord.Interaction):
     await interaction.response.send_message("pong")
 
-async def run_discord_bot():
-    async with bot:
-        await bot.start(TOKEN)
+def run_discord_bot():
+    bot.run(TOKEN)
 
 def start_flask_app():
     app.run(debug=False, host='0.0.0.0')
 
-def start_both():
-    loop = asyncio.get_event_loop()
-    loop.create_task(run_discord_bot())
-    threading.Thread(target=start_flask_app).start()
-    loop.run_forever()
-
 if __name__ == '__main__':
-    start_both()
+    discord_thread = threading.Thread(target=run_discord_bot)
+    discord_thread.start()
 
-"""
-flutter run -d chrome
-
-.\.venv\Scripts\activate
-cd..
-cd my-flutter-app/my-flask-app
-python app.py 
-
-npm run build
-heroku login
-git init
-heroku git:remote -a he-react-app
-
-git commit -m "react build"
-git push heroku main
-"""
+    flask_thread = threading.Thread(target=start_flask_app)
+    flask_thread.start()
