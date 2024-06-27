@@ -88,9 +88,6 @@ bot = commands.Bot(command_prefix='/', intents=intents)
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
-    app_info = await bot.application_info()
-    if app_info:
-        print(f'Bot has applications.commands scope: {app_info.flags.applications_commands}')
     # 로그인되었을 때 메시지 전송
     channel = bot.get_channel(int(CHANNEL_ID))
     if channel:
@@ -148,12 +145,6 @@ async def main():
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
-
-
-
-
-
-
 
 
 """
