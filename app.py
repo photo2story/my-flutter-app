@@ -214,13 +214,16 @@ cd..
 cd my-flutter-app/my-flask-app
 python app.py 
 
-npm run build
+
 heroku login
 git init
-heroku git:remote -a he-react-app
+heroku git:remote -a he-flutter-app
 
-git commit -m "react build"
-git push heroku main
+git add .
+git commit -m "Return simple text response for root route"
+git push heroku main  # 또는 git push heroku master
+heroku logs --tai
+
 """
 
 """
