@@ -42,18 +42,6 @@ CORS(app)
 def serve():
     return render_template('index.html')
 
-@app.route('/save_search_history', methods=['POST'])
-def save_search_history():
-    data = request.json
-    stock_name = data.get('stock_name')
-    print(f'Saved {stock_name} to search history.')
-    return jsonify({"success": True})
-
-@app.route('/api/get_tickers', methods=['GET'])
-def get_tickers():
-    tickers = load_tickers()
-    return jsonify(tickers)
-
 @app.route('/send_discord_message', methods=['POST'])
 def send_discord_message():
     data = request.json
@@ -69,6 +57,14 @@ def send_discord_message():
             return jsonify({'status': 'failure', 'error': response.text}), response.status_code
     return jsonify({'status': 'failure', 'error': 'No message provided'}), 400
 
+sent_messages = {}
+
+def reset_sent_messages():
+    global sent_messages
+    sent_messages = {}
+    threading.Timer(10.0, reset_sent_messages).start()
+
+reset_sent_messages()
 
 # Discord 설정
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
