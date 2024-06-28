@@ -49,14 +49,14 @@ class _MyHomePageState extends State<MyHomePage> {
             _resultImageUrl = resultFile['download_url'];
             _message = '';
           });
-          await sendDiscordMessage('$stockTicker 리뷰했습니다.');
+          await sendToFlaskServer('$stockTicker 리뷰했습니다.');
         } else {
           setState(() {
             _comparisonImageUrl = '';
             _resultImageUrl = '';
             _message = '해당 주식 티커에 대한 이미지를 찾을 수 없습니다';
           });
-          await sendDiscordMessage('$stockTicker 리뷰 추가가 필요합니다.');
+          await sendToFlaskServer('$stockTicker 리뷰 추가가 필요합니다.');
         }
       } else {
         setState(() {
@@ -74,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> sendDiscordMessage(String message) async {
+  Future<void> sendToFlaskServer(String message) async {
     final apiUrl = 'http://127.0.0.1:5000/send_discord_message'; // Flask 서버 URL로 수정하세요
     try {
       final response = await http.post(
@@ -84,10 +84,10 @@ class _MyHomePageState extends State<MyHomePage> {
       );
 
       if (response.statusCode != 200) {
-        print('Failed to send Discord message: ${response.statusCode}');
+        print('Failed to send message to Flask server: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error sending Discord message: $e');
+      print('Error sending message to Flask server: $e');
     }
   }
 

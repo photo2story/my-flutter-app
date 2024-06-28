@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify, send_from_directory
+# app.py
+from flask import Flask, request, jsonify, send_from_directory, render_template
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
@@ -8,9 +9,9 @@ import asyncio
 import nest_asyncio
 import requests
 import sys
-import certifi
 import threading
 import logging
+import certifi
 
 # Nest_asyncio 적용
 nest_asyncio.apply()
@@ -34,50 +35,39 @@ os.environ['SSL_CERT_FILE'] = certifi.where()
 # 환경 변수 로드
 load_dotenv()
 
-app = Flask(__name__, static_folder='build')
+app = Flask(__name__, static_folder='static')
 CORS(app)
 
 @app.route('/')
 def serve():
-    return send_from_directory(app.static_folder, 'index.html')
-
-@app.route('/<path:path>')
-def static_proxy(path):
-    return send_from_directory(app.static_folder, path)
+    return render_template('index.html')
 
 @app.route('/save_search_history', methods=['POST'])
 def save_search_history():
     data = request.json
     stock_name = data.get('stock_name')
-    # 여기에 검색 기록을 저장하는 로직을 작성합니다.
-    print(f'Saved {stock_name} to search history.')  # 실제로는 데이터베이스에 저장 등
+    print(f'Saved {stock_name} to search history.')
     return jsonify({"success": True})
-
-@app.route('/api/get_images', methods=['GET'])
-def get_images():
-    image_folder = os.path.join(app.static_folder, 'images')
-    images = []
-    for filename in os.listdir(image_folder):
-        if filename.endswith('.png'):
-            images.append(filename)
-    return jsonify(images)
 
 @app.route('/api/get_tickers', methods=['GET'])
 def get_tickers():
     tickers = load_tickers()
     return jsonify(tickers)
 
-@app.route('/api/estimate_stock', methods=['POST'])
-def estimate_stock_route():
+@app.route('/send_discord_message', methods=['POST'])
+def send_discord_message():
     data = request.json
-    stock_name = data.get('stock_name')
-    start_date = data.get('start_date')
-    end_date = data.get('end_date')
-    
-    # 주식 데이터를 처리하고 결과를 반환합니다.
-    result = estimate_stock(stock_name, start_date, end_date)
-    
-    return jsonify(result)
+    message = data.get('message')
+    if message:
+        payload = {
+            'content': message
+        }
+        response = requests.post(DISCORD_WEBHOOK_URL, json=payload)
+        if response.status_code == 204:
+            return jsonify({'status': 'success'}), 200
+        else:
+            return jsonify({'status': 'failure', 'error': response.text}), response.status_code
+    return jsonify({'status': 'failure', 'error': 'No message provided'}), 400
 
 
 # Discord 설정
@@ -88,7 +78,6 @@ intents = discord.Intents.all()
 intents.message_content = True
 bot = commands.Bot(command_prefix='', intents=intents)
 
-# Backtesting 관련 코드
 stocks = ['QQQ', 'NVDA', 'BAC', 'COIN']
 start_date = "2022-01-01"
 end_date = datetime.today().strftime('%Y-%m-%d')
@@ -208,45 +197,15 @@ def run_discord_bot():
         bot.is_running = True
         bot.run(TOKEN)
 
-# Discord Bot을 별도의 스레드에서 실행
-if not hasattr(threading, 'discord_thread'):
-    discord_thread = threading.Thread(target=run_discord_bot)
-    discord_thread.start()
-    threading.discord_thread = discord_thread
-
-@app.route('/execute_discord_command', methods=['POST'])
-def execute_discord_command():
-    data = request.json
-    stock_name = data.get('stock_name')
-    asyncio.run_coroutine_threadsafe(send_ping_command(stock_name), bot.loop)
-    return jsonify({'success': True})
-
-async def send_ping_command(stock_name):
-    channel = bot.get_channel(int(CHANNEL_ID))
-    await channel.send(f'ping: {stock_name}')
-
-@bot.event
-async def on_ready():
-    if not hasattr(bot, 'is_logged_in'):
-        bot.is_logged_in = True
-        print(f'Logged in as {bot.user.name}')
-        channel = bot.get_channel(int(CHANNEL_ID))
-        if channel:
-            asyncio.run_coroutine_threadsafe(channel.send(f'Bot has successfully logged in: {bot.user.name}'), bot.loop)
-
-def run_discord_bot():
-    if not getattr(bot, 'is_running', False):
-        bot.is_running = True
-        bot.run(TOKEN)
-
 if __name__ == '__main__':
     discord_thread = threading.Thread(target=run_discord_bot)
     discord_thread.start()
-    app.run()
+    app.run(debug=True)
+
 
 
 """
-flutter run
+flutter run -d chrome
 
 .\.venv\Scripts\activate
 cd..
