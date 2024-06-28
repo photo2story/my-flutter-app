@@ -1,15 +1,17 @@
-from flask import Flask, request, jsonify, send_from_directory, render_template
+# app.py
+from flask import Flask, send_from_directory, render_template, request, jsonify
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
 import asyncio
-import nest_asyncio
 import requests
 import sys
+import certifi
 import threading
 import logging
+import nest_asyncio
 
 # Nest_asyncio 적용
 nest_asyncio.apply()
