@@ -1,56 +1,52 @@
-from flask import Flask, request, jsonify, send_from_directory
+# app.py
+from flask import Flask, send_from_directory, render_template, request, jsonify
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
 import asyncio
-import nest_asyncio
 import requests
 import sys
 import certifi
 import threading
 import logging
+import nest_asyncio
 
-# Nest_asyncio 적용
-nest_asyncio.apply()
+logging.basicConfig(level=logging.INFO)
 
-# 콘솔 출력 인코딩을 UTF-8로 설정
 sys.stdout.reconfigure(encoding='utf-8')
-
-# 현재 디렉토리 경로를 시스템 경로에 추가
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 
 from datetime import datetime
-from get_ticker import load_tickers, search_tickers, get_ticker_name, get_ticker_from_korean_name
+import pandas as pd
+import numpy as np
+from get_ticker import load_tickers, search_tickers, get_ticker_name, update_stock_market_csv
 from estimate_stock import estimate_snp, estimate_stock
-from Results_plot import plot_comparison_results
-from Results_plot_mpl import plot_results_mpl
+from Results_plot import plot_comparison_results, plot_results_all
 from get_compare_stock_data import merge_csv_files, load_sector_info
+from Results_plot_mpl import plot_results_mpl
+from get_ticker import get_ticker_from_korean_name
 
-# SSL 인증서 설정
 os.environ['SSL_CERT_FILE'] = certifi.where()
-
-# 환경 변수 로드
 load_dotenv()
 
-app = Flask(__name__, static_folder='build')
+app = Flask(__name__)
 CORS(app)
 
 @app.route('/')
-def serve():
-    return send_from_directory(app.static_folder, 'index.html')
+def index():
+    return render_template('index.html')
 
-@app.route('/<path:path>')
-def static_proxy(path):
-    return send_from_directory(app.static_folder, path)
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    return send_from_directory('static', filename)
 
 @app.route('/save_search_history', methods=['POST'])
 def save_search_history():
     data = request.json
     stock_name = data.get('stock_name')
-    # 여기에 검색 기록을 저장하는 로직을 작성합니다.
-    print(f'Saved {stock_name} to search history.')  # 실제로는 데이터베이스에 저장 등
+    print(f'Saved {stock_name} to search history.')
     return jsonify({"success": True})
 
 @app.route('/api/get_images', methods=['GET'])
@@ -62,25 +58,15 @@ def get_images():
             images.append(filename)
     return jsonify(images)
 
-@app.route('/api/get_tickers', methods=['GET'])
-def get_tickers():
-    tickers = load_tickers()
-    return jsonify(tickers)
+sent_messages = {}
 
-@app.route('/api/estimate_stock', methods=['POST'])
-def estimate_stock_route():
-    data = request.json
-    stock_name = data.get('stock_name')
-    start_date = data.get('start_date')
-    end_date = data.get('end_date')
-    
-    # 주식 데이터를 처리하고 결과를 반환합니다.
-    result = estimate_stock(stock_name, start_date, end_date)
-    
-    return jsonify(result)
+def reset_sent_messages():
+    global sent_messages
+    sent_messages = {}
+    threading.Timer(10.0, reset_sent_messages).start()
 
+reset_sent_messages()
 
-# Discord 설정
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
 
@@ -88,12 +74,14 @@ intents = discord.Intents.all()
 intents.message_content = True
 bot = commands.Bot(command_prefix='', intents=intents)
 
-# Backtesting 관련 코드
 stocks = ['QQQ', 'NVDA', 'BAC', 'COIN']
 start_date = "2022-01-01"
 end_date = datetime.today().strftime('%Y-%m-%d')
 initial_investment = 30000000
 monthly_investment = 1000000
+
+processed_message_ids = set()
+login_once_flag = False  # 로그인 중복을 방지하기 위한 플래그
 
 async def backtest_and_send(ctx, stock, option_strategy):
     total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df = estimate_stock(
@@ -124,7 +112,6 @@ async def backtest_and_send(ctx, stock, option_strategy):
 
 @bot.command()
 async def buddy(ctx):
-    loop = asyncio.get_running_loop()
     for stock in stocks:
         await backtest_and_send(ctx, stock, 'modified_monthly')
         plot_results_mpl(stock, start_date, end_date)
@@ -192,8 +179,9 @@ async def show_all(ctx):
 
 @bot.event
 async def on_ready():
-    if not hasattr(bot, 'is_logged_in'):
-        bot.is_logged_in = True
+    global login_once_flag
+    if not login_once_flag:
+        login_once_flag = True
         print(f'Logged in as {bot.user.name}')
         channel = bot.get_channel(int(CHANNEL_ID))
         if channel:
@@ -201,48 +189,25 @@ async def on_ready():
 
 @bot.command()
 async def ping(ctx):
-    await ctx.send(f'pong: {bot.user.name}')
-
-def run_discord_bot():
-    if not getattr(bot, 'is_running', False):
-        bot.is_running = True
-        bot.run(TOKEN)
-
-# Discord Bot을 별도의 스레드에서 실행
-if not hasattr(threading, 'discord_thread'):
-    discord_thread = threading.Thread(target=run_discord_bot)
-    discord_thread.start()
-    threading.discord_thread = discord_thread
-
-@app.route('/execute_discord_command', methods=['POST'])
-def execute_discord_command():
-    data = request.json
-    stock_name = data.get('stock_name')
-    asyncio.run_coroutine_threadsafe(send_ping_command(stock_name), bot.loop)
-    return jsonify({'success': True})
-
-async def send_ping_command(stock_name):
-    channel = bot.get_channel(int(CHANNEL_ID))
-    await channel.send(f'ping: {stock_name}')
-
-@bot.event
-async def on_ready():
-    if not hasattr(bot, 'is_logged_in'):
-        bot.is_logged_in = True
-        print(f'Logged in as {bot.user.name}')
-        channel = bot.get_channel(int(CHANNEL_ID))
-        if channel:
-            asyncio.run_coroutine_threadsafe(channel.send(f'Bot has successfully logged in: {bot.user.name}'), bot.loop)
-
-def run_discord_bot():
-    if not getattr(bot, 'is_running', False):
-        bot.is_running = True
-        bot.run(TOKEN)
+    if ctx.message.id not in processed_message_ids:
+        processed_message_ids.add(ctx.message.id)
+        await ctx.send(f'pong: {bot.user.name}')
 
 if __name__ == '__main__':
-    discord_thread = threading.Thread(target=run_discord_bot)
-    discord_thread.start()
-    app.run()
+    nest_asyncio.apply()
+    
+    loop = asyncio.get_event_loop()
+
+    async def run():
+        await bot.start(TOKEN)
+    
+    def run_flask():
+        app.run(debug=True, use_reloader=False)
+
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.start()
+
+    loop.run_until_complete(run())
 
 
 """
