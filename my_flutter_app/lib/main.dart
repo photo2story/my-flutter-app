@@ -27,14 +27,15 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _response = '';
 
-  Future<void> sendPing() async {
+  Future<void> sendCommand() async {
     final response = await http.post(
       Uri.parse('http://127.0.0.1:5000/execute_discord_command'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
-        'message': 'ping',
+        'command': 'stock',
+        'stock_name': 'aapl',
       }),
     );
 
@@ -57,8 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
               'Response: $_response',
             ),
             ElevatedButton(
-              onPressed: sendPing,
-              child: Text('Send Ping to Discord'),
+              onPressed: sendCommand,
+              child: Text('Send Stock Command to Discord'),
             ),
           ],
         ),
