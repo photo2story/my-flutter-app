@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Stock Comparison Review',
+      title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -25,136 +25,42 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _comparisonImageUrl = '';
-  String _resultImageUrl = '';
-  String _message = '';
-  final TextEditingController _controller = TextEditingController();
+  String _response = '';
 
-  Future<void> fetchImages(String stockTicker) async {
-    final apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/my-flask-app';
-    try {
-      final response = await http.get(Uri.parse(apiUrl));
-      if (response.statusCode == 200) {
-        final List<dynamic> files = json.decode(response.body);
-        final comparisonFile = files.firstWhere(
-            (file) => file['name'] == 'comparison_${stockTicker}_VOO.png',
-            orElse: () => null);
-        final resultFile = files.firstWhere(
-            (file) => file['name'] == 'result_mpl_${stockTicker}.png',
-            orElse: () => null);
+  Future<void> sendPing() async {
+    final response = await http.post(
+      Uri.parse('http://127.0.0.1:5000/execute_discord_command'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'stock_name': 'AAPL',
+      }),
+    );
 
-        if (comparisonFile != null && resultFile != null) {
-          setState(() {
-            _comparisonImageUrl = comparisonFile['download_url'];
-            _resultImageUrl = resultFile['download_url'];
-            _message = '';
-          });
-          await sendToFlaskServer('$stockTicker 리뷰했습니다.');
-        } else {
-          setState(() {
-            _comparisonImageUrl = '';
-            _resultImageUrl = '';
-            _message = '해당 주식 티커에 대한 이미지를 찾을 수 없습니다';
-          });
-          await sendToFlaskServer('$stockTicker 리뷰 추가가 필요합니다.');
-        }
-      } else {
-        setState(() {
-          _comparisonImageUrl = '';
-          _resultImageUrl = '';
-          _message = 'GitHub API 호출 실패: ${response.statusCode}';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _comparisonImageUrl = '';
-        _resultImageUrl = '';
-        _message = '오류 발생: $e';
-      });
-    }
-  }
-
-  Future<void> sendToFlaskServer(String message) async {
-    final apiUrl = 'http://127.0.0.1:5000/send_discord_message'; // Flask 서버 URL로 수정하세요
-    try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'message': message}),
-      );
-
-      if (response.statusCode != 200) {
-        print('Failed to send message to Flask server: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error sending message to Flask server: $e');
-    }
+    setState(() {
+      _response = response.body;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Stock Comparison Review'),
+        title: Text('Flutter Demo Home Page'),
       ),
       body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: _controller,
-                  textCapitalization: TextCapitalization.characters,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Enter Stock Ticker',
-                  ),
-                  onChanged: (value) {
-                    _controller.value = TextEditingValue(
-                      text: value.toUpperCase(),
-                      selection: _controller.selection,
-                    );
-                  },
-                  onSubmitted: (value) {
-                    fetchImages(_controller.text.toUpperCase());
-                  },
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  fetchImages(_controller.text.toUpperCase());
-                },
-                child: Text('Fetch Stock Images'),
-              ),
-              SizedBox(height: 20),
-              _comparisonImageUrl.isNotEmpty
-                  ? Image.network(
-                      _comparisonImageUrl,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Text('Failed to load comparison image');
-                      },
-                    )
-                  : Container(),
-              SizedBox(height: 20),
-              _resultImageUrl.isNotEmpty
-                  ? Image.network(
-                      _resultImageUrl,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Text('Failed to load result image');
-                      },
-                    )
-                  : Container(),
-              SizedBox(height: 20),
-              _message.isNotEmpty
-                  ? Text(
-                      _message,
-                      style: TextStyle(fontSize: 16, color: Colors.red),
-                    )
-                  : Container(),
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Response: $_response',
+            ),
+            ElevatedButton(
+              onPressed: sendPing,
+              child: Text('Send Ping to Discord'),
+            ),
+          ],
         ),
       ),
     );
