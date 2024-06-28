@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 void main() {
   runApp(MyApp());
@@ -25,38 +23,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _response = '';
   String _imageUrl = '';
+  String _message = '';
   final TextEditingController _controller = TextEditingController();
 
-  Future<void> sendStockRequest(String stockName) async {
-    try {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:5000/execute_discord_command'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'command': 'stock',
-          'stock_name': stockName,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        setState(() {
-          _response = response.body;
-          _imageUrl = 'https://github.com/photo2story/my-flutter-app/blob/main/my-flask-app/comparison_${stockName.toUpperCase()}_VOO.png?raw=true';
-        });
-      } else {
-        setState(() {
-          _response = 'Error: ${response.statusCode} ${response.reasonPhrase}';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _response = 'Exception: $e';
-      });
-    }
+  void updateImageUrl(String stockName) {
+    setState(() {
+      _imageUrl = 'https://github.com/photo2story/my-flutter-app/blob/main/my-flask-app/comparison_${stockName.toUpperCase()}_VOO.png?raw=true';
+      _message = '';
+    });
   }
 
   @override
@@ -73,6 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.all(8.0),
               child: TextField(
                 controller: _controller,
+                textCapitalization: TextCapitalization.characters,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Enter Stock Ticker',
@@ -81,17 +57,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ElevatedButton(
               onPressed: () {
-                sendStockRequest(_controller.text);
+                updateImageUrl(_controller.text);
               },
-              child: Text('Send Stock Request'),
+              child: Text('Get Stock Image'),
             ),
-            SizedBox(height: 20),
-            _response.isNotEmpty
-                ? Text(
-                    'Response: $_response',
-                    style: TextStyle(fontSize: 16),
-                  )
-                : Container(),
             SizedBox(height: 20),
             _imageUrl.isNotEmpty
                 ? Image.network(
@@ -99,6 +68,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     errorBuilder: (context, error, stackTrace) {
                       return Text('Failed to load image');
                     },
+                  )
+                : Container(),
+            SizedBox(height: 20),
+            _message.isNotEmpty
+                ? Text(
+                    _message,
+                    style: TextStyle(fontSize: 16, color: Colors.red),
                   )
                 : Container(),
           ],
