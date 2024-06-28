@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(MyApp());
@@ -27,11 +29,38 @@ class _MyHomePageState extends State<MyHomePage> {
   String _message = '';
   final TextEditingController _controller = TextEditingController();
 
-  void updateImageUrl(String stockName) {
-    setState(() {
-      _imageUrl = 'https://github.com/photo2story/my-flutter-app/blob/main/my-flask-app/comparison_${stockName.toUpperCase()}_VOO.png?raw=true';
-      _message = '';
-    });
+  Future<void> checkImageExists(String stockName) async {
+    final apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/my-flask-app';
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        final List<dynamic> files = json.decode(response.body);
+        final imageFileName = 'comparison_${stockName.toUpperCase()}_VOO.png';
+        final fileExists = files.any((file) => file['name'] == imageFileName);
+
+        if (fileExists) {
+          setState(() {
+            _imageUrl = 'https://github.com/photo2story/my-flutter-app/blob/main/my-flask-app/$imageFileName?raw=true';
+            _message = '';
+          });
+        } else {
+          setState(() {
+            _imageUrl = '';
+            _message = '이미지를 불러올 수 없습니다';
+          });
+        }
+      } else {
+        setState(() {
+          _imageUrl = '';
+          _message = 'GitHub API 호출 실패: ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _imageUrl = '';
+        _message = '오류 발생: $e';
+      });
+    }
   }
 
   @override
@@ -57,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ElevatedButton(
               onPressed: () {
-                updateImageUrl(_controller.text);
+                checkImageExists(_controller.text);
               },
               child: Text('Get Stock Image'),
             ),
