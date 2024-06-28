@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       } else {
         setState(() {
-          _message = 'Failed to send message to Discord.';
+          _message = 'Failed to send message to Discord. Status code: ${response.statusCode}';
         });
       }
     } catch (e) {
