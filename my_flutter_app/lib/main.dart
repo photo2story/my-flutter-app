@@ -25,39 +25,48 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _imageUrl = '';
+  String _comparisonImageUrl = '';
+  String _resultImageUrl = '';
   String _message = '';
   final TextEditingController _controller = TextEditingController();
 
-  Future<void> fetchGitHubFiles() async {
+  Future<void> fetchImages(String stockTicker) async {
     final apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/my-flask-app';
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
         final List<dynamic> files = json.decode(response.body);
-        final pngFiles = files.where((file) => file['name'].endsWith('.png')).toList();
-        if (pngFiles.isNotEmpty) {
-          final firstPngFile = pngFiles[0];
-          final imageUrl = firstPngFile['download_url'];
+        final comparisonFile = files.firstWhere(
+            (file) => file['name'] == 'comparison_${stockTicker}_VOO.png',
+            orElse: () => null);
+        final resultFile = files.firstWhere(
+            (file) => file['name'] == 'result_mpl_${stockTicker}.png',
+            orElse: () => null);
+
+        if (comparisonFile != null && resultFile != null) {
           setState(() {
-            _imageUrl = imageUrl;
+            _comparisonImageUrl = comparisonFile['download_url'];
+            _resultImageUrl = resultFile['download_url'];
             _message = '';
           });
         } else {
           setState(() {
-            _imageUrl = '';
-            _message = 'PNG 파일이 없습니다';
+            _comparisonImageUrl = '';
+            _resultImageUrl = '';
+            _message = '해당 주식 티커에 대한 이미지를 찾을 수 없습니다';
           });
         }
       } else {
         setState(() {
-          _imageUrl = '';
+          _comparisonImageUrl = '';
+          _resultImageUrl = '';
           _message = 'GitHub API 호출 실패: ${response.statusCode}';
         });
       }
     } catch (e) {
       setState(() {
-        _imageUrl = '';
+        _comparisonImageUrl = '';
+        _resultImageUrl = '';
         _message = '오류 발생: $e';
       });
     }
@@ -83,20 +92,32 @@ class _MyHomePageState extends State<MyHomePage> {
                     border: OutlineInputBorder(),
                     labelText: 'Enter Stock Ticker',
                   ),
+                  onSubmitted: (value) {
+                    fetchImages(_controller.text.toUpperCase());
+                  },
                 ),
               ),
               ElevatedButton(
                 onPressed: () {
-                  fetchGitHubFiles();
+                  fetchImages(_controller.text.toUpperCase());
                 },
-                child: Text('Fetch GitHub Files'),
+                child: Text('Fetch Stock Images'),
               ),
               SizedBox(height: 20),
-              _imageUrl.isNotEmpty
+              _comparisonImageUrl.isNotEmpty
                   ? Image.network(
-                      _imageUrl,
+                      _comparisonImageUrl,
                       errorBuilder: (context, error, stackTrace) {
-                        return Text('Failed to load image');
+                        return Text('Failed to load comparison image');
+                      },
+                    )
+                  : Container(),
+              SizedBox(height: 20),
+              _resultImageUrl.isNotEmpty
+                  ? Image.network(
+                      _resultImageUrl,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Text('Failed to load result image');
                       },
                     )
                   : Container(),
