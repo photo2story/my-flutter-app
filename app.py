@@ -30,6 +30,9 @@ from get_ticker import get_ticker_from_korean_name
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 load_dotenv()
+print(os.getenv('DISCORD_WEBHOOK_URL'))
+print(os.getenv('DISCORD_APPLICATION_TOKEN'))
+print(os.getenv('DISCORD_CHANNEL_ID'))
 
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
@@ -204,3 +207,4 @@ if __name__ == '__main__':
     flask_thread.start()
 
     loop.run_until_complete(run())
+    
