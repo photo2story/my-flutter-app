@@ -25,39 +25,30 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _imageUrl = '';
+  String _fileList = '';
   String _message = '';
   final TextEditingController _controller = TextEditingController();
 
-  Future<void> checkImageExists(String stockName) async {
+  Future<void> fetchGitHubFiles() async {
     final apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/my-flask-app';
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
         final List<dynamic> files = json.decode(response.body);
-        final imageFileName = 'comparison_${stockName.toUpperCase()}_VOO.png';
-        final fileExists = files.any((file) => file['name'] == imageFileName);
-
-        if (fileExists) {
-          setState(() {
-            _imageUrl = 'https://github.com/photo2story/my-flutter-app/blob/main/my-flask-app/$imageFileName?raw=true';
-            _message = '';
-          });
-        } else {
-          setState(() {
-            _imageUrl = '';
-            _message = '이미지를 불러올 수 없습니다';
-          });
-        }
+        final fileNames = files.map((file) => file['name']).join('\n');
+        setState(() {
+          _fileList = fileNames;
+          _message = '';
+        });
       } else {
         setState(() {
-          _imageUrl = '';
+          _fileList = '';
           _message = 'GitHub API 호출 실패: ${response.statusCode}';
         });
       }
     } catch (e) {
       setState(() {
-        _imageUrl = '';
+        _fileList = '';
         _message = '오류 발생: $e';
       });
     }
@@ -86,17 +77,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ElevatedButton(
               onPressed: () {
-                checkImageExists(_controller.text);
+                fetchGitHubFiles();
               },
-              child: Text('Get Stock Image'),
+              child: Text('Fetch GitHub Files'),
             ),
             SizedBox(height: 20),
-            _imageUrl.isNotEmpty
-                ? Image.network(
-                    _imageUrl,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Text('Failed to load image');
-                    },
+            _fileList.isNotEmpty
+                ? Text(
+                    'GitHub Files:\n$_fileList',
+                    style: TextStyle(fontSize: 16),
                   )
                 : Container(),
             SizedBox(height: 20),
