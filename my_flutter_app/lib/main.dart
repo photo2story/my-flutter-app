@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Stock Comparison Review',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -26,8 +26,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _response = '';
+  String _imageUrl = '';
 
-  Future<void> sendCommand() async {
+  final TextEditingController _controller = TextEditingController();
+
+  Future<void> sendStockRequest(String stockName) async {
     final response = await http.post(
       Uri.parse('http://127.0.0.1:5000/execute_discord_command'),
       headers: <String, String>{
@@ -35,32 +38,64 @@ class _MyHomePageState extends State<MyHomePage> {
       },
       body: jsonEncode(<String, String>{
         'command': 'stock',
-        'stock_name': 'aapl',
+        'stock_name': stockName,
       }),
     );
 
-    setState(() {
-      _response = response.body;
-    });
+    if (response.statusCode == 200) {
+      setState(() {
+        _response = response.body;
+        _imageUrl = 'http://127.0.0.1:5000/static/images/comparison_${stockName.toUpperCase()}_VOO.png';
+      });
+    } else {
+      setState(() {
+        _response = 'Error: ${response.reasonPhrase}';
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter Demo Home Page'),
+        title: Text('Stock Comparison Review'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Response: $_response',
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: _controller,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Enter Stock Ticker',
+                ),
+              ),
             ),
             ElevatedButton(
-              onPressed: sendCommand,
-              child: Text('Send Stock Command to Discord'),
+              onPressed: () {
+                sendStockRequest(_controller.text);
+              },
+              child: Text('Send Stock Request'),
             ),
+            SizedBox(height: 20),
+            _response.isNotEmpty
+                ? Text(
+                    'Response: $_response',
+                    style: TextStyle(fontSize: 16),
+                  )
+                : Container(),
+            SizedBox(height: 20),
+            _imageUrl.isNotEmpty
+                ? Image.network(
+                    _imageUrl,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Text('Failed to load image');
+                    },
+                  )
+                : Container(),
           ],
         ),
       ),
