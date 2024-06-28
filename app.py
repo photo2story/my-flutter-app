@@ -222,7 +222,7 @@ heroku git:remote -a he-flutter-app
 git add .
 git commit -m "Return simple text response for root route"
 git push heroku main  # 또는 git push heroku master
-heroku logs --tai
+heroku logs --tail
 
 """
 
