@@ -1,6 +1,5 @@
-# app.py
 from flask import Flask, send_from_directory, render_template, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS  # Flask-CORS 패키지 임포트
 import os
 from dotenv import load_dotenv
 import discord
@@ -32,7 +31,7 @@ os.environ['SSL_CERT_FILE'] = certifi.where()
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app)  # CORS 설정 추가
 
 @app.route('/')
 def index():
@@ -208,6 +207,7 @@ if __name__ == '__main__':
     flask_thread.start()
 
     loop.run_until_complete(run())
+
 
 
 """
