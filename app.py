@@ -192,6 +192,14 @@ def send_discord_message():
             return jsonify({'status': 'failure', 'error': response.text}), response.status_code
     return jsonify({'status': 'failure', 'error': 'No message provided'}), 400
 
+@app.route('/check_env')
+def check_env():
+    webhook_url = os.getenv('DISCORD_WEBHOOK_URL')
+    token = os.getenv('DISCORD_APPLICATION_TOKEN')
+    channel_id = os.getenv('DISCORD_CHANNEL_ID')
+    return f"DISCORD_WEBHOOK_URL: {webhook_url}<br>DISCORD_APPLICATION_TOKEN: {token}<br>DISCORD_CHANNEL_ID: {channel_id}"
+
+
 if __name__ == '__main__':
     nest_asyncio.apply()
     
