@@ -25,7 +25,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _fileList = '';
+  String _imageUrl = '';
   String _message = '';
   final TextEditingController _controller = TextEditingController();
 
@@ -35,20 +35,27 @@ class _MyHomePageState extends State<MyHomePage> {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
         final List<dynamic> files = json.decode(response.body);
-        final pngFiles = files.where((file) => file['name'].endsWith('.png')).map((file) => file['name']).join('\n');
-        setState(() {
-          _fileList = pngFiles;
-          _message = '';
-        });
+        final pngFiles = files.where((file) => file['name'].endsWith('.png')).map((file) => file['name']).toList();
+        if (pngFiles.isNotEmpty) {
+          setState(() {
+            _imageUrl = 'https://github.com/photo2story/my-flutter-app/blob/main/my-flask-app/${pngFiles[0]}?raw=true';
+            _message = '';
+          });
+        } else {
+          setState(() {
+            _imageUrl = '';
+            _message = 'PNG 파일이 없습니다';
+          });
+        }
       } else {
         setState(() {
-          _fileList = '';
+          _imageUrl = '';
           _message = 'GitHub API 호출 실패: ${response.statusCode}';
         });
       }
     } catch (e) {
       setState(() {
-        _fileList = '';
+        _imageUrl = '';
         _message = '오류 발생: $e';
       });
     }
@@ -83,10 +90,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text('Fetch GitHub Files'),
               ),
               SizedBox(height: 20),
-              _fileList.isNotEmpty
-                  ? Text(
-                      'GitHub PNG Files:\n$_fileList',
-                      style: TextStyle(fontSize: 16),
+              _imageUrl.isNotEmpty
+                  ? Image.network(
+                      _imageUrl,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Text('Failed to load image');
+                      },
                     )
                   : Container(),
               SizedBox(height: 20),
