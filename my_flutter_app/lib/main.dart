@@ -35,10 +35,14 @@ class _MyHomePageState extends State<MyHomePage> {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
         final List<dynamic> files = json.decode(response.body);
+        print('GitHub API Response: $files'); // 파일 목록을 로그에 출력
         final pngFiles = files.where((file) => file['name'].endsWith('.png')).map((file) => file['name']).toList();
         if (pngFiles.isNotEmpty) {
+          final firstPngFile = pngFiles[0];
+          final imageUrl = 'https://github.com/photo2story/my-flutter-app/blob/main/my-flask-app/$firstPngFile?raw=true';
+          print('Image URL: $imageUrl'); // 생성된 이미지 URL을 로그에 출력
           setState(() {
-            _imageUrl = 'https://github.com/photo2story/my-flutter-app/blob/main/my-flask-app/${pngFiles[0]}?raw=true';
+            _imageUrl = imageUrl;
             _message = '';
           });
         } else {
