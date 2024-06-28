@@ -27,29 +27,34 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _response = '';
   String _imageUrl = '';
-
   final TextEditingController _controller = TextEditingController();
 
   Future<void> sendStockRequest(String stockName) async {
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:5000/execute_discord_command'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'command': 'stock',
-        'stock_name': stockName,
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:5000/execute_discord_command'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'command': 'stock',
+          'stock_name': stockName,
+        }),
+      );
 
-    if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
+        setState(() {
+          _response = response.body;
+          _imageUrl = 'https://github.com/photo2story/my-flutter-app/blob/main/my-flask-app/comparison_${stockName.toUpperCase()}_VOO.png?raw=true';
+        });
+      } else {
+        setState(() {
+          _response = 'Error: ${response.statusCode} ${response.reasonPhrase}';
+        });
+      }
+    } catch (e) {
       setState(() {
-        _response = response.body;
-        _imageUrl = 'http://127.0.0.1:5000/static/images/comparison_${stockName.toUpperCase()}_VOO.png';
-      });
-    } else {
-      setState(() {
-        _response = 'Error: ${response.reasonPhrase}';
+        _response = 'Exception: $e';
       });
     }
   }
