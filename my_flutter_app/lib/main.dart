@@ -35,9 +35,9 @@ class _MyHomePageState extends State<MyHomePage> {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
         final List<dynamic> files = json.decode(response.body);
-        final fileNames = files.map((file) => file['name']).join('\n');
+        final pngFiles = files.where((file) => file['name'].endsWith('.png')).map((file) => file['name']).join('\n');
         setState(() {
-          _fileList = fileNames;
+          _fileList = pngFiles;
           _message = '';
         });
       } else {
@@ -61,41 +61,43 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('Stock Comparison Review'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _controller,
-                textCapitalization: TextCapitalization.characters,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Enter Stock Ticker',
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _controller,
+                  textCapitalization: TextCapitalization.characters,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Enter Stock Ticker',
+                  ),
                 ),
               ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                fetchGitHubFiles();
-              },
-              child: Text('Fetch GitHub Files'),
-            ),
-            SizedBox(height: 20),
-            _fileList.isNotEmpty
-                ? Text(
-                    'GitHub Files:\n$_fileList',
-                    style: TextStyle(fontSize: 16),
-                  )
-                : Container(),
-            SizedBox(height: 20),
-            _message.isNotEmpty
-                ? Text(
-                    _message,
-                    style: TextStyle(fontSize: 16, color: Colors.red),
-                  )
-                : Container(),
-          ],
+              ElevatedButton(
+                onPressed: () {
+                  fetchGitHubFiles();
+                },
+                child: Text('Fetch GitHub Files'),
+              ),
+              SizedBox(height: 20),
+              _fileList.isNotEmpty
+                  ? Text(
+                      'GitHub PNG Files:\n$_fileList',
+                      style: TextStyle(fontSize: 16),
+                    )
+                  : Container(),
+              SizedBox(height: 20),
+              _message.isNotEmpty
+                  ? Text(
+                      _message,
+                      style: TextStyle(fontSize: 16, color: Colors.red),
+                    )
+                  : Container(),
+            ],
+          ),
         ),
       ),
     );
