@@ -30,8 +30,6 @@ class _MyHomePageState extends State<MyHomePage> {
   String _message = '';
   final TextEditingController _controller = TextEditingController();
 
-  final String discordWebhookUrl = 'YOUR_DISCORD_WEBHOOK_URL'; // 여기에 Discord 웹훅 URL을 입력하세요
-
   Future<void> fetchImages(String stockTicker) async {
     final apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/my-flask-app';
     try {
@@ -77,14 +75,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> sendDiscordMessage(String message) async {
+    final apiUrl = 'http://127.0.0.1:5000/send_discord_message'; // Flask 서버 URL로 수정하세요
     try {
       final response = await http.post(
-        Uri.parse(discordWebhookUrl),
+        Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'content': message}),
+        body: jsonEncode({'message': message}),
       );
 
-      if (response.statusCode != 204) {
+      if (response.statusCode != 200) {
         print('Failed to send Discord message: ${response.statusCode}');
       }
     } catch (e) {
@@ -112,6 +111,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     border: OutlineInputBorder(),
                     labelText: 'Enter Stock Ticker',
                   ),
+                  onChanged: (value) {
+                    _controller.value = TextEditingValue(
+                      text: value.toUpperCase(),
+                      selection: _controller.selection,
+                    );
+                  },
                   onSubmitted: (value) {
                     fetchImages(_controller.text.toUpperCase());
                   },

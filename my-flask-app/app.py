@@ -54,16 +54,20 @@ def get_tickers():
     tickers = load_tickers()
     return jsonify(tickers)
 
-@app.route('/api/estimate_stock', methods=['POST'])
-def estimate_stock_route():
+@app.route('/send_discord_message', methods=['POST'])
+def send_discord_message():
     data = request.json
-    stock_name = data.get('stock_name')
-    start_date = data.get('start_date')
-    end_date = data.get('end_date')
-    
-    result = estimate_stock(stock_name, start_date, end_date)
-    
-    return jsonify(result)
+    message = data.get('message')
+    if message:
+        payload = {
+            'content': message
+        }
+        response = requests.post(DISCORD_WEBHOOK_URL, json=payload)
+        if response.status_code == 204:
+            return jsonify({'status': 'success'}), 200
+        else:
+            return jsonify({'status': 'failure', 'error': response.text}), response.status_code
+    return jsonify({'status': 'failure', 'error': 'No message provided'}), 400
 
 
 # Discord 설정
