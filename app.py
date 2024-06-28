@@ -1,15 +1,17 @@
-import os
-import certifi
-import logging
-import threading
-import nest_asyncio
-from flask import Flask, request, jsonify
+# app.py
+from flask import Flask, request, jsonify, send_from_directory, render_template
 from flask_cors import CORS
+import os
 from dotenv import load_dotenv
+import discord
 from discord.ext import commands
 import asyncio
+import nest_asyncio
 import requests
 import sys
+import threading
+import logging
+import certifi
 
 # 로그 설정
 logging.basicConfig(level=logging.INFO)
