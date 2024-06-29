@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
+import nest_asyncio
 import threading
 import asyncio
 
@@ -34,11 +35,14 @@ async def on_ready():
     channel = bot.get_channel(int(CHANNEL_ID))
     if channel:
         await channel.send(f'Bot has successfully logged in: {bot.user.name}')
+    else:
+        print(f'Could not find channel with ID: {CHANNEL_ID}')
 
 def start_flask():
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
 if __name__ == '__main__':
+    nest_asyncio.apply()
     loop = asyncio.get_event_loop()
 
     def run_discord_bot():
