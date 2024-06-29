@@ -25,10 +25,6 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-@bot.command()
-async def ping(ctx):
-    await ctx.send(f'pong: {bot.user.name}')
-
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
@@ -37,6 +33,10 @@ async def on_ready():
         await channel.send(f'Bot has successfully logged in: {bot.user.name}')
     else:
         print(f'Could not find channel with ID: {CHANNEL_ID}')
+
+@bot.command()
+async def ping(ctx):
+    await ctx.send(f'pong: {bot.user.name}')
 
 def start_flask():
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
