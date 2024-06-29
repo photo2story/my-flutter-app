@@ -3,9 +3,9 @@ import os
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
-import asyncio
 import nest_asyncio
 import threading
+import asyncio
 
 # 환경 변수 로드
 load_dotenv()
@@ -37,18 +37,20 @@ async def on_ready():
         await channel.send(f'Bot has successfully logged in: {bot.user.name}')
 
 # 비동기 루프 설정
+def start_flask():
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
 if __name__ == '__main__':
     nest_asyncio.apply()
-    
     loop = asyncio.get_event_loop()
 
-    async def run():
-        await bot.start(TOKEN)
-    
-    def run_flask():
-        app.run(debug=True, use_reloader=False)
+    def run_discord_bot():
+        asyncio.run(bot.start(TOKEN))
 
-    flask_thread = threading.Thread(target=run_flask)
+    flask_thread = threading.Thread(target=start_flask)
     flask_thread.start()
 
-    loop.run_until_complete(run())
+    try:
+        loop.run_until_complete(run_discord_bot())
+    except KeyboardInterrupt:
+        loop.run_until_complete(bot.close())
