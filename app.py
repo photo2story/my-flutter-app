@@ -1,7 +1,13 @@
 import os
+import sys
 import asyncio
 from flask import Flask, jsonify
 from datetime import datetime
+
+# 현재 디렉토리 경로를 시스템 경로에 추가
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
+
+# 모듈 임포트
 from get_ticker import load_tickers, search_tickers, get_ticker_name, get_ticker_from_korean_name
 from estimate_stock import estimate_snp, estimate_stock
 from Results_plot import plot_comparison_results
