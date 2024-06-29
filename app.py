@@ -7,20 +7,26 @@ import nest_asyncio
 import threading
 import asyncio
 import logging
+import certifi
+from flask_cors import CORS
 
 # Load environment variables
 load_dotenv()
 
-# Flask app setup
-app = Flask(__name__)
-
-@app.route('/')
-def index():
-    return "API is running", 200
+# Set the SSL certificate file environment variable
+os.environ['SSL_CERT_FILE'] = certifi.where()
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Flask app setup
+app = Flask(__name__)
+CORS(app)
+
+@app.route('/')
+def index():
+    return "API is running", 200
 
 # Discord bot setup
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
@@ -60,3 +66,5 @@ if __name__ == '__main__':
         loop.run_until_complete(run_discord_bot())
     except KeyboardInterrupt:
         loop.run_until_complete(bot.close())
+    except Exception as e:
+        logger.exception(f'An error occurred: {e}')
