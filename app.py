@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask
 import os
 from dotenv import load_dotenv
 import discord
@@ -6,14 +6,8 @@ from discord.ext import commands
 import asyncio
 import nest_asyncio
 import threading
-import logging
-import certifi
-
-# 로그 설정
-logging.basicConfig(level=logging.INFO)
 
 # 환경 변수 로드
-os.environ['SSL_CERT_FILE'] = certifi.where()
 load_dotenv()
 
 # Flask 애플리케이션 설정
