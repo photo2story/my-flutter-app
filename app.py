@@ -5,7 +5,7 @@ from flask import Flask, jsonify
 from datetime import datetime
 
 # 현재 디렉토리 경로를 시스템 경로에 추가
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
 
 # 모듈 임포트
 from get_ticker import load_tickers, search_tickers, get_ticker_name, get_ticker_from_korean_name
@@ -48,4 +48,5 @@ def run_backtest():
     return jsonify({"message": "Backtesting completed and results have been processed."})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
