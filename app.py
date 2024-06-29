@@ -1,70 +1,42 @@
-from flask import Flask
 import os
-from dotenv import load_dotenv
-import discord
-from discord.ext import commands
-import nest_asyncio
-import threading
+import sys
 import asyncio
-import logging
-import certifi
-from flask_cors import CORS
+from datetime import datetime
+import matplotlib.pyplot as plt
+from flask import Flask
 
-# Load environment variables
-load_dotenv()
+# 현재 디렉토리 경로를 시스템 경로에 추가
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 
-# Set the SSL certificate file environment variable
-os.environ['SSL_CERT_FILE'] = certifi.where()
+# 필요한 모듈을 가져오기
+from Data_export import backtest_and_send
+from Results_plot_mpl import plot_results_mpl
 
-# Setup logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Flask app setup
 app = Flask(__name__)
-CORS(app)
 
 @app.route('/')
-def index():
-    return "API is running", 200
+def home():
+    return "Stock Backtesting Home"
 
-# Discord bot setup
-TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
-CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
+@app.route('/run-backtest')
+def run_backtest():
+    stocks = ['AAPL', 'MSFT', 'GOOGL']  # 예시로 몇 개의 주식 종목 설정
+    start_date = '2020-01-01'
+    end_date = datetime.now().strftime('%Y-%m-%d')
 
-intents = discord.Intents.default()
-intents.message_content = True
-bot = commands.Bot(command_prefix='!', intents=intents)
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
-@bot.event
-async def on_ready():
-    logger.info(f'Logged in as {bot.user.name}')
-    channel = bot.get_channel(CHANNEL_ID)
-    if channel:
-        await channel.send(f'Bot has successfully logged in: {bot.user.name}')
-    else:
-        logger.error(f'Could not find channel with ID: {CHANNEL_ID}')
+    async def main():
+        for stock in stocks:
+            await backtest_and_send(stock, 'modified_monthly')
+            plot_results_mpl(stock, start_date, end_date)
+            await asyncio.sleep(2)
 
-@bot.command()
-async def ping(ctx):
-    await ctx.send(f'pong: {bot.user.name}')
+    loop.run_until_complete(main())
 
-def start_flask():
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    return "Backtesting completed and results plotted."
 
 if __name__ == '__main__':
-    nest_asyncio.apply()
-    loop = asyncio.get_event_loop()
-
-    def run_discord_bot():
-        asyncio.run(bot.start(TOKEN))
-
-    flask_thread = threading.Thread(target=start_flask)
-    flask_thread.start()
-
-    try:
-        loop.run_until_complete(run_discord_bot())
-    except KeyboardInterrupt:
-        loop.run_until_complete(bot.close())
-    except Exception as e:
-        logger.exception(f'An error occurred: {e}')
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
