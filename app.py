@@ -6,6 +6,7 @@ from discord.ext import commands
 import nest_asyncio
 import threading
 import asyncio
+import logging
 
 # Load environment variables
 load_dotenv()
@@ -17,6 +18,10 @@ app = Flask(__name__)
 def index():
     return "API is running", 200
 
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Discord bot setup
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
@@ -27,12 +32,12 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user.name}')
+    logger.info(f'Logged in as {bot.user.name}')
     channel = bot.get_channel(int(CHANNEL_ID))
     if channel:
         await channel.send(f'Bot has successfully logged in: {bot.user.name}')
     else:
-        print(f'Could not find channel with ID: {CHANNEL_ID}')
+        logger.error(f'Could not find channel with ID: {CHANNEL_ID}')
 
 @bot.command()
 async def ping(ctx):
