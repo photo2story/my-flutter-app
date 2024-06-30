@@ -12,7 +12,7 @@ $(function() {
             method: 'GET',
             dataType: 'json',
             success: function(data) {
-                // 티커 이름과 회사 이름이 포함된 파일도 검색
+                // Search for files that include the ticker name and company name
                 const comparisonFile = data.find(file => file.name.includes(`comparison_${stockTicker}_`) && file.name.includes('_VOO.png'));
                 const resultFile = data.find(file => file.name.includes(`result_mpl_${stockTicker}.png`));
 
@@ -26,13 +26,13 @@ $(function() {
                             <img src="${resultFile.download_url}" alt="${stockTicker} Result" style="width: 100%; margin-top: 20px;">
                         </div>
                     `);
-                    alert(`${stockTicker} 리뷰를 성공적으로 불러왔습니다.`);
+                    alert(`Successfully loaded review for ${stockTicker}.`);
                 } else {
-                    alert(`해당 주식 티커에 대한 이미지를 찾을 수 없습니다`);
+                    alert(`Could not find images for the specified stock ticker.`);
                 }
             },
             error: function() {
-                alert('이미지를 불러오는 중 오류가 발생했습니다.');
+                alert('An error occurred while loading the images.');
             }
         });
     }
@@ -63,7 +63,7 @@ $(function() {
                 });
             },
             error: function() {
-                alert('티커 목록을 불러오는 중 오류가 발생했습니다.');
+                alert('An error occurred while loading the ticker list.');
             }
         });
     }
@@ -82,5 +82,5 @@ $(function() {
         }
     });
 
-    loadTickerList(); // 페이지 로드 시 티커 목록을 로드합니다.
+    loadTickerList(); // Load the ticker list when the page is loaded.
 });
