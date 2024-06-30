@@ -1,124 +1,51 @@
 $(function() {
-    loadReviews();
-
     const stockInput = $('#stockName');
-    const suggestionsBox = $('#autocomplete-list');
+    const searchReviewButton = $('#searchReviewButton');
+    const reviewList = $('#reviewList');
 
-    stockInput.on('input', function() {
-        this.value = this.value.toUpperCase();
-    });
+    function fetchImages(stockTicker) {
+        const apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
+        
+        $.ajax({
+            url: apiUrl,
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                const comparisonFile = data.find(file => file.name === `comparison_${stockTicker}_VOO.png`);
+                const resultFile = data.find(file => file.name === `result_mpl_${stockTicker}.png`);
 
-    stockInput.autocomplete({
-        source: function(request, response) {
-            $.ajax({
-                url: "https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images",
-                method: "GET",
-                dataType: "json",
-                success: function(data) {
-                    var filteredData = $.map(data, function(item) {
-                        if (item.name.toUpperCase().includes(request.term.toUpperCase())) {
-                            return {
-                                label: item.name,
-                                value: item.name
-                            };
-                        } else {
-                            return null;
-                        }
-                    });
-                    response(filteredData);
-                },
-                error: function() {
-                    console.error("Error fetching tickers");
+                reviewList.empty();
+
+                if (comparisonFile && resultFile) {
+                    reviewList.append(`
+                        <div class="review">
+                            <h3>${stockTicker} vs VOO</h3>
+                            <img src="${comparisonFile.download_url}" alt="${stockTicker} vs VOO" style="width: 100%;">
+                            <img src="${resultFile.download_url}" alt="${stockTicker} Result" style="width: 100%; margin-top: 20px;">
+                        </div>
+                    `);
+                    alert(`${stockTicker} 리뷰를 성공적으로 불러왔습니다.`);
+                } else {
+                    alert(`해당 주식 티커에 대한 이미지를 찾을 수 없습니다`);
                 }
-            });
-        },
-        select: function(event, ui) {
-            stockInput.val(ui.item.value);
-            $('#searchReviewButton').click();
-            return false;
+            },
+            error: function() {
+                alert('이미지를 불러오는 중 오류가 발생했습니다.');
+            }
+        });
+    }
+
+    searchReviewButton.click(function() {
+        const stockTicker = stockInput.val().toUpperCase();
+        if (stockTicker) {
+            fetchImages(stockTicker);
         }
     });
 
     stockInput.on('keypress', function(e) {
         if (e.which === 13) { // Enter key
-            $('#searchReviewButton').click();
+            searchReviewButton.click();
             return false;
         }
-    });
-
-    $('#searchReviewButton').click(function() {
-        const stockName = stockInput.val().toUpperCase();
-        const reviewList = $('#reviewList');
-        const reviewItems = reviewList.find('.review');
-        let stockFound = false;
-
-        reviewItems.each(function() {
-            const reviewItem = $(this);
-            if (reviewItem.find('h3').text().includes(stockName)) {
-                reviewItem[0].scrollIntoView({ behavior: 'smooth' });
-                stockFound = true;
-                return false; // break the loop
-            }
-        });
-
-        if (!stockFound) {
-            saveToSearchHistory(stockName);
-            alert('Review is being prepared. Please try again later.');
-        }
-    });
-
-    function loadReviews() {
-        const reviewList = $('#reviewList');
-
-        $.ajax({
-            url: 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images',
-            method: 'GET',
-            dataType: 'json',
-            success: function(data) {
-                data.forEach(function(item) {
-                    const stockName = item.name.replace('comparison_', '').replace('_VOO.png', '').toUpperCase();
-                    const newReview = $('<div>', { class: 'review' });
-                    newReview.html(`
-                        <h3>${stockName} vs VOO</h3>
-                        <img id="image-${stockName}" src="https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/${item.name}" alt="${stockName} vs VOO" style="width: 100%;">
-                    `);
-                    reviewList.append(newReview);
-                    $(`#image-${stockName}`).on('click', function() {
-                        showMplChart(stockName);
-                    });
-                });
-            },
-            error: function() {
-                console.error('Error fetching images');
-            }
-        });
-    }
-
-    function showMplChart(stockName) {
-        const url = `https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/result_mpl_${stockName}.png`;
-        window.open(url, '_blank');
-    }
-
-    function saveToSearchHistory(stockName) {
-        $.ajax({
-            url: '/save_search_history',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ stock_name: stockName }),
-            success: function(data) {
-                if (data.success) {
-                    console.log(`Saved ${stockName} to search history.`);
-                } else {
-                    console.error('Failed to save to search history.');
-                }
-            },
-            error: function() {
-                console.error('Error saving to search history');
-            }
-        });
-    }
-    // 홈 버튼 클릭 시 상단으로 스크롤
-    $('#homeButton').click(function() {
-        $('html, body').animate({ scrollTop: 0 }, 'slow');
     });
 });
