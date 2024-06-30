@@ -69,19 +69,28 @@ reset_sent_messages()
 
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
+DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 intents = discord.Intents.all()
 intents.message_content = True
 bot = commands.Bot(command_prefix='', intents=intents)
 
-stocks = ['QQQ', 'NVDA', 'BAC', 'COIN',
-          'MSFT', 'AAPL', 'TSLA', 'AMZN', 'GOOGL', 'FB', 'NFLX', 'DIS', 'V', 'MA', 'PYPL', 'INTC', 'AMD', 'CSCO',
-          'CRM', 'ORCL', 'IBM', 'ADBE', 'NOW', 'SNOW', 'ZM', 'DOCU', 'WORK', 'TWLO', 'SHOP', 'SE', 'NET', 'CRWD',
-          'DDOG', 'PINS', 'SNAP', 'U', 'FSLY', 'SPLK', 'ZS', 'OKTA', 'MDB', 'BILL', 'UPST', 'API', 'RNG', 'TWTR',
-          'UBER', 'LYFT', 'TDOC', 'Z', 'ZI', 'FVRR', 'ETSY', 'PTON', 'ROKU', 'SPOT', 'TTD', 'ROKU', 'TTD',
-          'SQ', 'PYPL', 'SHOP', 'ETSY', 'FSLY', 'CRWD', 'NET', 'PINS', 'DOCU', 'ZM', 'SNOW', 'NOW', 'ADBE', 'CRM',
-          'WORK', 'TWLO', 'SE', 'SHOP', 'ZS', 'OKTA', 'MDB', 'BILL', 'UPST', 'API', 'RNG', 'TWTR', 'UBER', 'LYFT',
-          'TDOC', 'Z', 'ZI', 'FVRR', 'PTON', 'ROKU', 'SPOT', 'TTD', 'ROKU', 'TTD', 'SQ', 'PYPL', 'SHOP', 'ETSY']
+stocks = ['QQQ', 'NVDA', 'BAC', 'COIN', 'MSFT', 'AAPL', 'TSLA', 'AMZN', 'GOOGL', 'FB', 'NFLX', 'DIS', 'V', 'MA', 
+          'PYPL', 'INTC', 'AMD', 'CSCO', 'CRM', 'ORCL', 'IBM', 'ADBE', 'NOW', 'SNOW', 'ZM', 'DOCU', 'WORK', 'TWLO', 
+          'SHOP', 'SE', 'NET', 'CRWD', 'DDOG', 'PINS', 'SNAP', 'U', 'FSLY', 'SPLK', 'ZS', 'OKTA', 'MDB', 'BILL', 
+          'UPST', 'API', 'RNG', 'TWTR', 'UBER', 'LYFT', 'TDOC', 'Z', 'ZI', 'FVRR', 'ETSY', 'PTON', 'ROKU', 'SPOT', 
+          'TTD', 'ROKU', 'TTD', 'SQ', 'PYPL', 'SHOP', 'ETSY', 'FSLY', 'CRWD', 'NET', 'PINS', 'DOCU', 'ZM', 'SNOW', 
+          'NOW', 'ADBE', 'CRM', 'WORK', 'TWLO', 'SE', 'SHOP', 'ZS', 'OKTA', 'MDB', 'BILL', 'UPST', 'API', 'RNG', 
+          'TWTR', 'UBER', 'LYFT', 'TDOC', 'Z', 'ZI', 'FVRR', 'PTON', 'ROKU', 'SPOT', 'TTD', 'ROKU', 'TTD', 'SQ', 
+          'PYPL', 'SHOP', 'ETSY']
+for stock in stocks:
+    try:
+        # 백테스팅 코드 (예: 데이터 가져오기, 계산 등)
+        print(f"Processing {stock}...")
+        # Example function call: backtest(stock, start_date, end_date, initial_investment)
+    except Exception as e:
+        print(f"Error processing {stock}: {e}")
+        
 start_date = "2022-01-01"
 end_date = datetime.today().strftime('%Y-%m-%d')
 initial_investment = 30000000
@@ -100,7 +109,6 @@ async def backtest_and_send(ctx, stock, option_strategy):
     user_stock_file_path2 = file_path
 
     name = get_ticker_name(stock)
-    DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
     message = {
         'content': f"Stock: {stock} ({name})\n"
                    f"Total_rate: {total_rate:,.0f} %\n"
@@ -205,7 +213,7 @@ if __name__ == '__main__':
     
     loop = asyncio.get_event_loop()
 
-    async def run():
+    async def run_bot():
         await bot.start(TOKEN)
     
     def run_flask():
@@ -214,7 +222,7 @@ if __name__ == '__main__':
     flask_thread = threading.Thread(target=run_flask)
     flask_thread.start()
 
-    loop.run_until_complete(run())
+    loop.run_until_complete(run_bot())
 
 
 # #  .\.venv\Scripts\activate
