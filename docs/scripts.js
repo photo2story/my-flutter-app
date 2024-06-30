@@ -72,7 +72,7 @@ $(function() {
         const reviewList = $('#reviewList');
 
         $.ajax({
-            url: 'https://photo2story.github.io/my-flutter-app/static/images', // 이미지 파일이 있는 GitHub Pages 경로로 변경
+            url: '/api/get_images',
             method: 'GET',
             dataType: 'json',
             success: function(data) {
