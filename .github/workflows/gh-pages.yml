@@ -29,3 +29,16 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./docs
+
+    - name: Commit files
+      run: |
+        git config --global user.email "phot2story@gmail.com"
+        git config --global user.name "phot2story"
+        git add .
+        git commit -m "Automated commit from GitHub Actions"
+    
+    - name: Push changes
+      uses: ad-m/github-push-action@v0.6.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: main
