@@ -246,3 +246,5 @@ app/**/flutter_export_environment.sh
 # lib/some_file_to_ignore.dart
 # lib/some_directory_to_ignore/
 
+*.csv
+!stock_market.csv
