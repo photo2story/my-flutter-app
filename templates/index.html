@@ -8,22 +8,20 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <style>
-        #homeButton {
+        .home-button {
             position: fixed;
             top: 10px;
             right: 10px;
-            z-index: 1000;
         }
     </style>
 </head>
 <body>
-    <button id="homeButton">HOME</button>
     <h1>Stock Comparison Review</h1>
     <label for="stockName">Stock name:</label>
     <input type="text" id="stockName" name="stockName">
     <button id="searchReviewButton">Search Review</button>
     <div id="reviewList"></div>
+    <button class="home-button" id="homeButton">HOME</button>
     <script src="scripts.js"></script>
 </body>
 </html>
-
