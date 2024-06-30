@@ -1,148 +1,85 @@
 $(function() {
-    loadReviews();
-    loadTickerList();
-
     const stockInput = $('#stockName');
-    const suggestionsBox = $('#autocomplete-list');
+    const searchReviewButton = $('#searchReviewButton');
+    const reviewList = $('#reviewList');
+    const tickerListContainer = $('#ticker-list');
 
-    stockInput.on('input', function() {
-        this.value = this.value.toUpperCase();
-    });
-
-    stockInput.autocomplete({
-        source: function(request, response) {
-            $.ajax({
-                url: "https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images",
-                method: "GET",
-                dataType: "json",
-                success: function(data) {
-                    var filteredData = $.map(data, function(item) {
-                        if (item.name.toUpperCase().includes(request.term.toUpperCase())) {
-                            return {
-                                label: item.name,
-                                value: item.name
-                            };
-                        } else {
-                            return null;
-                        }
-                    });
-                    response(filteredData);
-                },
-                error: function() {
-                    console.error("Error fetching tickers");
-                }
-            });
-        },
-        select: function(event, ui) {
-            stockInput.val(ui.item.value);
-            $('#searchReviewButton').click();
-            return false;
-        }
-    });
-
-    stockInput.on('keypress', function(e) {
-        if (e.which === 13) { // Enter key
-            $('#searchReviewButton').click();
-            return false;
-        }
-    });
-
-    $('#searchReviewButton').click(function() {
-        const stockName = stockInput.val().toUpperCase();
-        const reviewList = $('#reviewList');
-        const reviewItems = reviewList.find('.review');
-        let stockFound = false;
-
-        reviewItems.each(function() {
-            const reviewItem = $(this);
-            if (reviewItem.find('h3').text().includes(stockName)) {
-                reviewItem[0].scrollIntoView({ behavior: 'smooth' });
-                stockFound = true;
-                return false; // break the loop
-            }
-        });
-
-        if (!stockFound) {
-            saveToSearchHistory(stockName);
-            alert('Review is being prepared. Please try again later.');
-        }
-    });
-
-    function loadReviews() {
-        const reviewList = $('#reviewList');
+    function fetchImages(stockTicker) {
+        const apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
 
         $.ajax({
-            url: 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images',
+            url: apiUrl,
             method: 'GET',
             dataType: 'json',
             success: function(data) {
-                data.forEach(function(item) {
-                    const stockName = item.name.replace('comparison_', '').replace('_VOO.png', '').toUpperCase();
-                    const newReview = $('<div>', { class: 'review' });
-                    newReview.html(`
-                        <h3>${stockName} vs VOO</h3>
-                        <img id="image-${stockName}" src="https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/${item.name}" alt="${stockName} vs VOO" style="width: 100%;">
+                const comparisonFile = data.find(file => file.name === `comparison_${stockTicker}_VOO.png`);
+                const resultFile = data.find(file => file.name === `result_mpl_${stockTicker}.png`);
+
+                reviewList.empty();
+
+                if (comparisonFile && resultFile) {
+                    reviewList.append(`
+                        <div class="review">
+                            <h3>${stockTicker} vs VOO</h3>
+                            <img src="${comparisonFile.download_url}" alt="${stockTicker} vs VOO" style="width: 100%;">
+                            <img src="${resultFile.download_url}" alt="${stockTicker} Result" style="width: 100%; margin-top: 20px;">
+                        </div>
                     `);
-                    reviewList.append(newReview);
-                    $(`#image-${stockName}`).on('click', function() {
-                        showMplChart(stockName);
-                    });
-                });
+                    alert(`${stockTicker} 리뷰를 성공적으로 불러왔습니다.`);
+                } else {
+                    alert(`해당 주식 티커에 대한 이미지를 찾을 수 없습니다`);
+                }
             },
             error: function() {
-                console.error('Error fetching images');
+                alert('이미지를 불러오는 중 오류가 발생했습니다.');
             }
         });
     }
 
     function loadTickerList() {
-        const tickerList = $('#tickerList');
+        const apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
 
         $.ajax({
-            url: 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images',
+            url: apiUrl,
             method: 'GET',
             dataType: 'json',
             success: function(data) {
-                const tickerNames = data.map(item => item.name.replace('comparison_', '').replace('_VOO.png', '').toUpperCase());
-                const uniqueTickers = [...new Set(tickerNames)].sort();
+                const tickers = data
+                    .filter(file => file.name.startsWith('comparison_') && file.name.endsWith('_VOO.png'))
+                    .map(file => file.name.replace('comparison_', '').replace('_VOO.png', ''))
+                    .sort();
 
-                uniqueTickers.forEach(function(ticker) {
-                    const tickerItem = $('<div>', { class: 'ticker-item' });
-                    tickerItem.text(ticker);
-                    tickerItem.on('click', function() {
-                        stockInput.val(ticker);
-                        $('#searchReviewButton').click();
-                    });
-                    tickerList.append(tickerItem);
+                tickerListContainer.empty();
+
+                tickers.forEach(ticker => {
+                    tickerListContainer.append(`<span class="ticker-item">${ticker}</span>`);
+                });
+
+                $('.ticker-item').on('click', function() {
+                    const stockTicker = $(this).text();
+                    stockInput.val(stockTicker);
+                    fetchImages(stockTicker);
                 });
             },
             error: function() {
-                console.error('Error fetching tickers');
+                alert('티커 목록을 불러오는 중 오류가 발생했습니다.');
             }
         });
     }
 
-    function showMplChart(stockName) {
-        const url = `https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/result_mpl_${stockName}.png`;
-        window.open(url, '_blank');
-    }
+    searchReviewButton.click(function() {
+        const stockTicker = stockInput.val().toUpperCase();
+        if (stockTicker) {
+            fetchImages(stockTicker);
+        }
+    });
 
-    function saveToSearchHistory(stockName) {
-        $.ajax({
-            url: '/save_search_history',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ stock_name: stockName }),
-            success: function(data) {
-                if (data.success) {
-                    console.log(`Saved ${stockName} to search history.`);
-                } else {
-                    console.error('Failed to save to search history.');
-                }
-            },
-            error: function() {
-                console.error('Error saving to search history');
-            }
-        });
-    }
+    stockInput.on('keypress', function(e) {
+        if (e.which === 13) { // Enter key
+            searchReviewButton.click();
+            return false;
+        }
+    });
+
+    loadTickerList(); // 페이지 로드 시 티커 목록을 로드합니다.
 });

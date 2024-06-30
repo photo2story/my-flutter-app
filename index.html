@@ -16,12 +16,7 @@
             color: blue;
             text-decoration: underline;
             display: inline-block;
-            width: 30%;
-            padding: 5px;
-            box-sizing: border-box;
-        }
-        .ticker-item:hover {
-            color: darkblue;
+            margin: 5px 10px;
         }
     </style>
 </head>
@@ -30,11 +25,8 @@
     <label for="stockName">Stock name:</label>
     <input type="text" id="stockName" name="stockName">
     <button id="searchReviewButton">Search Review</button>
-
+    <div id="ticker-list" class="ticker-list"></div>
     <div id="reviewList"></div>
-
-    <div class="ticker-list" id="tickerList"></div>
-
     <script src="scripts.js"></script>
 </body>
 </html>
