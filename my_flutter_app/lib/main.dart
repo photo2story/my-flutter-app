@@ -31,7 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _controller = TextEditingController();
 
   Future<void> fetchImages(String stockTicker) async {
-    final apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/my-flask-app';
+    final apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
