@@ -70,7 +70,7 @@ $(function() {
 
     function loadReviews() {
         const reviewList = $('#reviewList');
-
+    
         $.ajax({
             url: '/api/get_images',
             method: 'GET',
@@ -81,7 +81,7 @@ $(function() {
                     const newReview = $('<div>', { class: 'review' });
                     newReview.html(`
                         <h3>${stockName} vs VOO</h3>
-                        <img id="image-${stockName}" src="https://photo2story.github.io/my-flutter-app/static/images/${image}" alt="${stockName} vs VOO" style="width: 100%;">
+                        <img id="image-${stockName}" src="https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/${image}" alt="${stockName} vs VOO" style="width: 100%;">
                     `);
                     reviewList.append(newReview);
                     $(`#image-${stockName}`).on('click', function() {
@@ -94,11 +94,12 @@ $(function() {
             }
         });
     }
-
+    
     function showMplChart(stockName) {
-        const url = `https://photo2story.github.io/my-flutter-app/static/images/result_mpl_${stockName}.png`;
+        const url = `https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/result_mpl_${stockName}.png`;
         window.open(url, '_blank');
     }
+        
 
     function saveToSearchHistory(stockName) {
         $.ajax({
