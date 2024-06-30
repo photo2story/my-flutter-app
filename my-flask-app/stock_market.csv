@@ -2682,64 +2682,64 @@
 266870,파워풀엑스,KRX,기타 화학제품 제조업,,,
 107640,한중엔시에스,KRX,자동차 신품 부품 제조업,,,
 MSFT,Microsoft Corp,NASDAQ,Technology,MSFT,Software - Infrastructure,0.893
-AAPL,Apple Inc,NASDAQ,Technology,AAPL,Consumer Electronics,1.264
-NVDA,NVIDIA Corp,NASDAQ,Technology,NVDA,Semiconductors,1.749
-AMZN,Amazon.com Inc,NASDAQ,Consumer Cyclical,AMZN,Internet Retail,1.155
+AAPL,Apple Inc,NASDAQ,Technology,AAPL,Consumer Electronics,1.25
+NVDA,NVIDIA Corp,NASDAQ,Technology,NVDA,Semiconductors,1.694
+AMZN,Amazon.com Inc,NASDAQ,Consumer Cyclical,AMZN,Internet Retail,1.142
 META,Meta Platforms Inc,NASDAQ,none,,,
-GOOGL,Alphabet Inc Class A,NASDAQ,Communication Services,GOOGL,Internet Content & Information,1.019
-GOOG,Alphabet Inc Class C,NASDAQ,none,,,
-AVGO,Broadcom Inc,NASDAQ,none,,,
-TSLA,Tesla Inc,NASDAQ,Consumer Cyclical,TSLA,Auto Manufacturers,2.408
+GOOGL,Alphabet Inc Class A,NASDAQ,Communication Services,GOOGL,Internet Content & Information,1.01
+GOOG,Alphabet Inc Class C,NASDAQ,Communication Services,GOOG,Internet Content & Information,1.01
+AVGO,Broadcom Inc,NASDAQ,Technology,AVGO,Semiconductors,1.182
+TSLA,Tesla Inc,NASDAQ,Consumer Cyclical,TSLA,Auto Manufacturers,2.318
 ASML,ASML Holding NV ADR,NASDAQ,none,,,
-COST,Costco Wholesale Corp,NASDAQ,none,,,
-AMD,Advanced Micro Devices Inc,NASDAQ,Technology,AMD,Semiconductors,1.66
-NFLX,Netflix Inc,NASDAQ,Communication Services,NFLX,Entertainment,1.232
-ADBE,Adobe Inc,NASDAQ,Technology,ADBE,Software - Infrastructure,1.281
-PEP,PepsiCo Inc,NASDAQ,none,,,
+COST,Costco Wholesale Corp,NASDAQ,Consumer Defensive,COST,Discount Stores,0.781
+AMD,Advanced Micro Devices Inc,NASDAQ,Technology,AMD,Semiconductors,1.686
+NFLX,Netflix Inc,NASDAQ,Communication Services,NFLX,Entertainment,1.257
+ADBE,Adobe Inc,NASDAQ,Technology,ADBE,Software - Infrastructure,1.269
+PEP,PepsiCo Inc,NASDAQ,Consumer Defensive,PEP,Beverages - Non-Alcoholic,0.531
 LIN,Linde PLC,NASDAQ,none,,,
 AZN,AstraZeneca PLC ADR,NASDAQ,none,,,
-CSCO,Cisco Systems Inc,NASDAQ,none,,,
-TMUS,T-Mobile US Inc,NASDAQ,none,,,
-INTC,Intel Corp,NASDAQ,none,,,
-QCOM,Qualcomm Inc,NASDAQ,none,,,
-INTU,Intuit Inc,NASDAQ,none,,,
-AMAT,Applied Materials Inc,NASDAQ,none,,,
-CMCSA,Comcast Corp,NASDAQ,none,,,
+CSCO,Cisco Systems Inc,NASDAQ,Technology,CSCO,Communication Equipment,0.845
+TMUS,T-Mobile US Inc,NASDAQ,Communication Services,TMUS,Telecom Services,0.497
+INTC,Intel Corp,NASDAQ,Technology,INTC,Semiconductors,1.06
+QCOM,Qualcomm Inc,NASDAQ,Technology,QCOM,Semiconductors,1.297
+INTU,Intuit Inc,NASDAQ,Technology,INTU,Software - Application,1.212
+AMAT,Applied Materials Inc,NASDAQ,Technology,AMAT,Semiconductor Equipment & Materials,1.56
+CMCSA,Comcast Corp,NASDAQ,Communication Services,CMCSA,Telecom Services,1.001
 PDD,PDD Holdings Inc ADR,NASDAQ,none,,,
-TXN,Texas Instruments Inc,NASDAQ,none,,,
-AMGN,Amgen Inc,NASDAQ,none,,,
+TXN,Texas Instruments Inc,NASDAQ,Technology,TXN,Semiconductors,0.991
+AMGN,Amgen Inc,NASDAQ,Healthcare,AMGN,Drug Manufacturers - General,0.601
 ARM,Arm Holdings PLC ADR,NASDAQ,none,,,
-ISRG,Intuitive Surgical Inc,NASDAQ,none,,,
-HON,Honeywell International Inc,NASDAQ,none,,,
-LRCX,Lam Research Corp,NASDAQ,none,,,
+ISRG,Intuitive Surgical Inc,NASDAQ,Healthcare,ISRG,Medical Instruments & Supplies,1.392
+HON,Honeywell International Inc,NASDAQ,Industrials,HON,Conglomerates,1.027
+LRCX,Lam Research Corp,NASDAQ,Technology,LRCX,Semiconductor Equipment & Materials,1.466
 SNY,Sanofi SA ADR,NASDAQ,none,,,
-BKNG,Booking Holdings Inc,NASDAQ,Consumer Cyclical,BKNG,Travel Services,1.403
+BKNG,Booking Holdings Inc,NASDAQ,Consumer Cyclical,BKNG,Travel Services,1.397
 VRTX,Vertex Pharmaceuticals Inc,NASDAQ,none,,,
-REGN,Regeneron Pharmaceuticals Inc,NASDAQ,none,,,
-MU,Micron Technology Inc,NASDAQ,none,,,
-SBUX,Starbucks Corp,NASDAQ,Consumer Cyclical,SBUX,Restaurants,0.982
+REGN,Regeneron Pharmaceuticals Inc,NASDAQ,Healthcare,REGN,Biotechnology,0.124
+MU,Micron Technology Inc,NASDAQ,Technology,MU,Semiconductors,1.212
+SBUX,Starbucks Corp,NASDAQ,Consumer Cyclical,SBUX,Restaurants,0.96
 ABNB,Airbnb Inc,NASDAQ,none,,,
-ADP,Automatic Data Processing Inc,NASDAQ,none,,,
-KLAC,KLA Corp,NASDAQ,none,,,
-MDLZ,Mondelez International Inc,NASDAQ,none,,,
-ADI,Analog Devices Inc,NASDAQ,none,,,
+ADP,Automatic Data Processing Inc,NASDAQ,Industrials,ADP,Staffing & Employment Services,0.791
+KLAC,KLA Corp,NASDAQ,Technology,KLAC,Semiconductor Equipment & Materials,1.275
+MDLZ,Mondelez International Inc,NASDAQ,Consumer Defensive,MDLZ,Confectioners,0.554
+ADI,Analog Devices Inc,NASDAQ,Technology,ADI,Semiconductors,1.124
 PANW,Palo Alto Networks Inc,NASDAQ,none,,,
-GILD,Gilead Sciences Inc,NASDAQ,none,,,
+GILD,Gilead Sciences Inc,NASDAQ,Healthcare,GILD,Drug Manufacturers - General,0.216
 SNPS,Synopsys Inc,NASDAQ,none,,,
 EQIX,Equinix Inc,NASDAQ,none,,,
 CDNS,Cadence Design Systems Inc,NASDAQ,none,,,
 CME,CME Group Inc,NASDAQ,none,,,
 MELI,MercadoLibre Inc,NASDAQ,none,,,
 CSX,CSX Corp,NASDAQ,none,,,
-MAR,Marriott International Inc,NASDAQ,none,,,
+MAR,Marriott International Inc,NASDAQ,Consumer Cyclical,MAR,Lodging,1.608
 CRWD,CrowdStrike Holdings Inc,NASDAQ,none,,,
 WDAY,Workday Inc,NASDAQ,none,,,
 NTES,NetEase Inc ADR,NASDAQ,none,,,
 MRVL,Marvell Technology Inc,NASDAQ,none,,,
 ORLY,O'Reilly Automotive Inc,NASDAQ,none,,,
-NXPI,NXP Semiconductors NV,NASDAQ,none,,,
+NXPI,NXP Semiconductors NV,NASDAQ,Technology,NXPI,Semiconductors,1.51
 CTAS,Cintas Corp,NASDAQ,none,,,
-PYPL,PayPal Holdings Inc,NASDAQ,none,,,
+PYPL,PayPal Holdings Inc,NASDAQ,Financial Services,PYPL,Credit Services,1.428
 SMCI,Super Micro Computer Inc,NASDAQ,none,,,
 MNST,Monster Beverage Corp,NASDAQ,none,,,
 PCAR,Paccar Inc,NASDAQ,none,,,
@@ -2749,7 +2749,8 @@ LULU,Lululemon Athletica Inc,NASDAQ,Consumer Cyclical,LULU,Apparel Retail,1.325
 ADSK,Autodesk Inc,NASDAQ,Technology,ADSK,Software - Application,1.454
 DASH,DoorDash Inc,NASDAQ,none,,,
 FTNT,Fortinet Inc,NASDAQ,none,,,
-COIN,Coinbase Global Inc,NASDAQ,none,,,
+COIN,Coinbase Global Inc,NASDAQ,Financial Services,COIN,Financial Data & Stock Exchanges,3.441
+ATVI,Activision Blizzard Inc,NASDAQ,Communication Services,ATVI,Electronic Gaming & Multimedia,0.645
 CPRT,Copart Inc,NASDAQ,none,,,
 TEAM,Atlassian Corp,NASDAQ,none,,,
 ROST,Ross Stores Inc,NASDAQ,none,,,
@@ -2764,8 +2765,8 @@ KHC,Kraft Heinz Co,NASDAQ,none,,,
 FAST,Fastenal Co,NASDAQ,none,,,
 GEHC,GE Healthcare Technologies Inc,NASDAQ,none,,,
 DDOG,Datadog Inc,NASDAQ,none,,,
-CHTR,Charter Communications Inc,NASDAQ,none,,,
-KDP,Keurig Dr Pepper Inc,NASDAQ,none,,,
+CHTR,Charter Communications Inc,NASDAQ,Communication Services,CHTR,Telecom Services,1.035
+KDP,Keurig Dr Pepper Inc,NASDAQ,Consumer Defensive,KDP,Beverages - Non-Alcoholic,0.618
 LI,Li Auto Inc ADR,NASDAQ,none,,,
 TTD,Trade Desk Inc,NASDAQ,none,,,
 CTSH,Cognizant Technology Solutions Corp,NASDAQ,none,,,
@@ -2950,7 +2951,7 @@ APPF,Appfolio Inc,NASDAQ,none,,,
 NXT,Nextracker Inc,NASDAQ,none,,,
 DBX,Dropbox Inc,NASDAQ,none,,,
 CHRW,CH Robinson Worldwide Inc,NASDAQ,none,,,
-ETSY,ETSY Inc,NASDAQ,none,,,
+ETSY,ETSY Inc,NASDAQ,Consumer Cyclical,ETSY,Internet Retail,1.988
 MIDD,Middleby Corp,NASDAQ,none,,,
 AMKR,Amkor Technology Inc,NASDAQ,none,,,
 OLED,Universal Display Corp,NASDAQ,none,,,
@@ -6527,40 +6528,40 @@ ATLCZ,Atlanticus Holding 9 25 Senior Notes due 2029,NASDAQ,none,,,
 IROHR,Iron Horse Acquisitions Rights Exp 27 December 2028,NASDAQ,none,,,
 LLY,Eli Lilly and Co,NYSE,Healthcare,LLY,Drug Manufacturers - General,0.371
 TSM,Taiwan Semiconductor Manufacturing Co Ltd ADR,NYSE,none,,,
-V,Visa Inc,NYSE,Financial Services,V,Credit Services,0.962
-JPM,JPMorgan Chase & Co,NYSE,Financial Services,JPM,Banks - Diversified,1.116
-BRK.B,Berkshire Hathaway Inc Class B,NYSE,none,,,
-WMT,Walmart Inc,NYSE,none,,,
-UNH,UnitedHealth Group Inc,NYSE,Healthcare,UNH,Healthcare Plans,0.561
-MA,Mastercard Inc,NYSE,none,,,
+V,Visa Inc,NYSE,Financial Services,V,Credit Services,0.967
+JPM,JPMorgan Chase & Co,NYSE,Financial Services,JPM,Banks - Diversified,1.11
+BRK.B,Berkshire Hathaway Inc Class B,NYSE,,BRK.B,,
+WMT,Walmart Inc,NYSE,Consumer Defensive,WMT,Discount Stores,0.517
+UNH,UnitedHealth Group Inc,NYSE,Healthcare,UNH,Healthcare Plans,0.59
+MA,Mastercard Inc,NYSE,Financial Services,MA,Credit Services,1.089
 NVO,Novo Nordisk A/S ADR,NYSE,none,,,
-XOM,Exxon Mobil Corp,NYSE,Energy,XOM,Oil & Gas Integrated,0.947
-JNJ,Johnson & Johnson,NYSE,Healthcare,JNJ,Drug Manufacturers - General,0.531
-PG,Procter & Gamble Co,NYSE,Consumer Defensive,PG,Household & Personal Products,0.423
-HD,Home Depot Inc,NYSE,Consumer Cyclical,HD,Home Improvement Retail,1.011
+XOM,Exxon Mobil Corp,NYSE,Energy,XOM,Oil & Gas Integrated,0.907
+JNJ,Johnson & Johnson,NYSE,Healthcare,JNJ,Drug Manufacturers - General,0.53
+PG,Procter & Gamble Co,NYSE,Consumer Defensive,PG,Household & Personal Products,0.414
+HD,Home Depot Inc,NYSE,Consumer Cyclical,HD,Home Improvement Retail,1.0
 BRK.A,Berkshire Hathaway Inc Class A,NYSE,,BRK.A,,
 TM,Toyota Motor Corp ADR,NYSE,none,,,
-ABBV,AbbVie Inc,NYSE,none,,,
-MRK,Merck & Co Inc,NYSE,none,,,
-ORCL,Oracle Corp,NYSE,none,,,
-CRM,Salesforce Inc,NYSE,none,,,
-BAC,Bank of America Corp,NYSE,Financial Services,BAC,Banks - Diversified,1.375
-CVX,Chevron Corp,NYSE,Energy,CVX,Oil & Gas Integrated,1.118
-KO,Coca-Cola Co,NYSE,Consumer Defensive,KO,Beverages - Non-Alcoholic,0.591
+ABBV,AbbVie Inc,NYSE,Healthcare,ABBV,Drug Manufacturers - General,0.582
+MRK,Merck & Co Inc,NYSE,Healthcare,MRK,Drug Manufacturers - General,0.403
+ORCL,Oracle Corp,NYSE,Technology,ORCL,Software - Infrastructure,1.008
+CRM,Salesforce Inc,NYSE,Technology,CRM,Software - Application,1.254
+BAC,Bank of America Corp,NYSE,Financial Services,BAC,Banks - Diversified,1.364
+CVX,Chevron Corp,NYSE,Energy,CVX,Oil & Gas Integrated,1.107
+KO,Coca-Cola Co,NYSE,Consumer Defensive,KO,Beverages - Non-Alcoholic,0.593
 ACN,Accenture PLC,NYSE,none,,,
-TMO,Thermo Fisher Scientific Inc,NYSE,none,,,
+TMO,Thermo Fisher Scientific Inc,NYSE,Healthcare,TMO,Diagnostics & Research,0.794
 SAP,SAP SE ADR,NYSE,none,,,
-MCD,McDonald's Corp,NYSE,none,,,
+MCD,McDonald's Corp,NYSE,Consumer Cyclical,MCD,Restaurants,0.714
 NVS,Novartis AG ADR,NYSE,none,,,
-DIS,Walt Disney Co,NYSE,none,,,
-ABT,Abbott Laboratories,NYSE,none,,,
+DIS,Walt Disney Co,NYSE,Communication Services,DIS,Entertainment,1.402
+ABT,Abbott Laboratories,NYSE,Healthcare,ABT,Medical Devices,0.739
 SHEL,Shell PLC ADR,NYSE,none,,,
 WFC,Wells Fargo & Co,NYSE,Financial Services,WFC,Banks - Diversified,1.196
-DHR,Danaher Corp,NYSE,none,,,
+DHR,Danaher Corp,NYSE,Healthcare,DHR,Diagnostics & Research,0.876
 BABA,Alibaba Group Holding Ltd ADR,NYSE,none,,,
-IBM,International Business Machines Corp,NYSE,none,,,
+IBM,International Business Machines Corp,NYSE,Technology,IBM,Information Technology Services,0.718
 GE,General Electric Co,NYSE,Industrials,GE,Aerospace & Defense,1.245
-VZ,Verizon Communications Inc,NYSE,none,,,
+VZ,Verizon Communications Inc,NYSE,Communication Services,VZ,Telecom Services,0.405
 CAT,Caterpillar Inc,NYSE,none,,,
 UBER,Uber Technologies Inc,NYSE,none,,,
 AXP,American Express Co,NYSE,none,,,
@@ -6568,10 +6569,10 @@ UNP,Union Pacific Corp,NYSE,none,,,
 BX,Blackstone Inc,NYSE,none,,,
 NOW,ServiceNow Inc,NYSE,none,,,
 TTE,TotalEnergies SE ADR,NYSE,none,,,
-NKE,Nike Inc,NYSE,Consumer Cyclical,NKE,Footwear & Accessories,1.076
+NKE,Nike Inc,NYSE,Consumer Cyclical,NKE,Footwear & Accessories,1.051
 HSBC,HSBC Holdings PLC ADR,NYSE,none,,,
-PFE,Pfizer Inc,NYSE,Healthcare,PFE,Drug Manufacturers - General,0.585
-MS,Morgan Stanley,NYSE,none,,,
+PFE,Pfizer Inc,NYSE,Healthcare,PFE,Drug Manufacturers - General,0.641
+MS,Morgan Stanley,NYSE,Financial Services,MS,Capital Markets,1.369
 BHP,BHP Group Ltd ADR,NYSE,none,,,
 PM,Philip Morris International Inc,NYSE,none,,,
 HDB,HDFC Bank Ltd ADR,NYSE,none,,,
@@ -6580,12 +6581,12 @@ RY,Royal Bank of Canada,NYSE,none,,,
 SYK,Stryker Corp,NYSE,none,,,
 SPGI,S&P Global Inc,NYSE,none,,,
 COP,Conocophillips,NYSE,none,,,
-UPS,United Parcel Service Inc,NYSE,none,,,
+UPS,United Parcel Service Inc,NYSE,Industrials,UPS,Integrated Freight & Logistics,0.999
 GS,Goldman Sachs Group Inc,NYSE,none,,,
 MUFG,Mitsubishi UFJ Financial Group Inc ADR,NYSE,none,,,
 SCHW,Charles Schwab Corp,NYSE,none,,,
-T,AT&T Inc,NYSE,none,,,
-BA,Boeing Co,NYSE,Industrials,BA,Aerospace & Defense,1.542
+T,AT&T Inc,NYSE,Communication Services,T,Telecom Services,0.736
+BA,Boeing Co,NYSE,Industrials,BA,Aerospace & Defense,1.555
 UL,Unilever PLC ADR,NYSE,none,,,
 PLD,Prologis Inc,NYSE,none,,,
 BLK,BlackRock Inc,NYSE,Financial Services,BLK,Asset Management,1.383
@@ -6593,13 +6594,13 @@ RTX,RTX Corp,NYSE,none,,,
 ETN,Eaton Corporation PLC,NYSE,none,,,
 ELV,Elevance Health Inc,NYSE,none,,,
 NEE,Nextera Energy Inc,NYSE,none,,,
-MDT,Medtronic PLC,NYSE,Healthcare,MDT,Medical Devices,0.771
+MDT,Medtronic PLC,NYSE,Healthcare,MDT,Medical Devices,0.841
 PGR,Progressive Corp,NYSE,none,,,
 TJX,TJX Companies Inc,NYSE,none,,,
-C,Citigroup Inc,NYSE,Financial Services,C,Banks - Diversified,1.498
+C,Citigroup Inc,NYSE,Financial Services,C,Banks - Diversified,1.467
 SONY,Sony Group Corp ADR,NYSE,none,,,
 TD,Toronto-Dominion Bank,NYSE,none,,,
-BMY,Bristol-Myers Squibb Co,NYSE,none,,,
+BMY,Bristol-Myers Squibb Co,NYSE,Healthcare,BMY,Drug Manufacturers - General,0.43
 LMT,Lockheed Martin Corp,NYSE,none,,,
 BUD,Anheuser-Busch Inbev SA ADR,NYSE,none,,,
 DE,Deere & Co,NYSE,none,,,
@@ -6610,7 +6611,7 @@ MMC,Marsh & McLennan Companies Inc,NYSE,none,,,
 BSX,Boston Scientific Corp,NYSE,none,,,
 CI,Cigna Group,NYSE,none,,,
 AMT,American Tower Corp,NYSE,none,,,
-SHOP,Shopify Inc,NYSE,none,,,
+SHOP,Shopify Inc,NYSE,Technology,SHOP,Software - Application,2.265
 CVS,CVS Health Corp,NYSE,none,,,
 IBN,ICICI Bank Ltd ADR,NYSE,none,,,
 FI,Fiserv Inc,NYSE,none,,,
@@ -6694,7 +6695,7 @@ COF,Capital One Financial Corp,NYSE,none,,,
 WELL,Welltower Inc,NYSE,none,,,
 EW,Edwards Lifesciences Corp,NYSE,none,,,
 HLT,Hilton Worldwide Holdings Inc,NYSE,none,,,
-MMM,3M Co,NYSE,none,,,
+MMM,3M Co,NYSE,Industrials,MMM,Conglomerates,1.012
 MET,MetLife Inc,NYSE,none,,,
 CARR,Carrier Global Corp,NYSE,none,,,
 ET,Energy Transfer Units,NYSE,none,,,
@@ -9687,10 +9688,10 @@ IPB,Merrill Lynch Depositor Corporate Backed Trust Certificates Series 2003-1 Ex
 TELZ,Tellurian 8 25 Senior Notes due 2028,AMEX,none,,,
 LNFA.U,L F Acquisition Redeemable Units Class A,AMEX,none,,,
 AMDI,Amphitrite Digital Inc,AMEX,none,,,
-SPY,SPDR S&P 500 ETF Trust,us_ETF,none,,,
+SPY,SPDR S&P 500 ETF Trust,us_ETF,,SPY,,
 QQQ,Invesco QQQ Trust Series 1,us_ETF,,QQQ,,
 IWM,iShares Russell 2000 ETF,us_ETF,none,,,
-TQQQ,ProShares UltraPro QQQ,us_ETF,none,,,
+TQQQ,ProShares UltraPro QQQ,us_ETF,,TQQQ,,
 SOXL,Direxion Daily Semiconductor Bull 3X Shares,us_ETF,,SOXL,,
 LQD,iShares iBoxx $ Inv Grade Corporate Bond ETF,us_ETF,none,,,
 TLT,iShares 20 Plus Year Treasury Bond ETF,us_ETF,none,,,
@@ -9707,7 +9708,7 @@ KRE,SPDR S&P Regional Banking ETF,us_ETF,none,,,
 FBTC,Fidelity Wise Origin Bitcoin Fund,us_ETF,none,,,
 EEM,iShares MSCI Emerging Markets ETF,us_ETF,none,,,
 XLK,Technology Select Sector SPDR Fund,us_ETF,none,,,
-SOXX,iShares Semiconductor ETF,us_ETF,none,,,
+SOXX,iShares Semiconductor ETF,us_ETF,,SOXX,,
 XLE,Energy Select Sector SPDR Fund,us_ETF,none,,,
 DIA,SPDR Dow Jones Industrial Average ETF Trust,us_ETF,none,,,
 FXI,iShares China Large-Cap ETF,us_ETF,none,,,
@@ -9729,7 +9730,7 @@ SPXL,Direxion Daily S&P 500 Bull 3X Shares,us_ETF,none,,,
 VUSB,Vanguard Ultra-Short Bond ETF,us_ETF,none,,,
 RSP,Invesco S&P 500 Eql Wght ETF,us_ETF,none,,,
 KWEB,KraneShares CSI China Internet ETF,us_ETF,none,,,
-VTI,Vanguard Total Stock Market Index Fund;ETF,us_ETF,none,,,
+VTI,Vanguard Total Stock Market Index Fund;ETF,us_ETF,,VTI,,
 VTIP,Vanguard Sht-Term Inflation-Protected Sec Idx;ETF,us_ETF,none,,,
 AGG,iShares Core US Aggregate Bond ETF,us_ETF,none,,,
 IEFA,iShares Core MSCI EAFE ETF,us_ETF,none,,,
@@ -9748,7 +9749,7 @@ IAU,iShares Gold Trust,us_ETF,none,,,
 JNK,SPDR Bloomberg High Yield Bond ETF,us_ETF,none,,,
 EWZ,Ishares Msci Brazil ETF,us_ETF,none,,,
 TZA,Direxion Daily Small Cap Bear 3X ETF,us_ETF,none,,,
-UPRO,ProShares UltraPro S&P500,us_ETF,none,,,
+UPRO,ProShares UltraPro S&P500,us_ETF,,UPRO,,
 IEMG,iShares Core MSCI Emerging Markets ETF,us_ETF,none,,,
 IGV,iShares Expanded Tech-Software Sector ETF,us_ETF,none,,,
 XLB,Materials Select Sector SPDR Fund,us_ETF,none,,,
@@ -9777,7 +9778,7 @@ SHV,iShares Short Treasury Bond ETF,us_ETF,none,,,
 ARKB,ARK 21Shares Bitcoin ETF,us_ETF,none,,,
 VTV,Vanguard Value Index Fund;ETF,us_ETF,none,,,
 GDXJ,VanEck Junior Gold Miners ETF,us_ETF,none,,,
-VGT,Vanguard Information Technology Index Fund;ETF,us_ETF,none,,,
+VGT,Vanguard Information Technology Index Fund;ETF,us_ETF,,VGT,,
 KBE,SPDR S&P Bank ETF,us_ETF,none,,,
 TSLQ,AXS TSLA Bear Daily ETF,us_ETF,none,,,
 DPST,Direxion Daily Regional Banks Bull 3X Shares,us_ETF,none,,,
@@ -10021,7 +10022,7 @@ SPYD,SPDR Portfolio S&P 500 High Dividend ETF,us_ETF,none,,,
 SHYG,iShares 0-5 Year High Yield Corporate Bond ETF,us_ETF,none,,,
 SPGP,Invesco S and P 500 GARP ETF,us_ETF,none,,,
 SPHD,Invesco S&P 500 High Div Low Volatility ETF,us_ETF,none,,,
-VHT,Vanguard Health Care Index Fund;ETF,us_ETF,none,,,
+VHT,Vanguard Health Care Index Fund;ETF,us_ETF,,VHT,,
 RPV,Invesco S&P 500 Pure Value ETF,us_ETF,none,,,
 SCHE,Schwab Emerging Markets Equity ETF,us_ETF,none,,,
 FDL,First Tr Morningstar Dividend Leaders Index Fund,us_ETF,none,,,
@@ -10033,7 +10034,7 @@ SVIX,-1x Short VIX Futures ETF,us_ETF,none,,,
 DBC,Invesco DB Commodity Index Tracking Fund,us_ETF,none,,,
 HYMB,SPDR Nuveen Bloomberg High Yield Municipal Bd ETF,us_ETF,none,,,
 FVD,First Trust Value Line Dividend Index Fund,us_ETF,none,,,
-VFH,Vanguard Financials Index Fund;ETF,us_ETF,none,,,
+VFH,Vanguard Financials Index Fund;ETF,us_ETF,,VFH,,
 USIG,iShares Broad USD Investment Grade Corporate Bond ETF,us_ETF,none,,,
 FIXD,First Trust TCW Opportunistic Fixed Income ETF,us_ETF,none,,,
 IDEV,iShares Core MSCI International Developed Mkt ETF,us_ETF,none,,,
@@ -10144,7 +10145,7 @@ BNO,United States Brent Oil Fund LP,us_ETF,none,,,
 SKYY,First Trust Cloud Computing ETF,us_ETF,none,,,
 BBCA,JPMorgan BetaBuilders Canada ETF,us_ETF,none,,,
 SCHI,Schwab 5-10 Year Corporate Bond ETF,us_ETF,none,,,
-VCR,Vanguard Consumer Discretionary Index Fund;ETF,us_ETF,none,,,
+VCR,Vanguard Consumer Discretionary Index Fund;ETF,us_ETF,,VCR,,
 BLOK,Amplify Transformational Data Sharing ETF,us_ETF,none,,,
 PFFD,Global X Us Preferred Etf,us_ETF,none,,,
 DFAI,DFA Dimensional International Core Equity Market,us_ETF,none,,,
@@ -13267,7 +13268,7 @@ EWM,iShares MSCI Malaysia,US_ETF,US_ETF,,,
 IYF,iShares US Financials,US_ETF,US_ETF,,,
 REM,iShares Mortgage Real Estate Capped,US_ETF,US_ETF,,,
 IEV,iShares Europe,US_ETF,US_ETF,,,
-SOXX,iShares PHLX Semiconductor,US_ETF,US_ETF,,,
+SOXX,iShares PHLX Semiconductor,US_ETF,,SOXX,,
 IHI,iShares US Medical Devices,US_ETF,US_ETF,,,
 EPP,iShares MSCI Pacific ex Japan,US_ETF,US_ETF,,,
 IVW,iShares S&P 500 Growth,US_ETF,US_ETF,,,
@@ -13870,7 +13871,7 @@ PDEV,Principal International Multi-Factor Core,US_ETF,US_ETF,,,
 PLC,Principal U.S. Large-Cap Multi-Factor Core Index,US_ETF,US_ETF,,,
 PSM,Principal U.S. Small-MidCap Multi-Factor Core,US_ETF,US_ETF,,,
 UFO,Procure Space,US_ETF,US_ETF,,,
-TQQQ,ProShares UltraPro QQQ,US_ETF,US_ETF,,,
+TQQQ,ProShares UltraPro QQQ,US_ETF,,TQQQ,,
 SQQQ,ProShares UltraPro Short QQQ,US_ETF,US_ETF,,,
 UVXY,ProShares Ultra VIX Short-Term Futures,US_ETF,US_ETF,,,
 SDS,ProShares UltraShort S&P500,US_ETF,US_ETF,,,
@@ -13878,7 +13879,7 @@ SPXU,ProShares UltraPro Short S&P500,US_ETF,US_ETF,,,
 SH,ProShares Short S&P500,US_ETF,US_ETF,,,
 TBT,ProShares UltraShort 20+ Year Treasury,US_ETF,US_ETF,,,
 SCO,ProShares UltraShort Bloomberg Crude Oil,US_ETF,US_ETF,,,
-UPRO,ProShares UltraPro S&P500,US_ETF,US_ETF,,,
+UPRO,ProShares UltraPro S&P500,US_ETF,,UPRO,,
 VIXY,ProShares VIX Short-Term Futures,US_ETF,US_ETF,,,
 QID,ProShares UltraShort QQQ,US_ETF,US_ETF,,,
 UCO,ProShares Ultra Bloomberg Crude Oil,US_ETF,US_ETF,,,
@@ -14059,7 +14060,7 @@ SFY,SoFi Select 500,US_ETF,US_ETF,,,
 SFYF,SoFi 50,US_ETF,US_ETF,,,
 SFYX,SoFi Next 500,US_ETF,US_ETF,,,
 GIGE,SoFi Gig Economy,US_ETF,US_ETF,,,
-SPY,SPDR S&P 500,US_ETF,US_ETF,,,
+SPY,SPDR S&P 500,US_ETF,,SPY,,
 XOP,SPDR S&P Oil & Gas Exploration & Production,US_ETF,US_ETF,,,
 XLF,Financial Select Sector SPDR,US_ETF,US_ETF,,,
 XLU,Utilities Select Sector SPDR,US_ETF,US_ETF,,,
@@ -14343,7 +14344,7 @@ VOO,Vanguard S&P 500,US_ETF,,VOO,,
 VCSH,Vanguard Short-Term Corporate Bond,US_ETF,US_ETF,,,
 BND,Vanguard Total Bond Market,US_ETF,US_ETF,,,
 VCIT,Vanguard Intermediate-Term Corporate Bond,US_ETF,US_ETF,,,
-VTI,Vanguard Total Stock Market,US_ETF,US_ETF,,,
+VTI,Vanguard Total Stock Market,US_ETF,,VTI,,
 VXUS,Vanguard Total International Stock,US_ETF,US_ETF,,,
 VTV,Vanguard Value,US_ETF,US_ETF,,,
 VT,Vanguard Total World Stock,US_ETF,US_ETF,,,
@@ -14355,10 +14356,10 @@ VIG,Vanguard Dividend Appreciation,US_ETF,US_ETF,,,
 BSV,Vanguard Short-Term Bond,US_ETF,US_ETF,,,
 BIV,Vanguard Intermediate-Term Bond,US_ETF,US_ETF,,,
 VUG,Vanguard Growth,US_ETF,US_ETF,,,
-VFH,Vanguard Financials,US_ETF,US_ETF,,,
+VFH,Vanguard Financials,US_ETF,,VFH,,
 VGSH,Vanguard Short-Term Government Bond,US_ETF,US_ETF,,,
 BLV,Vanguard Long-Term Bond,US_ETF,US_ETF,,,
-VGT,Vanguard Information Technology,US_ETF,US_ETF,,,
+VGT,Vanguard Information Technology,US_ETF,,VGT,,
 VTIP,Vanguard Sht-Term Inflation-Protected Securities,US_ETF,US_ETF,,,
 VCLT,Vanguard Long-Term Corporate Bond,US_ETF,US_ETF,,,
 ESGV,Vanguard ESG US Stock,US_ETF,US_ETF,,,
@@ -14380,7 +14381,7 @@ VPU,Vanguard Utilities,US_ETF,US_ETF,,,
 EDV,Vanguard Extended Duration,US_ETF,US_ETF,,,
 VWOB,Vanguard Emerging Markets Government Bond,US_ETF,US_ETF,,,
 VV,Vanguard Large-Cap,US_ETF,US_ETF,,,
-VHT,Vanguard Health Care,US_ETF,US_ETF,,,
+VHT,Vanguard Health Care,US_ETF,,VHT,,
 VSS,Vanguard FTSE All-World ex-US Small-Cap,US_ETF,US_ETF,,,
 VXF,Vanguard Extended Market,US_ETF,US_ETF,,,
 VOT,Vanguard Mid-Cap Growth,US_ETF,US_ETF,,,
@@ -14395,7 +14396,7 @@ VOOV,Vanguard S&P 500 Value,US_ETF,US_ETF,,,
 VOOG,Vanguard S&P 500 Growth,US_ETF,US_ETF,,,
 MGC,Vanguard Mega Cap,US_ETF,US_ETF,,,
 VAW,Vanguard Materials,US_ETF,US_ETF,,,
-VCR,Vanguard Consumer Discretionary,US_ETF,US_ETF,,,
+VCR,Vanguard Consumer Discretionary,US_ETF,,VCR,,
 VSGX,Vanguard ESG International Stock,US_ETF,US_ETF,,,
 VTC,Vanguard Total Corporate Bond Shares,US_ETF,US_ETF,,,
 VONE,Vanguard Russell 1000,US_ETF,US_ETF,,,
