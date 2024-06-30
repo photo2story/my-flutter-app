@@ -66,6 +66,9 @@ $(function() {
             saveToSearchHistory(stockName);
             alert('Review is being prepared. Please try again later.');
         }
+
+        // 검색 후 다시 상단으로 스크롤
+        $('html, body').animate({ scrollTop: 0 }, 'slow');
     });
 
     function loadReviews() {
@@ -81,7 +84,7 @@ $(function() {
                     const newReview = $('<div>', { class: 'review' });
                     newReview.html(`
                         <h3>${stockName} vs VOO</h3>
-                        <img id="image-${stockName}" src="/static/images/${image}" alt="${stockName} vs VOO" style="width: 100%;">
+                        <img id="image-${stockName}" src="https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/${image}" alt="${stockName} vs VOO" style="width: 100%;">
                     `);
                     reviewList.append(newReview);
                     $(`#image-${stockName}`).on('click', function() {
@@ -96,7 +99,7 @@ $(function() {
     }
 
     function showMplChart(stockName) {
-        const url = `/static/images/result_mpl_${stockName}.png`;
+        const url = `https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/result_mpl_${stockName}.png`;
         window.open(url, '_blank');
     }
 
@@ -118,4 +121,9 @@ $(function() {
             }
         });
     }
+
+    // 홈 버튼 클릭 시 상단으로 스크롤
+    $('#homeButton').click(function() {
+        $('html, body').animate({ scrollTop: 0 }, 'slow');
+    });
 });

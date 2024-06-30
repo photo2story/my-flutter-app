@@ -11,15 +11,16 @@ $(function() {
     stockInput.autocomplete({
         source: function(request, response) {
             $.ajax({
-                url: "https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images",
+                url: "/api/get_tickers",
                 method: "GET",
                 dataType: "json",
                 success: function(data) {
                     var filteredData = $.map(data, function(item) {
-                        if (item.name.toUpperCase().includes(request.term.toUpperCase())) {
+                        if (item.Symbol.toUpperCase().includes(request.term.toUpperCase()) ||
+                            item.Name.toUpperCase().includes(request.term.toUpperCase())) {
                             return {
-                                label: item.name,
-                                value: item.name
+                                label: item.Symbol + " - " + item.Name + " - " + item.Market + " - " + item.Sector + " - " + item.Industry,
+                                value: item.Symbol
                             };
                         } else {
                             return null;
@@ -65,22 +66,25 @@ $(function() {
             saveToSearchHistory(stockName);
             alert('Review is being prepared. Please try again later.');
         }
+
+        // 검색 후 다시 상단으로 스크롤
+        $('html, body').animate({ scrollTop: 0 }, 'slow');
     });
 
     function loadReviews() {
         const reviewList = $('#reviewList');
 
         $.ajax({
-            url: 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images',
+            url: '/api/get_images',
             method: 'GET',
             dataType: 'json',
             success: function(data) {
-                data.forEach(function(item) {
-                    const stockName = item.name.replace('comparison_', '').replace('_VOO.png', '').toUpperCase();
+                data.forEach(function(image) {
+                    const stockName = image.replace('comparison_', '').replace('_VOO.png', '').toUpperCase();
                     const newReview = $('<div>', { class: 'review' });
                     newReview.html(`
                         <h3>${stockName} vs VOO</h3>
-                        <img id="image-${stockName}" src="https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/${item.name}" alt="${stockName} vs VOO" style="width: 100%;">
+                        <img id="image-${stockName}" src="https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/${image}" alt="${stockName} vs VOO" style="width: 100%;">
                     `);
                     reviewList.append(newReview);
                     $(`#image-${stockName}`).on('click', function() {
@@ -117,4 +121,9 @@ $(function() {
             }
         });
     }
+
+    // 홈 버튼 클릭 시 상단으로 스크롤
+    $('#homeButton').click(function() {
+        $('html, body').animate({ scrollTop: 0 }, 'slow');
+    });
 });
