@@ -27,7 +27,8 @@ from Results_plot import plot_comparison_results, plot_results_all
 from get_compare_stock_data import merge_csv_files, load_sector_info
 from Results_plot_mpl import plot_results_mpl
 from get_ticker import get_ticker_from_korean_name
-import shutil
+import shutil# 이미지 파일을 images 폴더로 이동
+import glob# 이미지 파일을 images 폴더로 이동
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 load_dotenv()
@@ -109,6 +110,7 @@ def move_files_to_images_folder():# 이미지 파일을 images 폴더로 이동
     for pattern in patterns:
         for file in glob.glob(pattern):
             shutil.move(file, os.path.join(destination_folder, os.path.basename(file)))
+            
 def is_valid_stock(stock):# Check if the stock is in the stock market CSV
     try:
         stock_market_df = pd.read_csv('stock_market.csv')
@@ -148,7 +150,6 @@ async def backtest_and_send(ctx, stock, option_strategy):
             print('Successfully sent Discord message')
 
         plot_comparison_results(user_stock_file_path1, user_stock_file_path2, stock, 'VOO', total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date)
-        move_files_to_images_folder()
         await bot.change_presence(status=discord.Status.online, activity=discord.Game("Waiting"))
     except Exception as e:
         await ctx.send(f"An error occurred while processing {stock}: {e}")
@@ -162,6 +163,7 @@ async def buddy(ctx):
         plot_results_mpl(stock, start_date, end_date)
         await asyncio.sleep(2)
     await ctx.send("Backtesting results have been organized.")
+    move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
@@ -210,6 +212,7 @@ async def stock(ctx, *args):
 
         await backtest_and_send(ctx, info_stock, option_strategy='1')
         plot_results_mpl(info_stock, start_date, end_date)
+        move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
     except Exception as e:
         await ctx.send(f'An error occurred: {e}')
 
