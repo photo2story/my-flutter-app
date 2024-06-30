@@ -246,8 +246,9 @@ app/**/flutter_export_environment.sh
 # lib/some_file_to_ignore.dart
 # lib/some_directory_to_ignore/
 
-# *.csv
+*.csv
 !stock_market.csv
+!result_VOO*.csv
 
 # Chrome Device Default 제외
 my_flutter_app/.dart_tool/chrome-device/Default/
