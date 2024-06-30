@@ -112,7 +112,7 @@ def move_files_to_images_folder():# 이미지 파일을 images 폴더로 이동
 def is_valid_stock(stock):# Check if the stock is in the stock market CSV
     try:
         stock_market_df = pd.read_csv('stock_market.csv')
-        return stock in stock_market_df['ticker'].values
+        return stock in stock_market_df['Symbol'].values
     except Exception as e:
         print(f"Error checking stock market CSV: {e}")
         return False
@@ -136,10 +136,10 @@ async def backtest_and_send(ctx, stock, option_strategy):
         DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
         message = {
             'content': f"Stock: {stock} ({name})\n"
-                       f"Total_rate: {total_rate:,.0f} %\n"
-                       f"Invested_amount: {invested_amount:,.0f} $\n"
-                       f"Total_account_balance: {total_account_balance:,.0f} $\n"
-                       f"Last_signal: {str_last_signal} \n"
+                    f"Total_rate: {total_rate:,.0f} %\n"
+                    f"Invested_amount: {invested_amount:,.0f} $\n"
+                    f"Total_account_balance: {total_account_balance:,.0f} $\n"
+                    f"Last_signal: {str_last_signal} \n"
         }
         response = requests.post(DISCORD_WEBHOOK_URL, json=message)
         if response.status_code != 204:
@@ -148,8 +148,6 @@ async def backtest_and_send(ctx, stock, option_strategy):
             print('Successfully sent Discord message')
 
         plot_comparison_results(user_stock_file_path1, user_stock_file_path2, stock, 'VOO', total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date)
-        plot_results_mpl(stock, start_date, end_date)
-        move_files_to_images_folder()
         await bot.change_presence(status=discord.Status.online, activity=discord.Game("Waiting"))
     except Exception as e:
         await ctx.send(f"An error occurred while processing {stock}: {e}")
