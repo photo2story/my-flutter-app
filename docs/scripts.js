@@ -117,4 +117,8 @@ $(function() {
             }
         });
     }
+    // 홈 버튼 클릭 시 상단으로 스크롤
+    $('#homeButton').click(function() {
+        $('html, body').animate({ scrollTop: 0 }, 'slow');
+    });
 });
