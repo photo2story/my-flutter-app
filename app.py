@@ -78,12 +78,12 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='', intents=intents)
 
 stocks = ['QQQ', 'NVDA', 'BAC', 'COIN', 'MSFT', 'AAPL', 'TSLA', 'AMZN', 'GOOGL', 'FB', 'NFLX', 'DIS', 'V', 'MA', 
-        #   'PYPL', 'INTC', 'AMD', 'CSCO', 'CRM', 'ORCL', 'IBM', 'ADBE', 'NOW', 'SNOW', 'ZM', 'DOCU', 'WORK', 'TWLO', 
-        #   'SHOP', 'SE', 'NET', 'CRWD', 'DDOG', 'PINS', 'SNAP', 'U', 'FSLY', 'SPLK', 'ZS', 'OKTA', 'MDB', 'BILL', 
-        #   'UPST', 'API', 'RNG', 'TWTR', 'UBER', 'LYFT', 'TDOC', 'Z', 'ZI', 'FVRR', 'ETSY', 'PTON', 'ROKU', 'SPOT', 
-        #   'TTD', 'ROKU', 'TTD', 'SQ', 'PYPL', 'SHOP', 'ETSY', 'FSLY', 'CRWD', 'NET', 'PINS', 'DOCU', 'ZM', 'SNOW', 
-        #   'NOW', 'ADBE', 'CRM', 'WORK', 'TWLO', 'SE', 'SHOP', 'ZS', 'OKTA', 'MDB', 'BILL', 'UPST', 'API', 'RNG', 
-        #   'TWTR', 'UBER', 'LYFT', 'TDOC', 'Z', 'ZI', 'FVRR', 'PTON', 'ROKU', 'SPOT', 'TTD', 'ROKU', 'TTD', 'SQ', 
+          'PYPL', 'INTC', 'AMD', 'CSCO', 'CRM', 'ORCL', 'IBM', 'ADBE', 'NOW', 'SNOW', 'ZM', 'DOCU', 'WORK', 'TWLO', 
+          'SHOP', 'SE', 'NET', 'CRWD', 'DDOG', 'PINS', 'SNAP', 'U', 'FSLY', 'SPLK', 'ZS', 'OKTA', 'MDB', 'BILL', 
+          'UPST', 'API', 'RNG', 'TWTR', 'UBER', 'LYFT', 'TDOC', 'Z', 'ZI', 'FVRR', 'ETSY', 'PTON', 'ROKU', 'SPOT', 
+          'TTD', 'ROKU', 'TTD', 'SQ', 'PYPL', 'SHOP', 'ETSY', 'FSLY', 'CRWD', 'NET', 'PINS', 'DOCU', 'ZM', 'SNOW', 
+          'NOW', 'ADBE', 'CRM', 'WORK', 'TWLO', 'SE', 'SHOP', 'ZS', 'OKTA', 'MDB', 'BILL', 'UPST', 'API', 'RNG', 
+          'TWTR', 'UBER', 'LYFT', 'TDOC', 'Z', 'ZI', 'FVRR', 'PTON', 'ROKU', 'SPOT', 'TTD', 'ROKU', 'TTD', 'SQ', 
           'PYPL', 'SHOP', 'ETSY']
 for stock in stocks:
     try:
