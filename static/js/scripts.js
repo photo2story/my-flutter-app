@@ -2,11 +2,11 @@ $(function() {
     const stockInput = $('#stockName');
     const searchReviewButton = $('#searchReviewButton');
     const reviewList = $('#reviewList');
-    const tickerListContainer = $('#ticker-list');
+    const tickerListDiv = $('#ticker-list');
 
     function fetchImages(stockTicker) {
         const apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
-        
+
         $.ajax({
             url: apiUrl,
             method: 'GET',
@@ -36,7 +36,7 @@ $(function() {
         });
     }
 
-    function fetchTickerList() {
+    function fetchTickers() {
         const apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
 
         $.ajax({
@@ -47,12 +47,11 @@ $(function() {
                 const tickers = data
                     .filter(file => file.name.startsWith('comparison_'))
                     .map(file => file.name.split('_')[1])
-                    .filter((value, index, self) => self.indexOf(value) === index) // Remove duplicates
                     .sort();
 
-                tickerListContainer.empty();
+                tickerListDiv.empty();
                 tickers.forEach(ticker => {
-                    tickerListContainer.append(`<span class="ticker-item" onclick="fetchImages('${ticker}')">${ticker}</span> `);
+                    tickerListDiv.append(`<span class="ticker-item" onclick="fetchImages('${ticker}')">${ticker}</span> `);
                 });
             },
             error: function() {
@@ -75,5 +74,5 @@ $(function() {
         }
     });
 
-    fetchTickerList(); // Load ticker list on page load
+    fetchTickers(); // 페이지 로드 시 티커 목록을 불러옴
 });
