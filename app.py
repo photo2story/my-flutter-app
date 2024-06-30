@@ -27,6 +27,7 @@ from Results_plot import plot_comparison_results, plot_results_all
 from get_compare_stock_data import merge_csv_files, load_sector_info
 from Results_plot_mpl import plot_results_mpl
 from get_ticker import get_ticker_from_korean_name
+import shutil
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 load_dotenv()
@@ -99,31 +100,61 @@ monthly_investment = 1000000
 processed_message_ids = set()
 login_once_flag = False  # 로그인 중복을 방지하기 위한 플래그
 
+def move_files_to_images_folder():# 이미지 파일을 images 폴더로 이동
+    # 이동할 파일 패턴
+    patterns = ["*.png", "result_*.csv"]
+    # 이동할 폴더 경로
+    destination_folder = os.path.join(app.static_folder, 'images')
+
+    for pattern in patterns:
+        for file in glob.glob(pattern):
+            shutil.move(file, os.path.join(destination_folder, os.path.basename(file)))
+def is_valid_stock(stock):# Check if the stock is in the stock market CSV
+    try:
+        stock_market_df = pd.read_csv('stock_market.csv')
+        return stock in stock_market_df['ticker'].values
+    except Exception as e:
+        print(f"Error checking stock market CSV: {e}")
+        return False
 async def backtest_and_send(ctx, stock, option_strategy):
-    total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df = estimate_stock(
-        stock, start_date, end_date, initial_investment, monthly_investment, option_strategy)
-    min_stock_data_date = str(min_stock_data_date).split(' ')[0]
-    user_stock_file_path1 = file_path
+    if not is_valid_stock(stock):
+        message = f"Stock market information updates needed. {stock}"
+        await ctx.send(message)
+        print(message)
+        return
+    
+    try:
+        total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df = estimate_stock(
+            stock, start_date, end_date, initial_investment, monthly_investment, option_strategy)
+        min_stock_data_date = str(min_stock_data_date).split(' ')[0]
+        user_stock_file_path1 = file_path
 
-    file_path = estimate_snp(stock, 'VOO', min_stock_data_date, end_date, initial_investment, monthly_investment, option_strategy, result_df)
-    user_stock_file_path2 = file_path
+        file_path = estimate_snp(stock, 'VOO', min_stock_data_date, end_date, initial_investment, monthly_investment, option_strategy, result_df)
+        user_stock_file_path2 = file_path
 
-    name = get_ticker_name(stock)
-    message = {
-        'content': f"Stock: {stock} ({name})\n"
-                   f"Total_rate: {total_rate:,.0f} %\n"
-                   f"Invested_amount: {invested_amount:,.0f} $\n"
-                   f"Total_account_balance: {total_account_balance:,.0f} $\n"
-                   f"Last_signal: {str_last_signal} \n"
-    }
-    response = requests.post(DISCORD_WEBHOOK_URL, json=message)
-    if response.status_code != 204:
-        print('Failed to send Discord message')
-    else:
-        print('Successfully sent Discord message')
+        name = get_ticker_name(stock)
+        DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
+        message = {
+            'content': f"Stock: {stock} ({name})\n"
+                       f"Total_rate: {total_rate:,.0f} %\n"
+                       f"Invested_amount: {invested_amount:,.0f} $\n"
+                       f"Total_account_balance: {total_account_balance:,.0f} $\n"
+                       f"Last_signal: {str_last_signal} \n"
+        }
+        response = requests.post(DISCORD_WEBHOOK_URL, json=message)
+        if response.status_code != 204:
+            print('Failed to send Discord message')
+        else:
+            print('Successfully sent Discord message')
 
-    plot_comparison_results(user_stock_file_path1, user_stock_file_path2, stock, 'VOO', total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date)
-    await bot.change_presence(status=discord.Status.online, activity=discord.Game("Waiting"))
+        plot_comparison_results(user_stock_file_path1, user_stock_file_path2, stock, 'VOO', total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date)
+        plot_results_mpl(stock, start_date, end_date)
+        move_files_to_images_folder()
+        await bot.change_presence(status=discord.Status.online, activity=discord.Game("Waiting"))
+    except Exception as e:
+        await ctx.send(f"An error occurred while processing {stock}: {e}")
+        print(f"Error processing {stock}: {e}")
+
 
 @bot.command()
 async def buddy(ctx):
