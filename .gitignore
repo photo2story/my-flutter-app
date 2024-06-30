@@ -249,4 +249,15 @@ app/**/flutter_export_environment.sh
 *.csv
 !stock_market.csv
 
-.dart_tool/
+# Chrome Device Default 제외
+my_flutter_app/.dart_tool/chrome-device/Default/
+my_flutter_app/.dart_tool/chrome-device/Default/History
+my_flutter_app/.dart_tool/chrome-device/Default/History-journal
+my_flutter_app/.dart_tool/chrome-device/Default/LOG
+my_flutter_app/.dart_tool/chrome-device/Default/LOG.old
+my_flutter_app/.dart_tool/chrome-device/Default/Preferences
+my_flutter_app/.dart_tool/chrome-device/Default/Visited Links
+my_flutter_app/.dart_tool/chrome-device/Default/Extension State
+my_flutter_app/.dart_tool/chrome-device/Default/GCM Store/Encryption
+my_flutter_app/.dart_tool/chrome-device/Default/GCM Store/Extension
+my_flutter_app/.dart_tool/chrome-device/Default/Local Storage/leveldb
