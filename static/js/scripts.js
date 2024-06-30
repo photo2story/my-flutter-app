@@ -2,7 +2,7 @@ $(function() {
     const stockInput = $('#stockName');
     const searchReviewButton = $('#searchReviewButton');
     const reviewList = $('#reviewList');
-    const tickerList = $('#ticker-list');
+    const tickerListContainer = $('#ticker-list');
 
     function fetchImages(stockTicker) {
         const apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
@@ -25,12 +25,44 @@ $(function() {
                             <img src="${resultFile.download_url}" alt="${stockTicker} Result" style="width: 100%; margin-top: 20px;">
                         </div>
                     `);
+                    alert(`${stockTicker} 리뷰를 성공적으로 불러왔습니다.`);
                 } else {
                     alert(`해당 주식 티커에 대한 이미지를 찾을 수 없습니다`);
                 }
             },
             error: function() {
                 alert('이미지를 불러오는 중 오류가 발생했습니다.');
+            }
+        });
+    }
+
+    function loadTickerList() {
+        const apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
+
+        $.ajax({
+            url: apiUrl,
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                const tickers = data
+                    .filter(file => file.name.startsWith('comparison_') && file.name.endsWith('_VOO.png'))
+                    .map(file => file.name.replace('comparison_', '').replace('_VOO.png', ''))
+                    .sort();
+
+                tickerListContainer.empty();
+
+                tickers.forEach(ticker => {
+                    tickerListContainer.append(`<span class="ticker-item">${ticker}</span>`);
+                });
+
+                $('.ticker-item').on('click', function() {
+                    const stockTicker = $(this).text();
+                    stockInput.val(stockTicker);
+                    fetchImages(stockTicker);
+                });
+            },
+            error: function() {
+                alert('티커 목록을 불러오는 중 오류가 발생했습니다.');
             }
         });
     }
@@ -49,22 +81,5 @@ $(function() {
         }
     });
 
-    // 주식 티커 목록 가져오기 및 표시
-    const apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
-    $.ajax({
-        url: apiUrl,
-        method: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            const tickers = data.map(file => file.name.replace('comparison_', '').replace('_VOO.png', ''))
-                                .filter((value, index, self) => self.indexOf(value) === index)
-                                .sort();
-            tickers.forEach(ticker => {
-                tickerList.append(`<span class="ticker-item" onclick="fetchImages('${ticker}')">${ticker}</span>`);
-            });
-        },
-        error: function() {
-            alert('주식 티커 목록을 불러오는 중 오류가 발생했습니다.');
-        }
-    });
+    loadTickerList(); // 페이지 로드 시 티커 목록을 로드합니다.
 });
