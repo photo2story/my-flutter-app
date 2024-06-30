@@ -3,6 +3,7 @@ $(function() {
     const searchReviewButton = $('#searchReviewButton');
     const reviewList = $('#reviewList');
     const tickerListContainer = $('#ticker-list');
+    const searchedTickersContainer = $('#searched-tickers');
 
     function fetchImages(stockTicker) {
         const apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
@@ -12,9 +13,8 @@ $(function() {
             method: 'GET',
             dataType: 'json',
             success: function(data) {
-                // Search for files that include the ticker name and company name
-                const comparisonFile = data.find(file => file.name.includes(`comparison_${stockTicker}_`) && file.name.includes('_VOO.png'));
-                const resultFile = data.find(file => file.name.includes(`result_mpl_${stockTicker}.png`));
+                const comparisonFile = data.find(file => file.name === `comparison_${stockTicker}_VOO.png`);
+                const resultFile = data.find(file => file.name === `result_mpl_${stockTicker}.png`);
 
                 reviewList.empty();
 
@@ -26,15 +26,36 @@ $(function() {
                             <img src="${resultFile.download_url}" alt="${stockTicker} Result" style="width: 100%; margin-top: 20px;">
                         </div>
                     `);
-                    alert(`Successfully loaded review for ${stockTicker}.`);
+                    alert(`Successfully fetched review for ${stockTicker}.`);
                 } else {
-                    alert(`Could not find images for the specified stock ticker.`);
+                    alert(`Unable to find images for the stock ticker ${stockTicker}.`);
+                    saveSearchedTicker(stockTicker);
+                    displaySearchedTickers();
                 }
             },
             error: function() {
-                alert('An error occurred while loading the images.');
+                alert('Error occurred while fetching images.');
             }
         });
+    }
+
+    function saveSearchedTicker(ticker) {
+        let searchedTickers = JSON.parse(localStorage.getItem('searchedTickers')) || {};
+        if (searchedTickers[ticker]) {
+            searchedTickers[ticker]++;
+        } else {
+            searchedTickers[ticker] = 1;
+        }
+        localStorage.setItem('searchedTickers', JSON.stringify(searchedTickers));
+    }
+
+    function displaySearchedTickers() {
+        let searchedTickers = JSON.parse(localStorage.getItem('searchedTickers')) || {};
+        searchedTickersContainer.empty();
+        searchedTickersContainer.append('<h2>Searched Stocks</h2>');
+        for (let ticker in searchedTickers) {
+            searchedTickersContainer.append(`<span class="ticker-item">${ticker} (${searchedTickers[ticker]})</span>`);
+        }
     }
 
     function loadTickerList() {
@@ -47,7 +68,7 @@ $(function() {
             success: function(data) {
                 const tickers = data
                     .filter(file => file.name.startsWith('comparison_') && file.name.endsWith('_VOO.png'))
-                    .map(file => file.name.replace('comparison_', '').replace('_VOO.png', '').split('_')[0])
+                    .map(file => file.name.replace('comparison_', '').replace('_VOO.png', ''))
                     .sort();
 
                 tickerListContainer.empty();
@@ -63,7 +84,7 @@ $(function() {
                 });
             },
             error: function() {
-                alert('An error occurred while loading the ticker list.');
+                alert('Error occurred while loading ticker list.');
             }
         });
     }
@@ -82,5 +103,6 @@ $(function() {
         }
     });
 
-    loadTickerList(); // Load the ticker list when the page is loaded.
+    loadTickerList(); // Load ticker list on page load
+    displaySearchedTickers(); // Load searched tickers on page load
 });
