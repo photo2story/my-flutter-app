@@ -162,11 +162,13 @@ async def buddy(ctx):
 
     for stock in stocks:  # 주식 리스트를 순회하며 백테스팅 수행
         await backtest_and_send(ctx, stock, 'modified_monthly')
-
-        # Check if plot_results_mpl should be awaited or run in executor based on its implementation
-        plot_results_mpl(stock, start_date, end_date)  # Assuming it's synchronous
-
-        await asyncio.sleep(2)  # 1초 타임슬립 추가
+        if is_valid_stock(stock):  # 유효한 주식에 대해서만 결과를 플로팅
+            try:
+                plot_results_mpl(stock, start_date, end_date)
+            except KeyError as e:
+                await ctx.send(f"An error occurred while plotting {stock}: {e}")
+                print(f"Error plotting {stock}: {e}")
+        await asyncio.sleep(2)
 
     # Run synchronous functions in the executor
     await loop.run_in_executor(None, update_stock_market_csv, 'stock_market.csv', stocks)
