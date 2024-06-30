@@ -84,7 +84,7 @@ stocks = [
     'MS', 'HON', 'C', 'GILD', 'DHR', 'BA', 'IBM', 'MMM', 'TSLA', 'TXN', 'SBUX', 'COST', 'AMD', 'TMUS', 
     'CHTR', 'INTU', 'ADP', 'MU', 'MDLZ', 'ISRG', 'BKNG', 'ADI', 'ATVI', 'LRCX', 'AMAT', 'REGN', 'NXPI', 
     'KDP', 'MAR', 'KLAC', 'WMT', 'JPM',
-    'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO', 'SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'VFH'
+    'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO', 'SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'VFH', 'coin'
 ]
 for stock in stocks:
     try:
