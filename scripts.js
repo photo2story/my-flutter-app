@@ -65,9 +65,6 @@ $(function() {
             saveToSearchHistory(stockName);
             alert('Review is being prepared. Please try again later.');
         }
-
-        // 검색 후 다시 상단으로 스크롤
-        $('html, body').animate({ scrollTop: 0 }, 'slow');
     });
 
     function loadReviews() {
@@ -120,9 +117,4 @@ $(function() {
             }
         });
     }
-
-    // 홈 버튼 클릭 시 상단으로 스크롤
-    $('#homeButton').click(function() {
-        $('html, body').animate({ scrollTop: 0 }, 'slow');
-    });
 });
