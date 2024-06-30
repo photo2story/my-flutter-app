@@ -160,7 +160,12 @@ async def backtest_and_send(ctx, stock, option_strategy):
 async def buddy(ctx):
     for stock in stocks:
         await backtest_and_send(ctx, stock, 'modified_monthly')
-        plot_results_mpl(stock, start_date, end_date)
+        if is_valid_stock(stock):  # 유효한 주식에 대해서만 결과를 플로팅
+            try:
+                plot_results_mpl(stock, start_date, end_date)
+            except KeyError as e:
+                await ctx.send(f"An error occurred while plotting {stock}: {e}")
+                print(f"Error plotting {stock}: {e}")
         await asyncio.sleep(2)
     await ctx.send("Backtesting results have been organized.")
     move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
