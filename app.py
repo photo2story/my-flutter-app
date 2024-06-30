@@ -77,14 +77,14 @@ intents = discord.Intents.all()
 intents.message_content = True
 bot = commands.Bot(command_prefix='', intents=intents)
 
-stocks = ['QQQ', 'NVDA', 'BAC', 'COIN', 'MSFT', 'AAPL', 'TSLA', 'AMZN', 'GOOGL', 'FB', 'NFLX', 'DIS', 'V', 'MA', 
-          'PYPL', 'INTC', 'AMD', 'CSCO', 'CRM', 'ORCL', 'IBM', 'ADBE', 'NOW', 'SNOW', 'ZM', 'DOCU', 'WORK', 'TWLO', 
-          'SHOP', 'SE', 'NET', 'CRWD', 'DDOG', 'PINS', 'SNAP', 'U', 'FSLY', 'SPLK', 'ZS', 'OKTA', 'MDB', 'BILL', 
-          'UPST', 'API', 'RNG', 'TWTR', 'UBER', 'LYFT', 'TDOC', 'Z', 'ZI', 'FVRR', 'ETSY', 'PTON', 'ROKU', 'SPOT', 
-          'TTD', 'ROKU', 'TTD', 'SQ', 'PYPL', 'SHOP', 'ETSY', 'FSLY', 'CRWD', 'NET', 'PINS', 'DOCU', 'ZM', 'SNOW', 
-          'NOW', 'ADBE', 'CRM', 'WORK', 'TWLO', 'SE', 'SHOP', 'ZS', 'OKTA', 'MDB', 'BILL', 'UPST', 'API', 'RNG', 
-          'TWTR', 'UBER', 'LYFT', 'TDOC', 'Z', 'ZI', 'FVRR', 'PTON', 'ROKU', 'SPOT', 'TTD', 'ROKU', 'TTD', 'SQ', 
-          'PYPL', 'SHOP', 'ETSY']
+stocks = [
+    'AAPL', 'MSFT', 'AMZN', 'FB', 'GOOG', 'GOOGL', 'BRK.B', 'JNJ', 'V', 'PG', 'NVDA', 'UNH', 'HD', 'MA', 
+    'PYPL', 'DIS', 'NFLX', 'XOM', 'VZ', 'PFE', 'T', 'KO', 'ABT', 'MRK', 'CSCO', 'ADBE', 'CMCSA', 'NKE', 
+    'INTC', 'PEP', 'TMO', 'CVX', 'ORCL', 'ABBV', 'AVGO', 'MCD', 'QCOM', 'MDT', 'BMY', 'AMGN', 'UPS', 'CRM', 
+    'MS', 'HON', 'C', 'GILD', 'DHR', 'BA', 'IBM', 'MMM', 'TSLA', 'TXN', 'SBUX', 'COST', 'AMD', 'TMUS', 
+    'CHTR', 'INTU', 'ADP', 'MU', 'MDLZ', 'ISRG', 'BKNG', 'ADI', 'ATVI', 'LRCX', 'AMAT', 'REGN', 'NXPI', 
+    'KDP', 'MAR', 'KLAC', 'WMT', 'JPM', QQQ, TQQQ, SOXX, SOXL, UPRO, SPY, VOO, VTI, VGT, VHT, VCR, VFH
+]
 for stock in stocks:
     try:
         # 백테스팅 코드 (예: 데이터 가져오기, 계산 등)
