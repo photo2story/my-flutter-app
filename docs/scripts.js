@@ -12,8 +12,9 @@ $(function() {
             method: 'GET',
             dataType: 'json',
             success: function(data) {
-                const comparisonFile = data.find(file => file.name === `comparison_${stockTicker}_VOO.png`);
-                const resultFile = data.find(file => file.name === `result_mpl_${stockTicker}.png`);
+                // 티커 이름과 회사 이름이 포함된 파일도 검색
+                const comparisonFile = data.find(file => file.name.includes(`comparison_${stockTicker}_`) && file.name.includes('_VOO.png'));
+                const resultFile = data.find(file => file.name.includes(`result_mpl_${stockTicker}.png`));
 
                 reviewList.empty();
 
@@ -46,7 +47,7 @@ $(function() {
             success: function(data) {
                 const tickers = data
                     .filter(file => file.name.startsWith('comparison_') && file.name.endsWith('_VOO.png'))
-                    .map(file => file.name.replace('comparison_', '').replace('_VOO.png', ''))
+                    .map(file => file.name.replace('comparison_', '').replace('_VOO.png', '').split('_')[0])
                     .sort();
 
                 tickerListContainer.empty();
