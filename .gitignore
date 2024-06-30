@@ -248,3 +248,5 @@ app/**/flutter_export_environment.sh
 
 *.csv
 !stock_market.csv
+
+.dart_tool/

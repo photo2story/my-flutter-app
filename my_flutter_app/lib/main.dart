@@ -28,7 +28,43 @@ class _MyHomePageState extends State<MyHomePage> {
   String _comparisonImageUrl = '';
   String _resultImageUrl = '';
   String _message = '';
+  List<String> _tickers = [];
   final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTickers();
+  }
+
+  Future<void> _fetchTickers() async {
+    final apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        final List<dynamic> files = json.decode(response.body);
+        final tickers = files
+            .where((file) => file['name'].startsWith('comparison_') && file['name'].endsWith('_VOO.png'))
+            .map((file) => file['name']
+                .replace('comparison_', '')
+                .replace('_VOO.png', '')
+                .toUpperCase())
+            .toList();
+
+        setState(() {
+          _tickers = tickers;
+        });
+      } else {
+        setState(() {
+          _message = 'Failed to load tickers: ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _message = 'Error loading tickers: $e';
+      });
+    }
+  }
 
   Future<void> fetchImages(String stockTicker) async {
     final apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
@@ -127,6 +163,27 @@ class _MyHomePageState extends State<MyHomePage> {
                   fetchImages(_controller.text.toUpperCase());
                 },
                 child: Text('Fetch Stock Images'),
+              ),
+              SizedBox(height: 20),
+              Wrap(
+                children: _tickers.map((ticker) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        _controller.text = ticker;
+                        fetchImages(ticker);
+                      },
+                      child: Text(
+                        ticker,
+                        style: TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
               SizedBox(height: 20),
               _comparisonImageUrl.isNotEmpty
