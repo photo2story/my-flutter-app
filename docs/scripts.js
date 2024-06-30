@@ -11,16 +11,15 @@ $(function() {
     stockInput.autocomplete({
         source: function(request, response) {
             $.ajax({
-                url: "/api/get_tickers",
+                url: "https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images",
                 method: "GET",
                 dataType: "json",
                 success: function(data) {
                     var filteredData = $.map(data, function(item) {
-                        if (item.Symbol.toUpperCase().includes(request.term.toUpperCase()) ||
-                            item.Name.toUpperCase().includes(request.term.toUpperCase())) {
+                        if (item.name.toUpperCase().includes(request.term.toUpperCase())) {
                             return {
-                                label: item.Symbol + " - " + item.Name + " - " + item.Market + " - " + item.Sector + " - " + item.Industry,
-                                value: item.Symbol
+                                label: item.name,
+                                value: item.name
                             };
                         } else {
                             return null;
@@ -70,18 +69,18 @@ $(function() {
 
     function loadReviews() {
         const reviewList = $('#reviewList');
-    
+
         $.ajax({
-            url: '/api/get_images',
+            url: 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images',
             method: 'GET',
             dataType: 'json',
             success: function(data) {
-                data.forEach(function(image) {
-                    const stockName = image.replace('comparison_', '').replace('_VOO.png', '').toUpperCase();
+                data.forEach(function(item) {
+                    const stockName = item.name.replace('comparison_', '').replace('_VOO.png', '').toUpperCase();
                     const newReview = $('<div>', { class: 'review' });
                     newReview.html(`
                         <h3>${stockName} vs VOO</h3>
-                        <img id="image-${stockName}" src="https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/${image}" alt="${stockName} vs VOO" style="width: 100%;">
+                        <img id="image-${stockName}" src="https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/${item.name}" alt="${stockName} vs VOO" style="width: 100%;">
                     `);
                     reviewList.append(newReview);
                     $(`#image-${stockName}`).on('click', function() {
@@ -94,12 +93,11 @@ $(function() {
             }
         });
     }
-    
+
     function showMplChart(stockName) {
         const url = `https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/result_mpl_${stockName}.png`;
         window.open(url, '_blank');
     }
-        
 
     function saveToSearchHistory(stockName) {
         $.ajax({
