@@ -2682,18 +2682,18 @@
 266870,파워풀엑스,KRX,기타 화학제품 제조업,,,
 107640,한중엔시에스,KRX,자동차 신품 부품 제조업,,,
 MSFT,Microsoft Corp,NASDAQ,Technology,MSFT,Software - Infrastructure,0.893
-AAPL,Apple Inc,NASDAQ,Technology,AAPL,Consumer Electronics,1.264
-NVDA,NVIDIA Corp,NASDAQ,Technology,NVDA,Semiconductors,1.749
-AMZN,Amazon.com Inc,NASDAQ,Consumer Cyclical,AMZN,Internet Retail,1.155
+AAPL,Apple Inc,NASDAQ,Technology,AAPL,Consumer Electronics,1.25
+NVDA,NVIDIA Corp,NASDAQ,Technology,NVDA,Semiconductors,1.694
+AMZN,Amazon.com Inc,NASDAQ,Consumer Cyclical,AMZN,Internet Retail,1.142
 META,Meta Platforms Inc,NASDAQ,none,,,
-GOOGL,Alphabet Inc Class A,NASDAQ,Communication Services,GOOGL,Internet Content & Information,1.019
+GOOGL,Alphabet Inc Class A,NASDAQ,Communication Services,GOOGL,Internet Content & Information,1.01
 GOOG,Alphabet Inc Class C,NASDAQ,none,,,
 AVGO,Broadcom Inc,NASDAQ,none,,,
-TSLA,Tesla Inc,NASDAQ,Consumer Cyclical,TSLA,Auto Manufacturers,2.408
+TSLA,Tesla Inc,NASDAQ,Consumer Cyclical,TSLA,Auto Manufacturers,2.318
 ASML,ASML Holding NV ADR,NASDAQ,none,,,
 COST,Costco Wholesale Corp,NASDAQ,none,,,
 AMD,Advanced Micro Devices Inc,NASDAQ,Technology,AMD,Semiconductors,1.66
-NFLX,Netflix Inc,NASDAQ,Communication Services,NFLX,Entertainment,1.232
+NFLX,Netflix Inc,NASDAQ,Communication Services,NFLX,Entertainment,1.257
 ADBE,Adobe Inc,NASDAQ,Technology,ADBE,Software - Infrastructure,1.281
 PEP,PepsiCo Inc,NASDAQ,none,,,
 LIN,Linde PLC,NASDAQ,none,,,
@@ -2739,7 +2739,7 @@ MRVL,Marvell Technology Inc,NASDAQ,none,,,
 ORLY,O'Reilly Automotive Inc,NASDAQ,none,,,
 NXPI,NXP Semiconductors NV,NASDAQ,none,,,
 CTAS,Cintas Corp,NASDAQ,none,,,
-PYPL,PayPal Holdings Inc,NASDAQ,none,,,
+PYPL,PayPal Holdings Inc,NASDAQ,Financial Services,PYPL,Credit Services,1.428
 SMCI,Super Micro Computer Inc,NASDAQ,none,,,
 MNST,Monster Beverage Corp,NASDAQ,none,,,
 PCAR,Paccar Inc,NASDAQ,none,,,
@@ -2749,7 +2749,7 @@ LULU,Lululemon Athletica Inc,NASDAQ,Consumer Cyclical,LULU,Apparel Retail,1.325
 ADSK,Autodesk Inc,NASDAQ,Technology,ADSK,Software - Application,1.454
 DASH,DoorDash Inc,NASDAQ,none,,,
 FTNT,Fortinet Inc,NASDAQ,none,,,
-COIN,Coinbase Global Inc,NASDAQ,none,,,
+COIN,Coinbase Global Inc,NASDAQ,Financial Services,COIN,Financial Data & Stock Exchanges,3.441
 CPRT,Copart Inc,NASDAQ,none,,,
 TEAM,Atlassian Corp,NASDAQ,none,,,
 ROST,Ross Stores Inc,NASDAQ,none,,,
@@ -2950,7 +2950,7 @@ APPF,Appfolio Inc,NASDAQ,none,,,
 NXT,Nextracker Inc,NASDAQ,none,,,
 DBX,Dropbox Inc,NASDAQ,none,,,
 CHRW,CH Robinson Worldwide Inc,NASDAQ,none,,,
-ETSY,ETSY Inc,NASDAQ,none,,,
+ETSY,ETSY Inc,NASDAQ,Consumer Cyclical,ETSY,Internet Retail,1.988
 MIDD,Middleby Corp,NASDAQ,none,,,
 AMKR,Amkor Technology Inc,NASDAQ,none,,,
 OLED,Universal Display Corp,NASDAQ,none,,,
@@ -6527,12 +6527,12 @@ ATLCZ,Atlanticus Holding 9 25 Senior Notes due 2029,NASDAQ,none,,,
 IROHR,Iron Horse Acquisitions Rights Exp 27 December 2028,NASDAQ,none,,,
 LLY,Eli Lilly and Co,NYSE,Healthcare,LLY,Drug Manufacturers - General,0.371
 TSM,Taiwan Semiconductor Manufacturing Co Ltd ADR,NYSE,none,,,
-V,Visa Inc,NYSE,Financial Services,V,Credit Services,0.962
+V,Visa Inc,NYSE,Financial Services,V,Credit Services,0.967
 JPM,JPMorgan Chase & Co,NYSE,Financial Services,JPM,Banks - Diversified,1.116
 BRK.B,Berkshire Hathaway Inc Class B,NYSE,none,,,
 WMT,Walmart Inc,NYSE,none,,,
 UNH,UnitedHealth Group Inc,NYSE,Healthcare,UNH,Healthcare Plans,0.561
-MA,Mastercard Inc,NYSE,none,,,
+MA,Mastercard Inc,NYSE,Financial Services,MA,Credit Services,1.089
 NVO,Novo Nordisk A/S ADR,NYSE,none,,,
 XOM,Exxon Mobil Corp,NYSE,Energy,XOM,Oil & Gas Integrated,0.947
 JNJ,Johnson & Johnson,NYSE,Healthcare,JNJ,Drug Manufacturers - General,0.531
@@ -6544,7 +6544,7 @@ ABBV,AbbVie Inc,NYSE,none,,,
 MRK,Merck & Co Inc,NYSE,none,,,
 ORCL,Oracle Corp,NYSE,none,,,
 CRM,Salesforce Inc,NYSE,none,,,
-BAC,Bank of America Corp,NYSE,Financial Services,BAC,Banks - Diversified,1.375
+BAC,Bank of America Corp,NYSE,Financial Services,BAC,Banks - Diversified,1.364
 CVX,Chevron Corp,NYSE,Energy,CVX,Oil & Gas Integrated,1.118
 KO,Coca-Cola Co,NYSE,Consumer Defensive,KO,Beverages - Non-Alcoholic,0.591
 ACN,Accenture PLC,NYSE,none,,,
@@ -6552,7 +6552,7 @@ TMO,Thermo Fisher Scientific Inc,NYSE,none,,,
 SAP,SAP SE ADR,NYSE,none,,,
 MCD,McDonald's Corp,NYSE,none,,,
 NVS,Novartis AG ADR,NYSE,none,,,
-DIS,Walt Disney Co,NYSE,none,,,
+DIS,Walt Disney Co,NYSE,Communication Services,DIS,Entertainment,1.402
 ABT,Abbott Laboratories,NYSE,none,,,
 SHEL,Shell PLC ADR,NYSE,none,,,
 WFC,Wells Fargo & Co,NYSE,Financial Services,WFC,Banks - Diversified,1.196
@@ -6610,7 +6610,7 @@ MMC,Marsh & McLennan Companies Inc,NYSE,none,,,
 BSX,Boston Scientific Corp,NYSE,none,,,
 CI,Cigna Group,NYSE,none,,,
 AMT,American Tower Corp,NYSE,none,,,
-SHOP,Shopify Inc,NYSE,none,,,
+SHOP,Shopify Inc,NYSE,Technology,SHOP,Software - Application,2.265
 CVS,CVS Health Corp,NYSE,none,,,
 IBN,ICICI Bank Ltd ADR,NYSE,none,,,
 FI,Fiserv Inc,NYSE,none,,,
