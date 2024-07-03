@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Comparison Review</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <style>
+        body {
+            padding-top: 200px; /* 상단 고정 부분을 위한 패딩 */
+        }
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            z-index: 1000;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .ticker-list {
+            margin-top: 20px;
+        }
+        .ticker-item {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+            display: inline-block;
+            margin: 5px 10px;
+            font-size: 12px; /* 글씨 크기 줄이기 */
+            line-height: 1.0; /* 줄 간격 줄이기 */
+        }
+        .review {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="fixed-header">
+        <h1>Stock Comparison Review</h1>
+        <label for="stockName">Stock name:</label>
+        <input type="text" id="stockName" name="stockName">
+        <button id="searchReviewButton">Search Review</button>
+        <div id="ticker-list" class="ticker-list"></div>
+    </div>
+    <div id="reviewList"></div>
+    <div id="searched-tickers" class="ticker-list">
+        <h2>검토한 주식</h2>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>

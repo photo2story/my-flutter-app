@@ -1,0 +1,23 @@
+name: my_flutter_app
+description: A new Flutter project.
+
+# 버전 번호는 프로젝트에 맞게 수정하세요
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+
+  # http 패키지 추가
+  http: ^0.13.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
