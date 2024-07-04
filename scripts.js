@@ -82,6 +82,11 @@ $(function() {
                     stockInput.val(stockTicker);
                     fetchImages(stockTicker);
                 });
+
+                // 모든 검토된 주식을 초기화면에 표시
+                tickers.forEach(ticker => {
+                    fetchImages(ticker);
+                });
             },
             error: function() {
                 alert('Error occurred while loading ticker list.');
