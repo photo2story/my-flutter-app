@@ -26,15 +26,15 @@ $(function() {
                             <img src="${resultFile.download_url}" alt="${stockTicker} Result" style="width: 100%; margin-top: 20px;">
                         </div>
                     `);
-                    alert(`Successfully fetched review for ${stockTicker}.`);
+                    console.log(`Successfully fetched review for ${stockTicker}.`);
                 } else {
-                    alert(`Unable to find images for the stock ticker ${stockTicker}.`);
+                    console.log(`Unable to find images for the stock ticker ${stockTicker}.`);
                     saveSearchedTicker(stockTicker);
                     displaySearchedTickers();
                 }
             },
             error: function() {
-                alert('Error occurred while fetching images.');
+                console.log('Error occurred while fetching images.');
             }
         });
     }
@@ -89,7 +89,7 @@ $(function() {
                 });
             },
             error: function() {
-                alert('Error occurred while loading ticker list.');
+                console.log('Error occurred while loading ticker list.');
             }
         });
     }
