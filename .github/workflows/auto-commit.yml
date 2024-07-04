@@ -26,5 +26,6 @@ jobs:
         git commit -m "Auto-commit at $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
 
     - name: Push changes
-      run: |
-        git push https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git
+      run: git push https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
