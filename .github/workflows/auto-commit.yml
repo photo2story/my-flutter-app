@@ -1,1 +1,32 @@
+name: Auto Commit
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '*/5 * * * *'  # 매 5분마다 실행
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Git
+      run: |
+        git config --global user.name 'Your GitHub Username'
+        git config --global user.email 'your-email@example.com'
+
+    - name: Commit changes
+      run: |
+        git add .
+        git commit -m "Auto-commit at $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+
+    - name: Push changes
+      run: git push origin main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
