@@ -12,8 +12,6 @@ import certifi
 import threading
 import logging
 import nest_asyncio
-from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer
-import subprocess
 
 logging.basicConfig(level=logging.INFO)
 
@@ -29,8 +27,8 @@ from Results_plot import plot_comparison_results, plot_results_all
 from get_compare_stock_data import merge_csv_files, load_sector_info
 from Results_plot_mpl import plot_results_mpl
 from get_ticker import get_ticker_from_korean_name
-import shutil
-import glob
+import shutil# 이미지 파일을 images 폴더로 이동
+import glob# 이미지 파일을 images 폴더로 이동
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 load_dotenv()
@@ -62,43 +60,6 @@ def get_images():
             images.append(filename)
     return jsonify(images)
 
-@app.route('/generate_description', methods=['POST'])
-def generate_description():
-    data = request.json
-    stock_ticker = data.get('stock_ticker')
-    description = create_description(stock_ticker)
-    send_description_to_discord(stock_ticker, description)
-    return jsonify({"description": description})
-
-def create_description(stock_ticker):
-    prompt = f"Generate a detailed description of the stock performance for {stock_ticker}."
-
-    try:
-        process = subprocess.Popen(
-            ["ollama", "generate", "EEVE-Korean-Instruct-10.8B", "--prompt", prompt],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            creationflags=subprocess.CREATE_NO_WINDOW
-        )
-        stdout, stderr = process.communicate()
-        description = stdout.decode('utf-8').strip()
-    except Exception as e:
-        description = f"Failed to generate description: {str(e)}"
-    
-    print(f"Generated description for {stock_ticker}: {description}")
-    return description
-
-def send_description_to_discord(stock_ticker, description):
-    DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-    message = {
-        'content': f"Description for {stock_ticker}:\n{description}"
-    }
-    response = requests.post(DISCORD_WEBHOOK_URL, json=message)
-    if response.status_code != 204:
-        print('Failed to send Discord message')
-    else:
-        print('Successfully sent Discord message')
-
 sent_messages = {}
 
 def reset_sent_messages():
@@ -116,6 +77,23 @@ intents = discord.Intents.all()
 intents.message_content = True
 bot = commands.Bot(command_prefix='', intents=intents)
 
+stocks = [
+    'AAPL', 'MSFT', 'AMZN', 'FB', 'GOOG', 'GOOGL', 'BRK.B', 'JNJ', 'V', 'PG', 'NVDA', 'UNH', 'HD', 'MA', 
+    'PYPL', 'DIS', 'NFLX', 'XOM', 'VZ', 'PFE', 'T', 'KO', 'ABT', 'MRK', 'CSCO', 'ADBE', 'CMCSA', 'NKE', 
+    'INTC', 'PEP', 'TMO', 'CVX', 'ORCL', 'ABBV', 'AVGO', 'MCD', 'QCOM', 'MDT', 'BMY', 'AMGN', 'UPS', 'CRM', 
+    'MS', 'HON', 'C', 'GILD', 'DHR', 'BA', 'IBM', 'MMM', 'TSLA', 'TXN', 'SBUX', 'COST', 'AMD', 'TMUS', 
+    'CHTR', 'INTU', 'ADP', 'MU', 'MDLZ', 'ISRG', 'BKNG', 'ADI', 'ATVI', 'LRCX', 'AMAT', 'REGN', 'NXPI', 
+    'KDP', 'MAR', 'KLAC', 'WMT', 'JPM',
+    'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO', 'SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'VFH', 'coin'
+]
+for stock in stocks:
+    try:
+        # 백테스팅 코드 (예: 데이터 가져오기, 계산 등)
+        print(f"Processing {stock}...")
+        # Example function call: backtest(stock, start_date, end_date, initial_investment)
+    except Exception as e:
+        print(f"Error processing {stock}: {e}")
+        
 start_date = "2022-01-01"
 end_date = datetime.today().strftime('%Y-%m-%d')
 initial_investment = 30000000
@@ -124,22 +102,23 @@ monthly_investment = 1000000
 processed_message_ids = set()
 login_once_flag = False  # 로그인 중복을 방지하기 위한 플래그
 
-def move_files_to_images_folder():
+def move_files_to_images_folder():# 이미지 파일을 images 폴더로 이동
+    # 이동할 파일 패턴
     patterns = ["*.png", "result_*.csv"]
+    # 이동할 폴더 경로
     destination_folder = os.path.join(app.static_folder, 'images')
 
     for pattern in patterns:
         for file in glob.glob(pattern):
             shutil.move(file, os.path.join(destination_folder, os.path.basename(file)))
-
-def is_valid_stock(stock):
+            
+def is_valid_stock(stock):# Check if the stock is in the stock market CSV
     try:
         stock_market_df = pd.read_csv('stock_market.csv')
         return stock in stock_market_df['Symbol'].values
     except Exception as e:
         print(f"Error checking stock market CSV: {e}")
         return False
-
 async def backtest_and_send(ctx, stock, option_strategy):
     if not is_valid_stock(stock):
         message = f"Stock market information updates needed. {stock}"
@@ -173,14 +152,63 @@ async def backtest_and_send(ctx, stock, option_strategy):
 
         plot_comparison_results(user_stock_file_path1, user_stock_file_path2, stock, 'VOO', total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date)
         await bot.change_presence(status=discord.Status.online, activity=discord.Game("Waiting"))
-
-        # 주식 설명 생성 및 콘솔 출력
-        description = create_description(stock)
-        print(f"Description for {stock}: {description}")
-
     except Exception as e:
         await ctx.send(f"An error occurred while processing {stock}: {e}")
         print(f"Error processing {stock}: {e}")
+
+
+@bot.command()
+async def buddy(ctx):
+    loop = asyncio.get_running_loop()  # Get the current event loop
+
+    for stock in stocks:  # 주식 리스트를 순회하며 백테스팅 수행
+        await backtest_and_send(ctx, stock, 'modified_monthly')
+        if is_valid_stock(stock):  # 유효한 주식에 대해서만 결과를 플로팅
+            try:
+                plot_results_mpl(stock, start_date, end_date)
+            except KeyError as e:
+                await ctx.send(f"An error occurred while plotting {stock}: {e}")
+                print(f"Error plotting {stock}: {e}")
+        await asyncio.sleep(2)
+
+    # Run synchronous functions in the executor
+    await loop.run_in_executor(None, update_stock_market_csv, 'stock_market.csv', stocks)
+    sector_dict = await loop.run_in_executor(None, load_sector_info) # run_in_executor returns a future, await it if function is synchronous
+    path = '.'  # Assuming folder path
+    await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
+
+    await ctx.send("백테스팅 결과가 섹터별로 정리되었습니다.")
+    move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
+
+@bot.command()
+async def ticker(ctx, *, query: str = None):
+    print(f'Command received: ticker with query: {query}')
+    if query is None:
+        await ctx.send("Please enter ticker stock name or ticker.")
+        return
+
+    ticker_dict = load_tickers()
+    matching_tickers = search_tickers(query, ticker_dict)
+
+    if not matching_tickers:
+        await ctx.send("No search results.")
+        return
+
+    response_message = "Search results:\n"
+    response_messages = []
+    for symbol, name in matching_tickers:
+        line = f"{symbol} - {name}\n"
+        if len(response_message) + len(line) > 2000:
+            response_messages.append(response_message)
+            response_message = "Search results (continued):\n"
+        response_message += line
+
+    if response_message:
+        response_messages.append(response_message)
+
+    for message in response_messages:
+        await ctx.send(message)
+    print(f'Sent messages for query: {query}')
 
 @bot.command()
 async def stock(ctx, *args):
@@ -202,6 +230,15 @@ async def stock(ctx, *args):
         move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
     except Exception as e:
         await ctx.send(f'An error occurred: {e}')
+
+@bot.command()
+async def show_all(ctx):
+    try:
+        await plot_results_all()
+        await ctx.send("All results have been successfully displayed.")
+    except Exception as e:
+        await ctx.send(f"An error occurred: {e}")
+        print(f"Error: {e}")
 
 @bot.event
 async def on_ready():
@@ -234,6 +271,8 @@ if __name__ == '__main__':
     flask_thread.start()
 
     loop.run_until_complete(run_bot())
+
+
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
