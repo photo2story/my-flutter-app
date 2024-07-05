@@ -67,7 +67,7 @@ def update_stock_market_csv(file_path, tickers_to_update):
 def load_tickers():
     """CSV 파일에서 티커 데이터를 읽어 딕셔너리로 반환합니다."""
     ticker_dict = {}
-    with open('stock_market.csv', mode='r') as file:
+    with open('stock_market.csv', mode='r', encoding='utf-8') as file:
         csv_reader = csv.reader(file)
         for rows in csv_reader:
             if len(rows) >= 2:
