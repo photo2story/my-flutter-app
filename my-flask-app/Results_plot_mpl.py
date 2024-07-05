@@ -91,22 +91,18 @@ def plot_results_mpl(ticker,start_date, end_date):
       RSI(), PPO(), TradeSpan('ppohist>0')
     ]
 
-    chart = Chart(title=ticker, max_bars=max_bars)
+    # 티커 이름 가져오기
+    name = get_ticker_name(ticker)
+    
+    # 차트 제목을 티커 이름과 함께 설정
+    chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=max_bars)
     chart.plot(prices, indicators)
 
     fig = chart.figure
 
     # 그래프를 PNG 파일로 저장
     save_figure(fig, 'result_mpl_{}.png'.format(ticker))
-    # 티커 이름 가져오기
-    name = get_ticker_name(ticker)
-
-
-    # 그래프를 PNG 파일로 저장
-    save_figure(fig, 'result_mpl_{}.png'.format(ticker))
-
-    # tv_analysis =get_tradingview_analysis(ticker)
-
+    
     # Discord로 이미지 전송
     import requests
 
