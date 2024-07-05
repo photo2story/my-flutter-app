@@ -24,8 +24,12 @@ $(function() {
                     reviewList.append(`
                         <div class="review">
                             <h3>${stockTicker} vs VOO</h3>
-                            <img src="${comparisonFile.download_url}" alt="${stockTicker} vs VOO" class="responsive-img">
-                            <img src="${resultFile.download_url}" alt="${stockTicker} Result" class="responsive-img" style="margin-top: 20px;">
+                            <div class="chart-container">
+                                <img src="${comparisonFile.download_url}" alt="${stockTicker} vs VOO" class="responsive-img">
+                            </div>
+                            <div class="chart-container" style="margin-top: 20px;">
+                                <img src="${resultFile.download_url}" alt="${stockTicker} Result" class="responsive-img">
+                            </div>
                         </div>
                     `);
                     console.log(`Successfully fetched review for ${stockTicker}.`);
