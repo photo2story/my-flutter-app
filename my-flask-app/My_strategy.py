@@ -102,33 +102,33 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
 
 
 
-        if performance< -0.4 and (aroon_up_ta == 0 and bb_lower_ta > row['Close']):
-            Sudden_fall = True
+        if performance< -0.4 and (aroon_up_ta == 0 and bb_lower_ta > row['Close']): # 최근 고점 대비 40% 이상 하락하고, aroon_up_ta가 0이고, bb_lower_ta가 종가보다 크면
+            Sudden_fall = True # 급락 시그널
             signal = 'Sudden fall'
-            shares_to_sell = 0.5 * shares
-            shares -= shares_to_sell
-            cash += shares_to_sell * price * 0.5
-            deposit += shares_to_sell * price * 0.5
-            signal = 'sell 0.5%' + ' ' + signal
+            shares_to_sell = 0.5 * shares # 50% 주식 매도
+            shares -= shares_to_sell # 주식 보유량 업데이트
+            cash += shares_to_sell * price * 0.5 # 현금 업데이트
+            deposit += shares_to_sell * price * 0.5 # 보관금 업데이트
+            signal = 'sell 50 %' + ' ' + signal
  
                 
-        if Sudden_fall and (SMA_60_turn == True or PPO_BUY == True):
-            shares_to_buy_depot = 0.5 * max(0, deposit) // price
-            shares_to_buy_cash = 1.0 * max(0, cash) // price
-            shares += shares_to_buy_depot + shares_to_buy_cash
-            deposit -= shares_to_buy_depot * price
-            cash -= shares_to_buy_cash * price
-            signal = 'sudden fall + sma trend rise'
-            Sudden_fall = False
+        if Sudden_fall and (SMA_60_turn == True or PPO_BUY == True):# 급락 시그널이 발생한 후이고, 60일 이동평균선이 상승하거나, PPO_BUY가 True일 때
+            shares_to_buy_depot = 0.5 * max(0, deposit) // price # 보관금의 50%로 주식 매수
+            shares_to_buy_cash = 1.0 * max(0, cash) // price # 현금의 100%로 주식 매수
+            shares += shares_to_buy_depot + shares_to_buy_cash # 주식 보유량 업데이트
+            deposit -= shares_to_buy_depot * price # 보관금 업데이트
+            cash -= shares_to_buy_cash * price # 현금 업데이트
+            signal = 'sudden fall + sma trend rise' 
+            Sudden_fall = False # 급락 시그널 초기화
 
         # Check if portfolio value has doubled and sell 50% stocks
-        if portfolio_value >= 2 * invested_amount and cash > invested_amount and PPO_BUY == False:
+        if portfolio_value >= 2 * invested_amount and cash > invested_amount and PPO_BUY == False: # 포트폴리오 가치가 투자금의 2배 이상이고, 현금이 투자금보다 많고, PPO_BUY가 False일 때
             # shares_to_sell = 0.5 * shares
-            shares_to_sell = 0.5 * shares
+            shares_to_sell = 0.5 * shares # 주식 매도량 50%
             shares -= shares_to_sell
-            cash += shares_to_sell * price * 0.5
-            deposit += shares_to_sell * price * 0.5
-            signal = 'Act1 end!  sell 50%' + ' ' + signal
+            cash += shares_to_sell * price * 0.5 # 현금 업데이트
+            deposit += shares_to_sell * price * 0.5 # 보관금 업데이트
+            signal = 'Act1 end!  sell 50%' + ' ' + signal # 신호 업데이트
         else:
             # Hold cash
             pass
@@ -141,8 +141,8 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
             ta_sell_amount = sell_result
             sell_signal = '' + ' ' + signal
 
-        if Invest_day and ta_sell_amount > 0:
-            shares_to_sell = ta_sell_amount * shares
+        if Invest_day and ta_sell_amount > 0: # 투자일이고, ta_sell_amount가 0보다 클 때
+            shares_to_sell = ta_sell_amount * shares # 주식 매도량
             shares -= shares_to_sell
             cash += shares_to_sell * price
             signal = sell_signal + ' ' + signal
@@ -155,14 +155,14 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
             perform_buy_amount = buy_result
             return_signal = ''  + ' ' + signal
 
-        if Invest_day and PPO_BUY == True:
-            shares_to_buy = 0.5 * min(cash, monthly_investment) // price
+        if Invest_day and PPO_BUY == True: # 투자일이고, PPO_BUY가 True일 때
+            shares_to_buy = 0.5 * min(cash, monthly_investment) // price # 현금과 월간 투자금 중 작은 값의 50%로 주식 매수
             shares += shares_to_buy
             cash -= shares_to_buy * price
-            signal = 'weekly trade'  + ' ' + signal
+            signal = 'weekly trade'  + ' ' + signal # 신호 업데이트
 
-        if Invest_day and perform_buy_amount > 0:
-            shares_to_buy = perform_buy_amount * cash // price
+        if Invest_day and perform_buy_amount > 0: # 투자일이고, perform_buy_amount가 0보다 클 때
+            shares_to_buy = perform_buy_amount * cash // price # 현금의 perform_buy_amount%로 주식 매수
             shares += shares_to_buy
             cash -= shares_to_buy * price
             signal = 'week +' + buy_signal  + ' ' + signal

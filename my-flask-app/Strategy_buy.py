@@ -28,18 +28,18 @@ def strategy_buy(current_date, price, mfi_ta, sma20_ta, sma60_ta, recent_high, p
     #     buy_signal = None
     #  'default'  'monthly' 'modified_monthly'
     if option_strategy == 'default':
-        perform_buy_amount = 1.0 if PPO_BUY else 0.5
-    elif option_strategy == 'modified_monthly' and performance > 0:
+        perform_buy_amount = 1.0 if PPO_BUY else 0.5 # 50% 투자 
+    elif option_strategy == 'modified_monthly' and performance > 0: # 수익률이 양수일 때만 투자
         perform_buy_amount = 0
     else:
-       perform_buy_amount = 1.0 if PPO_BUY else 0.5
+       perform_buy_amount = 1.0 if PPO_BUY else 0.5 # 50% 투자
 
 
   
     # 옵션 2: 적립식 투자일 경우, 매월 100% 투자
     # 옵션 3: 변형 적립식 투자일 경우, 수익률이 음수일 때만 투자
-    if option_strategy == 'modified_monthly' and performance > 0:
-        perform_buy_amount = 0
+    if option_strategy == 'modified_monthly' and performance > 0: # 수익률이 양수일 때만 투자
+        perform_buy_amount = 0 # 투자하지 않음
         buy_signal = None
 
     else:
