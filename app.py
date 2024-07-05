@@ -29,6 +29,7 @@ from Results_plot_mpl import plot_results_mpl
 from get_ticker import get_ticker_from_korean_name
 import shutil# 이미지 파일을 images 폴더로 이동
 import glob# 이미지 파일을 images 폴더로 이동
+from git_operations import move_files_to_images_folder  # 추가된 부분
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 load_dotenv()
