@@ -102,15 +102,17 @@ monthly_investment = 1000000
 processed_message_ids = set()
 login_once_flag = False  # 로그인 중복을 방지하기 위한 플래그
 
-def move_files_to_images_folder():# 이미지 파일을 images 폴더로 이동
+def move_files_to_images_folder(): # 이미지 파일을 images 폴더로 이동
     # 이동할 파일 패턴
-    patterns = ["*.png", "result_*.csv"]
+    patterns = ["*.png", "*.csv"]
     # 이동할 폴더 경로
     destination_folder = os.path.join(app.static_folder, 'images')
 
     for pattern in patterns:
         for file in glob.glob(pattern):
-            shutil.move(file, os.path.join(destination_folder, os.path.basename(file)))
+            if file != "stock_market.csv":
+                shutil.move(file, os.path.join(destination_folder, os.path.basename(file)))
+                print(f"Moved {file} to {destination_folder}")
             
 def is_valid_stock(stock):# Check if the stock is in the stock market CSV
     try:
