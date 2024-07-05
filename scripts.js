@@ -5,7 +5,7 @@ $(function() {
     const tickerListContainer = $('#ticker-list');
     const searchedTickersContainer = $('#searched-tickers');
 
-    function fetchImages(stockTicker) {
+    function fetchImages(stockTicker, clearReviewList = false) {
         const apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
 
         $.ajax({
@@ -16,7 +16,9 @@ $(function() {
                 const comparisonFile = data.find(file => file.name === `comparison_${stockTicker}_VOO.png`);
                 const resultFile = data.find(file => file.name === `result_mpl_${stockTicker}.png`);
 
-                reviewList.empty();
+                if (clearReviewList) {
+                    reviewList.empty();
+                }
 
                 if (comparisonFile && resultFile) {
                     reviewList.append(`
@@ -80,12 +82,12 @@ $(function() {
                 $('.ticker-item').on('click', function() {
                     const stockTicker = $(this).text();
                     stockInput.val(stockTicker);
-                    fetchImages(stockTicker);
+                    fetchImages(stockTicker, true); // 특정 주식을 클릭했을 때 리뷰 목록 초기화
                 });
 
                 // 모든 검토된 주식을 초기화면에 표시
                 tickers.forEach(ticker => {
-                    fetchImages(ticker);
+                    fetchImages(ticker, false); // 모든 티커에 대해 reviewList를 비우지 않음
                 });
             },
             error: function() {
@@ -97,7 +99,7 @@ $(function() {
     searchReviewButton.click(function() {
         const stockTicker = stockInput.val().toUpperCase();
         if (stockTicker) {
-            fetchImages(stockTicker);
+            fetchImages(stockTicker, true); // 검색 시 리뷰 목록 초기화
         }
     });
 
