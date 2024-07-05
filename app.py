@@ -30,6 +30,7 @@ from get_ticker import get_ticker_from_korean_name
 import shutil# 이미지 파일을 images 폴더로 이동
 import glob# 이미지 파일을 images 폴더로 이동
 from git_operations import move_files_to_images_folder  # 추가된 부분
+from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 load_dotenv()
@@ -103,13 +104,6 @@ monthly_investment = 1000000
 processed_message_ids = set()
 login_once_flag = False  # 로그인 중복을 방지하기 위한 플래그
 
-def is_valid_stock(stock):# Check if the stock is in the stock market CSV
-    try:
-        stock_market_df = pd.read_csv('stock_market.csv')
-        return stock in stock_market_df['Symbol'].values
-    except Exception as e:
-        print(f"Error checking stock market CSV: {e}")
-        return False
 async def backtest_and_send(ctx, stock, option_strategy):
     if not is_valid_stock(stock):
         message = f"Stock market information updates needed. {stock}"

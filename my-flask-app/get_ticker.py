@@ -9,14 +9,15 @@ import requests
 import yfinance as yf
 import investpy
 from tradingview_ta import TA_Handler, Interval, Exchange
+from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path # stock_market.csv 파일 경로
 
-def get_ticker_name(ticker, file_path='stock_market.csv'):
+def get_ticker_name(ticker, file_path=ticker_path):
     df = pd.read_csv(file_path)
     result = df.loc[df['Symbol'] == ticker, 'Name']
     name = result.iloc[0] if not result.empty else None
     return name
 
-def get_ticker_market(ticker, file_path='stock_market.csv'):
+def get_ticker_market(ticker, file_path=ticker_path):
   df = pd.read_csv(file_path)
   result = df.loc[df['Symbol'] == ticker, 'Market']
   market = result.iloc[0] if not result.empty else None
@@ -67,7 +68,7 @@ def update_stock_market_csv(file_path, tickers_to_update):
 def load_tickers():
     """CSV 파일에서 티커 데이터를 읽어 딕셔너리로 반환합니다."""
     ticker_dict = {}
-    with open('stock_market.csv', mode='r', encoding='utf-8') as file:
+    with open(ticker_path, mode='r', encoding='utf-8') as file:
         csv_reader = csv.reader(file)
         for rows in csv_reader:
             if len(rows) >= 2:
@@ -171,7 +172,7 @@ def get_ticker_list_all():
     df_US_ETF = search_ticker_list_US_ETF()
 
     df_combined = pd.concat([df_KR, df_US, df_US_ETF], ignore_index=True)
-    df_combined.to_csv('stock_market.csv', encoding='utf-8-sig', index=False)
+    df_combined.to_csv(ticker_path, encoding='utf-8-sig', index=False)
 
     return df_combined
 
@@ -182,18 +183,18 @@ def get_ticker_from_korean_name(name):
     return ticker
 
 if __name__ == "__main__":
-    # 사용 예시
+    # 사용 예시 python get_ticker.py
     # get_ticker_list_all()
-    tickers_to_update = [
-    'VOO', 'QQQ', 'AAPL', 'GOOGL', 'MSFT','U', 'SPOT', 'PLTR','ADBE', 'TSLA', 'APTV', 
-    'FSLR',  'PFE', 'INMD', 'UNH',  'TDOC', 'OXY', 'FSLR', 'ALB','AMZN', 'NFLX', 'LLY', 'EL',
-    'NKE', 'LOW', 'ADSK', 'NIO', 'F', 'BA', 'GE', 'JPM', 'BAC', 'SQ', 'HD', 'PG',
-    'IONQ','NVDA','AMD']
+    # tickers_to_update = [
+    # 'VOO', 'QQQ', 'AAPL', 'GOOGL', 'MSFT','U', 'SPOT', 'PLTR','ADBE', 'TSLA', 'APTV', 
+    # 'FSLR',  'PFE', 'INMD', 'UNH',  'TDOC', 'OXY', 'FSLR', 'ALB','AMZN', 'NFLX', 'LLY', 'EL',
+    # 'NKE', 'LOW', 'ADSK', 'NIO', 'F', 'BA', 'GE', 'JPM', 'BAC', 'SQ', 'HD', 'PG',
+    # 'IONQ','NVDA','AMD']
      # 여기에 필요한 티커 20개 추가
     
     # # 파일 경로 지정 및 CSV 파일 업데이트
-    file_path = 'stock_market.csv'
-    update_stock_market_csv(file_path, tickers_to_update)
+    # file_path = 'stock_market.csv'
+    # update_stock_market_csv(file_path, tickers_to_update)
 
     # search_ticker_list_US()
     # Use the function and assign the resulting DataFrame to a variable
@@ -204,5 +205,5 @@ if __name__ == "__main__":
     # df_us.to_csv('us_stock_market.csv', encoding='utf-8-sig', index=False)  # Save the DataFrame to a CSV
     info = get_stock_info('AAPL')
     print(info)
-    market = get_ticker_market('086520', file_path='stock_market.csv')
+    market = get_ticker_market('086520', file_path=ticker_path)
     print(market)
