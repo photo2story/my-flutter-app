@@ -103,6 +103,15 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _openImage(BuildContext context, String imageUrl) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImageScreen(imageUrl: imageUrl),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,20 +151,26 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               SizedBox(height: 20),
               _comparisonImageUrl.isNotEmpty
-                  ? Image.network(
-                      _comparisonImageUrl,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Text('Failed to load comparison image');
-                      },
+                  ? GestureDetector(
+                      onTap: () => _openImage(context, _comparisonImageUrl),
+                      child: Image.network(
+                        _comparisonImageUrl,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Text('Failed to load comparison image');
+                        },
+                      ),
                     )
                   : Container(),
               SizedBox(height: 20),
               _resultImageUrl.isNotEmpty
-                  ? Image.network(
-                      _resultImageUrl,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Text('Failed to load result image');
-                      },
+                  ? GestureDetector(
+                      onTap: () => _openImage(context, _resultImageUrl),
+                      child: Image.network(
+                        _resultImageUrl,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Text('Failed to load result image');
+                        },
+                      ),
                     )
                   : Container(),
               SizedBox(height: 20),
@@ -173,9 +188,4 @@ class _MyHomePageState extends State<MyHomePage> {
                     )
                   : Container(),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+          
