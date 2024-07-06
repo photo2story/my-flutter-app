@@ -13,17 +13,17 @@ from github_operations import save_csv_to_github, save_image_to_github, is_valid
 
 import os, sys
 # app.py에서 전역 변수 가져오기
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from app import csv_url
+# sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+# from github_operations import csv_url
 
-def get_ticker_name(ticker, csv_url):
+def get_ticker_name(ticker, ticker_path):
     df = pd.read_csv(csv_url)
     result = df.loc[df['Symbol'] == ticker, 'Name']
     name = result.iloc[0] if not result.empty else None
     return name
 
 def get_ticker_market(ticker, csv_url):
-  df = pd.read_csv(csv_url)
+  df = pd.read_csv(ticker_path)
   result = df.loc[df['Symbol'] == ticker, 'Market']
   market = result.iloc[0] if not result.empty else None
   return market
@@ -210,7 +210,7 @@ if __name__ == "__main__":
     # df_us.to_csv('us_stock_market.csv', encoding='utf-8-sig', index=False)  # Save the DataFrame to a CSV
     info = get_stock_info('AAPL')
     print(info)
-    market = get_ticker_market('086520', csv_url)
+    market = get_ticker_market('086520', ticker_path)
     print(market)
     
     # python get_ticker.py

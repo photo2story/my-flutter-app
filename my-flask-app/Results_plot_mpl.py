@@ -18,9 +18,8 @@ from get_ticker import get_ticker_name, get_ticker_market
 from tradingview_ta import TA_Handler, Interval, Exchange
 
 import os, sys
-# app.py에서 전역 변수 가져오기
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from app import csv_url
+from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path # ticker_path=stock_market.csv 파일 경로
+
 
 def convert_file_path_for_saving(file_path):
   return file_path.replace('/', '-')
@@ -35,7 +34,7 @@ def save_figure(fig, file_path):
 
 def get_tradingview_analysis(ticker):
   # tv_symbol = f"{ticker.upper()}/USD"  # 트레이딩뷰에서 사용하는 심볼 형식
-  market = get_ticker_market(ticker, csv_url) # file_path='stock_market.csv'
+  market = get_ticker_market(ticker, ticker_path) # file_path='stock_market.csv'
   if market == 'KRX':
     screener = "korea"
   elif market == 'UPBIT' or market == 'BINANCE' :   

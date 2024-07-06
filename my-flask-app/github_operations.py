@@ -56,7 +56,7 @@ def save_image_to_github(image_path, commit_message):
 
 def is_valid_stock(stock):  # Check if the stock is in the stock market CSV
     try:
-        url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/stock_market.csv'
+        url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'
         stock_market_df = pd.read_csv(url)
         return stock in stock_market_df['Symbol'].values
     except Exception as e:
