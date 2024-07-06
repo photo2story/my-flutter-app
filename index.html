@@ -58,6 +58,7 @@
     <div id="searched-tickers" class="ticker-list">
         <h2>검토한 주식</h2>
     </div>
-    <script src="scripts.js"></script>
+    <!-- 정적 파일 경로를 동적으로 생성하여 JavaScript 파일 로드 -->
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </body>
 </html>
