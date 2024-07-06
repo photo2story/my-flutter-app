@@ -239,6 +239,10 @@ async def on_ready():
         channel = bot.get_channel(int(CHANNEL_ID))
         if channel:
             await channel.send(f'Bot has successfully logged in: {bot.user.name}')
+        else:
+            print(f'Failed to get channel with ID {CHANNEL_ID}')
+    else:
+        print('Bot already logged in')
 
 @bot.command()
 async def ping(ctx):
@@ -271,18 +275,19 @@ def data():
 
 if __name__ == '__main__':
     nest_asyncio.apply()
-    
-    loop = asyncio.get_event_loop()
 
     async def run_bot():
+        print("Starting Discord bot...")
         await bot.start(TOKEN)
     
     def run_flask():
+        print("Starting Flask server...")
         app.run(debug=True, use_reloader=False)
 
     flask_thread = threading.Thread(target=run_flask)
     flask_thread.start()
 
+    loop = asyncio.get_event_loop()
     loop.run_until_complete(run_bot())
 
 # #  .\.venv\Scripts\activate
