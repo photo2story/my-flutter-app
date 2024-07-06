@@ -80,7 +80,7 @@ async def ping(ctx):
 
 if __name__ == "__main__":
     async def run_bot():
-        await bot.start(TOKEN)
+        await bot.start("DISCORD_BOT_TOKEN")
     
     def run_flask():
         app.run(debug=True, use_reloader=False)
@@ -90,5 +90,6 @@ if __name__ == "__main__":
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run_bot())
-
+ 
+#  .\.venv\Scripts\activate
 # python flask-discord.py    
