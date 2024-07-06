@@ -20,8 +20,9 @@ def estimate_stock(stock,start_date, end_date, initial_investment, monthly_inves
     str_last_signal = result_dict['Last_signal']
 
     # 결과 CSV 파일로 저장하기
-    safe_ticker = stock.replace('/', '-')
-    file_path = 'result_{}.csv'.format(safe_ticker)
+    safe_ticker = stock.replace('/', '-') # 슬래시를 하이픈으로 변경
+    file_path = 'result_{}.csv'.format(safe_ticker) # result_TSLA.csv
+    print('file_path:',file_path)
     result_df = export_csv(file_path, result_dict)
     print('estimate_stock:',stock)
 

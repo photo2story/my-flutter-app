@@ -110,6 +110,7 @@ processed_message_ids = set()
 login_once_flag = False
 
 async def backtest_and_send(ctx, stock, option_strategy):
+    await ctx.send(f'backtest_and_send.command1: {stock}') # 주식 이름을 출력
     if not is_valid_stock(stock):
         message = f"Stock market information updates needed. {stock}"
         await ctx.send(message)
@@ -119,6 +120,7 @@ async def backtest_and_send(ctx, stock, option_strategy):
     try:
         total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df = estimate_stock(
             stock, start_date, end_date, initial_investment, monthly_investment, option_strategy)
+        await ctx.send(f'backtest_and_send.command2: {stock}') # 주식 이름을 출력
         min_stock_data_date = str(min_stock_data_date).split(' ')[0]
         user_stock_file_path1 = file_path
 
