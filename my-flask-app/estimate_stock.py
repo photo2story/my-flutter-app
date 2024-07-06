@@ -23,6 +23,7 @@ def estimate_stock(stock,start_date, end_date, initial_investment, monthly_inves
     safe_ticker = stock.replace('/', '-')
     file_path = 'result_{}.csv'.format(safe_ticker)
     result_df = export_csv(file_path, result_dict)
+    print('estimate_stock:',stock)
 
     return total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date,file_path, result_df
 
