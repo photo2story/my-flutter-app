@@ -42,9 +42,9 @@ CORS(app)
 def index():
     return render_template('index.html')
 
-@app.route('/static/<path:filename>')
-def static_files(filename):
-    return send_from_directory('static', filename)
+@app.route('/<path:path>')
+def static_proxy(path):
+    return send_from_directory(app.static_folder, path)
 
 @app.route('/save_search_history', methods=['POST'])
 def save_search_history():
