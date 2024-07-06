@@ -1,7 +1,6 @@
 name: my_flutter_app
 description: A new Flutter project.
 
-# 버전 번호는 프로젝트에 맞게 수정하세요
 version: 1.0.0+1
 
 environment:
@@ -11,12 +10,9 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-
-  # http 패키지 추가 (최신 버전으로 업데이트)
-  http: ^1.2.1
-
-  # photo_view 패키지 추가
-  photo_view: ^0.15.0
+  http: ^0.14.0
+  photo_view: ^0.14.0
+  flutter_dotenv: ^5.0.2
 
 dev_dependencies:
   flutter_test:

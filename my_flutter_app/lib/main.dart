@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:photo_view/photo_view.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }
 
@@ -33,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _controller = TextEditingController();
 
   Future<void> fetchImages(String stockTicker) async {
-    final apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
+    final apiUrl = '${dotenv.env['HEROKU_APP_URL']}/contents/static/images';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -77,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> generateDescription(String stockTicker) async {
-    final apiUrl = 'http://127.0.0.1:5000/generate_description'; // 플라스크 서버 엔드포인트
+    final apiUrl = '${dotenv.env['HEROKU_APP_URL']}/generate_description'; // 플라스크 서버 엔드포인트
 
     try {
       final response = await http.post(
