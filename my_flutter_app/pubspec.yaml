@@ -10,8 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  http: ^0.14.0
-  photo_view: ^0.14.0
+  http: ^1.2.1  # 최신 버전으로 업데이트
+  photo_view: ^0.15.0
   flutter_dotenv: ^5.0.2
 
 dev_dependencies:
