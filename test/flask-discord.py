@@ -10,7 +10,6 @@ from flask import Flask, redirect, url_for, render_template, request, jsonify
 from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
 from dotenv import load_dotenv
 from datetime import datetime
-import pandas as pd
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 load_dotenv()
@@ -24,7 +23,7 @@ app.config["DISCORD_BOT_TOKEN"] = os.getenv("DISCORD_BOT_TOKEN")
 
 discord_oauth = DiscordOAuth2Session(app)
 
-# TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
+TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 # CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
 # DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
@@ -65,6 +64,12 @@ def me():
         </body>
     </html>"""
 
+def welcome_user(user):
+    dm_channel = discord_oauth.bot_request("/users/@me/channels", "POST", json={"recipient_id": user.id})
+    discord_oauth.bot_request(
+        f"/channels/{dm_channel['id']}/messages", "POST", json={"content": "Thanks for authorizing the app!"}
+    )
+
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
@@ -80,7 +85,7 @@ async def ping(ctx):
 
 if __name__ == "__main__":
     async def run_bot():
-        await bot.start("DISCORD_BOT_TOKEN")
+        await bot.start(TOKEN)
     
     def run_flask():
         app.run(debug=True, use_reloader=False)
@@ -90,6 +95,6 @@ if __name__ == "__main__":
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run_bot())
- 
+
 #  .\.venv\Scripts\activate
 # python flask-discord.py    
