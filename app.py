@@ -161,7 +161,7 @@ async def buddy(ctx):
         await asyncio.sleep(2)
 
     # Run synchronous functions in the executor
-    await loop.run_in_executor(None, update_stock_market_csv, 'stock_market.csv', stocks)
+    await loop.run_in_executor(None, update_stock_market_csv, ticker_path, stocks)
     sector_dict = await loop.run_in_executor(None, load_sector_info) # run_in_executor returns a future, await it if function is synchronous
     path = '.'  # Assuming folder path
     await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
