@@ -7,6 +7,8 @@ import pandas as pd
 import requests
 import numpy as np
 import FinanceDataReader as fdr
+from github_operations import ticker_path # stock_market.csv 파일 경로
+
 
 def calculate_mfi(high_prices, low_prices, close_prices, volumes, length=14):
     typical_prices = (high_prices + low_prices + close_prices) / 3
@@ -45,7 +47,7 @@ def calculate_mfi(high_prices, low_prices, close_prices, volumes, length=14):
     return mfi_values_full
 
 def load_industry_info():
-    industry_df = pd.read_csv('stock_market.csv')
+    industry_df = pd.read_csv(ticker_path)# stock_market.csv 파일 경로
     industry_dict = dict(zip(industry_df['Symbol'], industry_df['Industry']))
     return industry_dict
   
@@ -57,7 +59,7 @@ def get_start_date(ticker):
 
 def get_stock_data(ticker, start_date, end_date):
     # FinanceDataReader를 사용하여 주식 데이터 불러오기
-    print(ticker)
+    print('get_stock_data.1:',ticker)
     # print(start_date)
     stock_data = fdr.DataReader(ticker, start_date, end_date)
 
@@ -90,7 +92,7 @@ def get_stock_data(ticker, start_date, end_date):
 
 
     # Industry 정보 추가
-    sector_df = pd.read_csv('stock_market.csv')
+    sector_df = pd.read_csv(ticker_path)# stock_market.csv 파일 경로
     sector_dict = dict(zip(sector_df['Symbol'], sector_df['Sector']))
     if ticker in sector_dict:
         stock_data['Sector'] = sector_dict[ticker]

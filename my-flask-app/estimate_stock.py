@@ -9,6 +9,7 @@ import pandas as pd
 def estimate_stock(stock,start_date, end_date, initial_investment, monthly_investment,option_strategy):
     
     stock_data, min_stock_data_date = get_stock_data(stock, start_date, end_date)
+    ptint('estimate_stock.1:',stock)
     
     result_dict = My_strategy.my_strategy(stock_data, initial_investment, monthly_investment, option_strategy)
 
