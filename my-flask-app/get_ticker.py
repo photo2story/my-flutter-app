@@ -12,18 +12,18 @@ from tradingview_ta import TA_Handler, Interval, Exchange
 from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path # stock_market.csv 파일 경로
 
 import os, sys
-# app.py에서 전역 변수 가져오기
+# github_operations에서 전역 변수 가져오기
 # sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 # from github_operations import csv_url
 
-def get_ticker_name(ticker, ticker_path):
-    df = pd.read_csv(csv_url)
+def get_ticker_name(ticker):
+    df = pd.read_csv(ticker_path) # stock_market.csv 파일 경로
     result = df.loc[df['Symbol'] == ticker, 'Name']
     name = result.iloc[0] if not result.empty else None
     return name
 
-def get_ticker_market(ticker, csv_url):
-  df = pd.read_csv(ticker_path)
+def get_ticker_market(ticker):
+  df = pd.read_csv(ticker_path) # stock_market.csv 파일 경로
   result = df.loc[df['Symbol'] == ticker, 'Market']
   market = result.iloc[0] if not result.empty else None
   return market
