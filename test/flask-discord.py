@@ -15,11 +15,11 @@ os.environ['SSL_CERT_FILE'] = certifi.where()
 load_dotenv()
 
 app = Flask(__name__)
-# app.secret_key = os.getenv("FLASK_SECRET_KEY")
-# app.config["DISCORD_CLIENT_ID"] = os.getenv("DISCORD_CLIENT_ID")
-# app.config["DISCORD_CLIENT_SECRET"] = os.getenv("DISCORD_CLIENT_SECRET")
-# app.config["DISCORD_REDIRECT_URI"] = os.getenv("DISCORD_REDIRECT_URI")
-# app.config["DISCORD_BOT_TOKEN"] = os.getenv("DISCORD_BOT_TOKEN")
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
+app.config["DISCORD_CLIENT_ID"] = os.getenv("DISCORD_CLIENT_ID")
+app.config["DISCORD_CLIENT_SECRET"] = os.getenv("DISCORD_CLIENT_SECRET")
+app.config["DISCORD_REDIRECT_URI"] = os.getenv("DISCORD_REDIRECT_URI")
+app.config["DISCORD_BOT_TOKEN"] = os.getenv("DISCORD_BOT_TOKEN")
 
 discord_oauth = DiscordOAuth2Session(app)
 
