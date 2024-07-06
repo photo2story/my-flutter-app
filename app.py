@@ -1,22 +1,22 @@
 # app.py
-from flask import Flask, send_from_directory, render_template, request, jsonify
-from flask_cors import CORS
 import os
-from dotenv import load_dotenv
-import discord
-from discord.ext import commands
-import asyncio
-import requests
-import sys
-import certifi
-import threading
 import logging
+import threading
+import asyncio
+from flask import Flask, render_template, send_from_directory, jsonify, request
+from flask_cors import CORS
+from dotenv import load_dotenv
+from discord.ext import commands
+import discord
+import requests
+import certifi
+import sys
 import nest_asyncio
 import git
 
 logging.basicConfig(level=logging.INFO)
-
 sys.stdout.reconfigure(encoding='utf-8')
+
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 
 from datetime import datetime
@@ -28,24 +28,7 @@ from Results_plot import plot_comparison_results, plot_results_all
 from get_compare_stock_data import merge_csv_files, load_sector_info
 from Results_plot_mpl import plot_results_mpl
 from get_ticker import get_ticker_from_korean_name
-
-# 이미지 파일을 images 폴더로 이동
-import shutil
-import glob
-
-def is_git_repository(path):
-    try:
-        _ = git.Repo(path).git_dir
-        return True
-    except git.exc.InvalidGitRepositoryError:
-        return False
-
-if is_git_repository('.'):
-    from git_operations import move_files_to_images_folder
-else:
-    def move_files_to_images_folder():
-        print("Not a valid Git repository. Skipping move_files_to_images_folder.")
-
+from git_operations import move_files_to_images_folder
 from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
@@ -66,10 +49,7 @@ def static_proxy(path):
 def generate_description():
     data = request.get_json()
     stock_ticker = data.get('stock_ticker')
-
-    # 여기에 원하는 설명을 생성하는 로직을 추가하세요.
     description = f"Description for {stock_ticker}"
-
     return jsonify({"description": description})
 
 @app.route('/save_search_history', methods=['POST'])
@@ -114,21 +94,20 @@ stocks = [
     'KDP', 'MAR', 'KLAC', 'WMT', 'JPM',
     'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO', 'SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'VFH', 'coin'
 ]
+
 for stock in stocks:
     try:
-        # 백테스팅 코드 (예: 데이터 가져오기, 계산 등)
         print(f"Processing {stock}...")
-        # Example function call: backtest(stock, start_date, end_date, initial_investment)
     except Exception as e:
         print(f"Error processing {stock}: {e}")
-        
+
 start_date = "2022-01-01"
 end_date = datetime.today().strftime('%Y-%m-%d')
 initial_investment = 30000000
 monthly_investment = 1000000
 
 processed_message_ids = set()
-login_once_flag = False  # 로그인 중복을 방지하기 위한 플래그
+login_once_flag = False
 
 async def backtest_and_send(ctx, stock, option_strategy):
     if not is_valid_stock(stock):
@@ -167,14 +146,13 @@ async def backtest_and_send(ctx, stock, option_strategy):
         await ctx.send(f"An error occurred while processing {stock}: {e}")
         print(f"Error processing {stock}: {e}")
 
-
 @bot.command()
 async def buddy(ctx):
-    loop = asyncio.get_running_loop()  # Get the current event loop
+    loop = asyncio.get_running_loop()
 
-    for stock in stocks:  # 주식 리스트를 순회하며 백테스팅 수행
+    for stock in stocks:
         await backtest_and_send(ctx, stock, 'modified_monthly')
-        if is_valid_stock(stock):  # 유효한 주식에 대해서만 결과를 플로팅
+        if is_valid_stock(stock):
             try:
                 plot_results_mpl(stock, start_date, end_date)
             except KeyError as e:
@@ -182,14 +160,13 @@ async def buddy(ctx):
                 print(f"Error plotting {stock}: {e}")
         await asyncio.sleep(2)
 
-    # Run synchronous functions in the executor
     await loop.run_in_executor(None, update_stock_market_csv, 'stock_market.csv', stocks)
-    sector_dict = await loop.run_in_executor(None, load_sector_info) # run_in_executor returns a future, await it if function is synchronous
-    path = '.'  # Assuming folder path
+    sector_dict = await loop.run_in_executor(None, load_sector_info)
+    path = '.'
     await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
 
     await ctx.send("백테스팅 결과가 섹터별로 정리되었습니다.")
-    move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
+    move_files_to_images_folder()
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
@@ -226,9 +203,9 @@ async def stock(ctx, *args):
     stock_name = ' '.join(args)
     await ctx.send(f'Arguments passed by command: {stock_name}')
     try:
-        info_stock = str(stock_name).upper()
+        info_stock = str(stock_name).toUpperCase()
         if info_stock.startswith('K '):
-            korean_stock_name = info_stock[2:].upper()
+            korean_stock_name = info_stock[2:].toUpperCase()
             korean_stock_code = get_ticker_from_korean_name(korean_stock_name)
             if korean_stock_code is None:
                 await ctx.send(f'Cannot find the stock {korean_stock_name}.')
@@ -238,7 +215,7 @@ async def stock(ctx, *args):
 
         await backtest_and_send(ctx, info_stock, option_strategy='1')
         plot_results_mpl(info_stock, start_date, end_date)
-        move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
+        move_files_to_images_folder()
     except Exception as e:
         await ctx.send(f'An error occurred: {e}')
 
@@ -275,7 +252,7 @@ csv_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-
 def fetch_csv_data(url):
     try:
         response = requests.get(url)
-        response.raise_for_status()  # HTTP 에러가 발생하면 예외 발생
+        response.raise_for_status()
         csv_data = response.content.decode('utf-8')
         return pd.read_csv(io.StringIO(csv_data))
     except requests.exceptions.RequestException as e:
@@ -288,8 +265,7 @@ def data():
     if df is None:
         return "Error fetching data", 500
 
-    # 데이터를 처리하고 결과를 반환
-    return df.to_html()        
+    return df.to_html()
 
 if __name__ == '__main__':
     nest_asyncio.apply()
@@ -306,7 +282,6 @@ if __name__ == '__main__':
     flask_thread.start()
 
     loop.run_until_complete(run_bot())
-
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
