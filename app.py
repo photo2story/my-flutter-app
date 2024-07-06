@@ -148,11 +148,11 @@ async def backtest_and_send(ctx, stock, option_strategy):
 
 @bot.command()
 async def buddy(ctx):
-    loop = asyncio.get_running_loop()
+    loop = asyncio.get_running_loop()  # Get the current event loop
 
-    for stock in stocks:
+    for stock in stocks:  # 주식 리스트를 순회하며 백테스팅 수행
         await backtest_and_send(ctx, stock, 'modified_monthly')
-        if is_valid_stock(stock):
+        if is_valid_stock(stock):  # 유효한 주식에 대해서만 결과를 플로팅
             try:
                 plot_results_mpl(stock, start_date, end_date)
             except KeyError as e:
@@ -160,13 +160,14 @@ async def buddy(ctx):
                 print(f"Error plotting {stock}: {e}")
         await asyncio.sleep(2)
 
+    # Run synchronous functions in the executor
     await loop.run_in_executor(None, update_stock_market_csv, 'stock_market.csv', stocks)
-    sector_dict = await loop.run_in_executor(None, load_sector_info)
-    path = '.'
+    sector_dict = await loop.run_in_executor(None, load_sector_info) # run_in_executor returns a future, await it if function is synchronous
+    path = '.'  # Assuming folder path
     await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
 
     await ctx.send("백테스팅 결과가 섹터별로 정리되었습니다.")
-    move_files_to_images_folder()
+    move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
@@ -203,9 +204,9 @@ async def stock(ctx, *args):
     stock_name = ' '.join(args)
     await ctx.send(f'Arguments passed by command: {stock_name}')
     try:
-        info_stock = str(stock_name).toUpperCase()
+        info_stock = str(stock_name).upper()
         if info_stock.startswith('K '):
-            korean_stock_name = info_stock[2:].toUpperCase()
+            korean_stock_name = info_stock[2:].upper()
             korean_stock_code = get_ticker_from_korean_name(korean_stock_name)
             if korean_stock_code is None:
                 await ctx.send(f'Cannot find the stock {korean_stock_name}.')
@@ -215,10 +216,9 @@ async def stock(ctx, *args):
 
         await backtest_and_send(ctx, info_stock, option_strategy='1')
         plot_results_mpl(info_stock, start_date, end_date)
-        move_files_to_images_folder()
+        move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
     except Exception as e:
         await ctx.send(f'An error occurred: {e}')
-
 @bot.command()
 async def show_all(ctx):
     try:
