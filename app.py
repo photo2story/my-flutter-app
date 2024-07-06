@@ -14,7 +14,7 @@ import sys
 import nest_asyncio
 import git
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO) # Set logging level to INFO
 sys.stdout.reconfigure(encoding='utf-8')
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
@@ -232,17 +232,12 @@ async def show_all(ctx):
 
 @bot.event
 async def on_ready():
-    global login_once_flag
-    if not login_once_flag:
-        login_once_flag = True
-        print(f'Logged in as {bot.user.name}')
-        channel = bot.get_channel(int(CHANNEL_ID))
-        if channel:
-            await channel.send(f'Bot has successfully logged in: {bot.user.name}')
-        else:
-            print(f'Failed to get channel with ID {CHANNEL_ID}')
+    print(f'Logged in as {bot.user.name}')
+    channel = bot.get_channel(int(CHANNEL_ID))
+    if channel:
+        await channel.send(f'Bot has successfully logged in: {bot.user.name}')
     else:
-        print('Bot already logged in')
+        print(f'Failed to get channel with ID {CHANNEL_ID}')
 
 @bot.command()
 async def ping(ctx):
@@ -274,14 +269,10 @@ def data():
     return df.to_html()
 
 if __name__ == '__main__':
-    nest_asyncio.apply()
-
     async def run_bot():
-        print("Starting Discord bot...")
         await bot.start(TOKEN)
     
     def run_flask():
-        print("Starting Flask server...")
         app.run(debug=True, use_reloader=False)
 
     flask_thread = threading.Thread(target=run_flask)
