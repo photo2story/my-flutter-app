@@ -46,6 +46,16 @@ def index():
 def static_proxy(path):
     return send_from_directory(app.static_folder, path)
 
+@app.route('/generate_description', methods=['POST'])
+def generate_description():
+    data = request.get_json()
+    stock_ticker = data.get('stock_ticker')
+
+    # 여기에 원하는 설명을 생성하는 로직을 추가하세요.
+    description = f"Description for {stock_ticker}"
+
+    return jsonify({"description": description})
+
 @app.route('/save_search_history', methods=['POST'])
 def save_search_history():
     data = request.json
@@ -281,8 +291,6 @@ if __name__ == '__main__':
 
     loop.run_until_complete(run_bot())
 
-
-
 # #  .\.venv\Scripts\activate
 # #  python app.py 
 # pip install huggingface_hub
@@ -295,3 +303,4 @@ if __name__ == '__main__':
 # pip install langchain
 # ollama create EEVE-Korean-10.8B -f Modelfile
 # git push heroku main
+# heroku logs --tail
