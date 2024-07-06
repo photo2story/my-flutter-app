@@ -240,6 +240,30 @@ async def ping(ctx):
     if ctx.message.id not in processed_message_ids:
         processed_message_ids.add(ctx.message.id)
         await ctx.send(f'pong: {bot.user.name}')
+        
+import io
+
+# CSV 파일 URL
+csv_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'
+
+def fetch_csv_data(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # HTTP 에러가 발생하면 예외 발생
+        csv_data = response.content.decode('utf-8')
+        return pd.read_csv(io.StringIO(csv_data))
+    except requests.exceptions.RequestException as e:
+        print(f'Error fetching CSV data: {e}')
+        return None
+
+@app.route('/data')
+def data():
+    df = fetch_csv_data(csv_url)
+    if df is None:
+        return "Error fetching data", 500
+
+    # 데이터를 처리하고 결과를 반환
+    return df.to_html()        
 
 if __name__ == '__main__':
     nest_asyncio.apply()
@@ -266,7 +290,6 @@ if __name__ == '__main__':
 # EEVE-Korean-Instruct-10.8B-v1.0-GGUF
 # ollama create EEVE-Korean-Instruct-10.8B -f Modelfile-V02
 # ollama create EEVE-Korean-10.8B -f EEVE-Korean-Instruct-10.8B-v1.0-GGUF/Modelfile
-# 출처: https://normalstory.tistory.com/entry/LangChain-테디노트-따라하기-LangServe수정본 [청춘만화:티스토리]
 # pip install ollama
 # pip install chromadb
 # pip install langchain
