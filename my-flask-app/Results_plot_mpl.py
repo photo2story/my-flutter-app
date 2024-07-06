@@ -14,9 +14,13 @@ import requests
 import numpy as np
 import FinanceDataReader as fdr
 from datetime import datetime
-import os
 from get_ticker import get_ticker_name, get_ticker_market
 from tradingview_ta import TA_Handler, Interval, Exchange
+
+import os, sys
+# app.py에서 전역 변수 가져오기
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from app import csv_url
 
 def convert_file_path_for_saving(file_path):
   return file_path.replace('/', '-')
@@ -31,7 +35,7 @@ def save_figure(fig, file_path):
 
 def get_tradingview_analysis(ticker):
   # tv_symbol = f"{ticker.upper()}/USD"  # 트레이딩뷰에서 사용하는 심볼 형식
-  market = get_ticker_market(ticker, file_path='stock_market.csv')
+  market = get_ticker_market(ticker, csv_url) # file_path='stock_market.csv'
   if market == 'KRX':
     screener = "korea"
   elif market == 'UPBIT' or market == 'BINANCE' :   
@@ -133,23 +137,3 @@ if __name__ == "__main__":
   start_date = "2022-01-01"
   end_date = datetime.today().strftime('%Y-%m-%d')  # 오늘 날짜 문자열로 변환하기
   plot_results_mpl(ticker,start_date , end_date)
-
-  # from tradingview_ta import TA_Handler, Interval, Exchange
-
-  # tesla = TA_Handler(
-  #     symbol="U",
-  #     screener="america",
-  #     exchange="NYSE",
-  #     interval=Interval.INTERVAL_1_DAY,
-  # )
-  # # Existing code: ...
-  # # At the point where you are fetching analysis from TradingView
-  # tesla_analysis = tesla.get_analysis()
-
-  # # Check if we received an analysis object
-  # if tesla_analysis is not None:
-  #     print(tesla_analysis.summary)  # Assuming .summary is a valid attribute of the analysis object
-  # else:
-  #     print("Failed to retrieve analysis.")
-  # # Example output: {"RECOMMENDATION": "BUY", "BUY": 8, "NEUTRAL": 6, "SELL": 3}
-  # tv_analysis = get_tradingview_analysis(ticker)

@@ -11,14 +11,19 @@ import investpy
 from tradingview_ta import TA_Handler, Interval, Exchange
 from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path # stock_market.csv 파일 경로
 
-def get_ticker_name(ticker, file_path=ticker_path):
-    df = pd.read_csv(file_path)
+import os, sys
+# app.py에서 전역 변수 가져오기
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from app import csv_url
+
+def get_ticker_name(ticker, csv_url):
+    df = pd.read_csv(csv_url)
     result = df.loc[df['Symbol'] == ticker, 'Name']
     name = result.iloc[0] if not result.empty else None
     return name
 
-def get_ticker_market(ticker, file_path=ticker_path):
-  df = pd.read_csv(file_path)
+def get_ticker_market(ticker, csv_url):
+  df = pd.read_csv(csv_url)
   result = df.loc[df['Symbol'] == ticker, 'Market']
   market = result.iloc[0] if not result.empty else None
   return market
@@ -68,7 +73,7 @@ def update_stock_market_csv(file_path, tickers_to_update):
 def load_tickers():
     """CSV 파일에서 티커 데이터를 읽어 딕셔너리로 반환합니다."""
     ticker_dict = {}
-    with open(ticker_path, mode='r', encoding='utf-8') as file:
+    with open(csv_url, mode='r', encoding='utf-8') as file:
         csv_reader = csv.reader(file)
         for rows in csv_reader:
             if len(rows) >= 2:
@@ -205,5 +210,7 @@ if __name__ == "__main__":
     # df_us.to_csv('us_stock_market.csv', encoding='utf-8-sig', index=False)  # Save the DataFrame to a CSV
     info = get_stock_info('AAPL')
     print(info)
-    market = get_ticker_market('086520', file_path=ticker_path)
+    market = get_ticker_market('086520', csv_url)
     print(market)
+    
+    # python get_ticker.py
