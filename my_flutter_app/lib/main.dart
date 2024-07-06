@@ -188,4 +188,32 @@ class _MyHomePageState extends State<MyHomePage> {
                     )
                   : Container(),
             ],
-          
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ImageScreen extends StatelessWidget {
+  final String imageUrl;
+
+  ImageScreen({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Image Preview'),
+      ),
+      body: Center(
+        child: Image.network(
+          imageUrl,
+          errorBuilder: (context, error, stackTrace) {
+            return Text('Failed to load image');
+          },
+        ),
+      ),
+    );
+  }
+}
