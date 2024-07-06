@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:photo_view/photo_view.dart';
 
 void main() {
   runApp(MyApp());
@@ -207,8 +208,8 @@ class ImageScreen extends StatelessWidget {
         title: Text('Image Preview'),
       ),
       body: Center(
-        child: Image.network(
-          imageUrl,
+        child: PhotoView(
+          imageProvider: NetworkImage(imageUrl),
           errorBuilder: (context, error, stackTrace) {
             return Text('Failed to load image');
           },

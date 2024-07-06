@@ -15,6 +15,9 @@ dependencies:
   # http 패키지 추가
   http: ^0.13.3
 
+  # photo_view 패키지 추가
+  photo_view: ^0.15.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
