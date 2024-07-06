@@ -12,7 +12,6 @@ import certifi
 import threading
 import logging
 import nest_asyncio
-import concurrent.futures
 
 logging.basicConfig(level=logging.INFO)
 
@@ -28,9 +27,9 @@ from Results_plot import plot_comparison_results, plot_results_all
 from get_compare_stock_data import merge_csv_files, load_sector_info
 from Results_plot_mpl import plot_results_mpl
 from get_ticker import get_ticker_from_korean_name
-import shutil
-import glob
-from git_operations import move_files_to_images_folder
+import shutil  # 이미지 파일을 images 폴더로 이동
+import glob  # 이미지 파일을 images 폴더로 이동
+from git_operations import move_files_to_images_folder  # 추가된 부분
 from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
@@ -153,44 +152,28 @@ async def backtest_and_send(ctx, stock, option_strategy):
         print(f"Error processing {stock}: {e}")
 
 
-async def backtest_and_send_parallel(ctx, stock_list, option_strategy):
-    loop = asyncio.get_event_loop()
-
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [
-            loop.run_in_executor(executor, backtest_and_send, ctx, stock, option_strategy)
-            for stock in stock_list
-        ]
-        results = await asyncio.gather(*futures)
-    return results
-
-
 @bot.command()
 async def buddy(ctx):
     loop = asyncio.get_running_loop()  # Get the current event loop
 
-    try:
-        await backtest_and_send_parallel(ctx, stocks, 'modified_monthly')
-        for stock in stocks:  # 유효한 주식에 대해서만 결과를 플로팅
-            if is_valid_stock(stock):
-                try:
-                    plot_results_mpl(stock, start_date, end_date)
-                except KeyError as e:
-                    await ctx.send(f"An error occurred while plotting {stock}: {e}")
-                    print(f"Error plotting {stock}: {e}")
-            await asyncio.sleep(2)
+    for stock in stocks:  # 주식 리스트를 순회하며 백테스팅 수행
+        await backtest_and_send(ctx, stock, 'modified_monthly')
+        if is_valid_stock(stock):  # 유효한 주식에 대해서만 결과를 플로팅
+            try:
+                plot_results_mpl(stock, start_date, end_date)
+            except KeyError as e:
+                await ctx.send(f"An error occurred while plotting {stock}: {e}")
+                print(f"Error plotting {stock}: {e}")
+        await asyncio.sleep(2)
 
-        await loop.run_in_executor(None, update_stock_market_csv, 'stock_market.csv', stocks)
-        sector_dict = await loop.run_in_executor(None, load_sector_info)
-        path = '.'  # Assuming folder path
-        await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
+    # Run synchronous functions in the executor
+    await loop.run_in_executor(None, update_stock_market_csv, 'stock_market.csv', stocks)
+    sector_dict = await loop.run_in_executor(None, load_sector_info) # run_in_executor returns a future, await it if function is synchronous
+    path = '.'  # Assuming folder path
+    await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
 
-        await ctx.send("백테스팅 결과가 섹터별로 정리되었습니다.")
-        move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
-    except Exception as e:
-        print(f"Error during buddy command: {e}")
-        await ctx.send(f"An error occurred: {e}")
-
+    await ctx.send("백테스팅 결과가 섹터별로 정리되었습니다.")
+    move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
@@ -267,7 +250,7 @@ async def ping(ctx):
     if ctx.message.id not in processed_message_ids:
         processed_message_ids.add(ctx.message.id)
         await ctx.send(f'pong: {bot.user.name}')
-
+        
 import io
 
 # CSV 파일 URL
