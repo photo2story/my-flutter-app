@@ -12,6 +12,7 @@ import certifi
 import threading
 import logging
 import nest_asyncio
+import git
 
 logging.basicConfig(level=logging.INFO)
 
@@ -27,9 +28,24 @@ from Results_plot import plot_comparison_results, plot_results_all
 from get_compare_stock_data import merge_csv_files, load_sector_info
 from Results_plot_mpl import plot_results_mpl
 from get_ticker import get_ticker_from_korean_name
-import shutil  # 이미지 파일을 images 폴더로 이동
-import glob  # 이미지 파일을 images 폴더로 이동
-from git_operations import move_files_to_images_folder  # 추가된 부분
+
+# 이미지 파일을 images 폴더로 이동
+import shutil
+import glob
+
+def is_git_repository(path):
+    try:
+        _ = git.Repo(path).git_dir
+        return True
+    except git.exc.InvalidGitRepositoryError:
+        return False
+
+if is_git_repository('.'):
+    from git_operations import move_files_to_images_folder
+else:
+    def move_files_to_images_folder():
+        print("Not a valid Git repository. Skipping move_files_to_images_folder.")
+
 from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
@@ -290,7 +306,6 @@ if __name__ == '__main__':
     flask_thread.start()
 
     loop.run_until_complete(run_bot())
-
 
 
 # #  .\.venv\Scripts\activate
