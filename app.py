@@ -294,3 +294,4 @@ if __name__ == '__main__':
 # pip install chromadb
 # pip install langchain
 # ollama create EEVE-Korean-10.8B -f Modelfile
+# git push heroku main

@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:photo_view/photo_view.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() async {
-  await dotenv.load(fileName: ".env");
+void main() {
   runApp(MyApp());
 }
 
@@ -34,9 +32,11 @@ class _MyHomePageState extends State<MyHomePage> {
   String _description = '';
   final TextEditingController _controller = TextEditingController();
 
-  Future<void> fetchImages(String stockTicker) async {
-    final apiUrl = '${dotenv.env['HEROKU_APP_URL']}/contents/static/images';
+  // 환경 변수 직접 포함
+  final String apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
+  final String descriptionApiUrl = 'https://he-flutter-app.herokuapp.com/generate_description';
 
+  Future<void> fetchImages(String stockTicker) async {
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
@@ -79,11 +79,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> generateDescription(String stockTicker) async {
-    final apiUrl = '${dotenv.env['HEROKU_APP_URL']}/generate_description'; // 플라스크 서버 엔드포인트
-
     try {
       final response = await http.post(
-        Uri.parse(apiUrl),
+        Uri.parse(descriptionApiUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'stock_ticker': stockTicker}),
       );
