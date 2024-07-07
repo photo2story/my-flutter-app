@@ -16,8 +16,7 @@ import nest_asyncio
 import git
 
 logging.basicConfig(level=logging.INFO)  # Set logging level to INFO
-sys.stdout.reconfigure(encoding='utf-8')
-
+sys.stdout.reconfigure(encoding='utf-8') # 한글 출력을 위한 인코딩 설정
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
 
 from datetime import datetime
