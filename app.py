@@ -1,18 +1,16 @@
 # app.py
 import os
-from dotenv import load_dotenv
-import discord
-from discord.ext import tasks, commands
-import logging
 import sys
-from datetime import datetime
-import pandas as pd
-import numpy as np
-from flask import Flask, render_template, send_from_directory, jsonify, request
-from flask_cors import CORS
+import asyncio
+import threading
 import requests
 import io
-import git
+from datetime import datetime
+from flask import Flask, render_template, send_from_directory, jsonify, request
+from flask_cors import CORS
+import discord
+from discord.ext import tasks, commands
+import pandas as pd
 
 # Add my-flask-app directory to sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
@@ -26,7 +24,7 @@ from Results_plot_mpl import plot_results_mpl
 from get_ticker import get_ticker_from_korean_name
 from git_operations import move_files_to_images_folder
 from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
-from backtest_send import backtest_and_send  # 추가된 부분
+from backtest_send import backtest_and_send
 
 # Load configuration from config.py
 import config
@@ -49,31 +47,22 @@ async def send_msg():
     else:
         print("Failed to find channel with ID:", config.DISCORD_CHANNEL_ID)
 
-# Assign configuration values
-stocks = config.STOCKS
-start_date = config.START_DATE
-end_date = config.END_DATE
-initial_investment = config.INITIAL_INVESTMENT
-monthly_investment = config.MONTHLY_INVESTMENT
-csv_url = config.CSV_URL
-github_api_url = config.GITHUB_API_URL
-
 @bot.command()
 async def buddy(ctx):
     loop = asyncio.get_running_loop()  # Get the current event loop
 
-    for stock in stocks:  # 주식 리스트를 순회하며 백테스팅 수행
+    for stock in config.STOCKS:  # 주식 리스트를 순회하며 백테스팅 수행
         await backtest_and_send(ctx, stock, 'modified_monthly')
         if is_valid_stock(stock):  # 유효한 주식에 대해서만 결과를 플로팅
             try:
-                plot_results_mpl(stock, start_date, end_date)
+                plot_results_mpl(stock, config.START_DATE, config.END_DATE)
             except KeyError as e:
                 await ctx.send(f"An error occurred while plotting {stock}: {e}")
                 print(f"Error plotting {stock}: {e}")
         await asyncio.sleep(2)
 
     # Run synchronous functions in the executor
-    await loop.run_in_executor(None, update_stock_market_csv, ticker_path, stocks)
+    await loop.run_in_executor(None, update_stock_market_csv, ticker_path, config.STOCKS)
     sector_dict = await loop.run_in_executor(None, load_sector_info)  # run_in_executor returns a future, await it if function is synchronous
     path = '.'  # Assuming folder path
     await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
@@ -88,28 +77,7 @@ async def ticker(ctx, *, query: str = None):
         await ctx.send("Please enter ticker stock name or ticker.")
         return
 
-    ticker_dict = load_tickers()
-    matching_tickers = search_tickers(query, ticker_dict)
-
-    if not matching_tickers:
-        await ctx.send("No search results.")
-        return
-
-    response_message = "Search results:\n"
-    response_messages = []
-    for symbol, name in matching_tickers:
-        line = f"{symbol} - {name}\n"
-        if len(response_message) + len(line) > 2000:
-            response_messages.append(response_message)
-            response_message = "Search results (continued):\n"
-        response_message += line
-
-    if response_message:
-        response_messages.append(response_message)
-
-    for message in response_messages:
-        await ctx.send(message)
-    print(f'Sent messages for query: {query}')
+    await search_tickers_and_respond(ctx, query)
 
 @bot.command()
 async def stock(ctx, *args):
@@ -127,7 +95,7 @@ async def stock(ctx, *args):
                 info_stock = korean_stock_code
 
         await backtest_and_send(ctx, info_stock, option_strategy='1')
-        plot_results_mpl(info_stock, start_date, end_date)
+        plot_results_mpl(info_stock, config.START_DATE, config.END_DATE)
         move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
     except Exception as e:
         await ctx.send(f'An error occurred: {e}')
@@ -219,10 +187,9 @@ def data():
 
     return df.to_html()
 
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-     
+
 # #  .\.venv\Scripts\activate
 # #  python app.py 
 # pip install huggingface_hub

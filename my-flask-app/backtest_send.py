@@ -44,7 +44,8 @@ async def backtest_and_send(ctx, stock, option_strategy):
             print('Successfully sent Discord message')
 
         plot_comparison_results(user_stock_file_path1, user_stock_file_path2, stock, 'VOO', total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date)
-        await bot.change_presence(status=discord.Status.online, activity=discord.Game("Waiting"))
+        await ctx.bot.change_presence(status=discord.Status.online, activity=discord.Game("Waiting"))
     except Exception as e:
         await ctx.send(f"An error occurred while processing {stock}: {e}")
         print(f"Error processing {stock}: {e}")
+
