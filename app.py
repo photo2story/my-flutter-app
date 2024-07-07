@@ -5,28 +5,29 @@ import asyncio
 import threading
 import requests
 import io
-from datetime import datetime
-from flask import Flask, render_template, send_from_directory, jsonify, request
-from flask_cors import CORS
+from dotenv import load_dotenv
 import discord
 from discord.ext import tasks, commands
+from datetime import datetime
 import pandas as pd
+import numpy as np
+from flask import Flask, render_template, send_from_directory, jsonify, request
+from flask_cors import CORS
 
-# Add my-flask-app directory to sys.path
+# my-flask-app 디렉토리를 sys.path에 추가
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 
-# Import custom modules
-from get_ticker import load_tickers, search_tickers, get_ticker_name, update_stock_market_csv
+# 사용자 정의 모듈 임포트
+from get_ticker import get_ticker_name, get_ticker_from_korean_name, search_tickers_and_respond, update_stock_market_csv
 from estimate_stock import estimate_snp, estimate_stock
 from Results_plot import plot_comparison_results, plot_results_all
 from get_compare_stock_data import merge_csv_files, load_sector_info
 from Results_plot_mpl import plot_results_mpl
-from get_ticker import get_ticker_from_korean_name
 from git_operations import move_files_to_images_folder
 from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
 from backtest_send import backtest_and_send
 
-# Load configuration from config.py
+# config.py에서 설정값 로드
 import config
 
 intents = discord.Intents.default()
@@ -47,32 +48,39 @@ async def send_msg():
     else:
         print("Failed to find channel with ID:", config.DISCORD_CHANNEL_ID)
 
+# 설정값 할당
+stocks = config.STOCKS
+start_date = config.START_DATE
+end_date = config.END_DATE
+initial_investment = config.INITIAL_INVESTMENT
+monthly_investment = config.MONTHLY_INVESTMENT
+csv_url = config.CSV_URL
+github_api_url = config.GITHUB_API_URL
+
 @bot.command()
 async def buddy(ctx):
-    loop = asyncio.get_running_loop()  # Get the current event loop
+    loop = asyncio.get_running_loop()
 
-    for stock in config.STOCKS:  # 주식 리스트를 순회하며 백테스팅 수행
+    for stock in stocks:
         await backtest_and_send(ctx, stock, 'modified_monthly')
-        if is_valid_stock(stock):  # 유효한 주식에 대해서만 결과를 플로팅
+        if is_valid_stock(stock):
             try:
-                plot_results_mpl(stock, config.START_DATE, config.END_DATE)
+                plot_results_mpl(stock, start_date, end_date)
             except KeyError as e:
                 await ctx.send(f"An error occurred while plotting {stock}: {e}")
                 print(f"Error plotting {stock}: {e}")
         await asyncio.sleep(2)
 
-    # Run synchronous functions in the executor
-    await loop.run_in_executor(None, update_stock_market_csv, ticker_path, config.STOCKS)
-    sector_dict = await loop.run_in_executor(None, load_sector_info)  # run_in_executor returns a future, await it if function is synchronous
-    path = '.'  # Assuming folder path
+    await loop.run_in_executor(None, update_stock_market_csv, ticker_path, stocks)
+    sector_dict = await loop.run_in_executor(None, load_sector_info)
+    path = '.'
     await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
 
     await ctx.send("백테스팅 결과가 섹터별로 정리되었습니다.")
-    move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
+    move_files_to_images_folder()
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
-    print(f'Command received: ticker with query: {query}')
     if query is None:
         await ctx.send("Please enter ticker stock name or ticker.")
         return
@@ -95,8 +103,8 @@ async def stock(ctx, *args):
                 info_stock = korean_stock_code
 
         await backtest_and_send(ctx, info_stock, option_strategy='1')
-        plot_results_mpl(info_stock, config.START_DATE, config.END_DATE)
-        move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
+        plot_results_mpl(info_stock, start_date, end_date)
+        move_files_to_images_folder()
     except Exception as e:
         await ctx.send(f'An error occurred: {e}')
 
@@ -187,8 +195,10 @@ def data():
 
     return df.to_html()
 
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
