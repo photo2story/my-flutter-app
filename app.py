@@ -1,5 +1,5 @@
 # app.py
-import os
+import os, sys
 from dotenv import load_dotenv
 import discord
 from discord.ext import tasks, commands
@@ -7,6 +7,8 @@ from Results_plot import plot_comparison_results, plot_results_all
 import yfinance as yf
 import matplotlib.pyplot as plt
 
+
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
 # Load environment variables from .env file
 load_dotenv()
 
