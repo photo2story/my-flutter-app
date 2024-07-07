@@ -15,7 +15,7 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-@app.route('/')
+@bot.route('/')
 def index():
     return render_template('index.html')
 
