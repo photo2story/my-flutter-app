@@ -1,5 +1,4 @@
 # app.py
-# flask-discord.py    
 import os
 import asyncio
 import threading
