@@ -145,6 +145,10 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
             stock1 = stock1 + '_' + stock1_name
             # print(stock1)
     save_path = f'comparison_{stock1}_{stock2}.png'
+    
+    # 그래프 상단 여백 조정
+    plt.subplots_adjust(top=0.8)  # 상단 여백을 추가합니다.
+    
     fig.savefig(save_path)
 
     
