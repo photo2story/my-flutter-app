@@ -147,7 +147,6 @@ async def ticker(ctx, *, query: str = None):
         return
 
     ticker_dict = load_tickers()
-
     matching_tickers = search_tickers(query, ticker_dict)
 
     if not matching_tickers:
@@ -169,6 +168,7 @@ async def ticker(ctx, *, query: str = None):
     for message in response_messages:
         await ctx.send(message)
     print(f'Sent messages for query: {query}')
+
 
 @bot.command()
 async def stock(ctx, *args):
