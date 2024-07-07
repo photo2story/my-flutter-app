@@ -70,16 +70,20 @@ def update_stock_market_csv(file_path, tickers_to_update):
 
 
 
+import io
 def load_tickers():
-    """CSV 파일에서 티커 데이터를 읽어 딕셔너리로 반환합니다."""
+    """URL에서 CSV 데이터를 읽어 딕셔너리로 반환합니다."""
     ticker_dict = {}
-    ticker_path='https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'
-    with open(ticker_path, mode='r', encoding='utf-8') as file:
-        csv_reader = csv.reader(file)
-        for rows in csv_reader:
-            if len(rows) >= 2:
-                ticker_dict[rows[1]] = rows[0]
+    ticker_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'
+    response = requests.get(ticker_url)
+    response.raise_for_status()
+    csv_data = response.content.decode('utf-8')
+    csv_reader = csv.reader(io.StringIO(csv_data))
+    for rows in csv_reader:
+        if len(rows) >= 2:
+            ticker_dict[rows[1]] = rows[0]
     return ticker_dict
+
 
 def search_tickers(stock_name, ticker_dict):
     """주식명으로 티커와 이름을 검색합니다."""

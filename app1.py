@@ -147,6 +147,7 @@ async def ticker(ctx, *, query: str = None):
         return
 
     ticker_dict = load_tickers()
+
     matching_tickers = search_tickers(query, ticker_dict)
 
     if not matching_tickers:
