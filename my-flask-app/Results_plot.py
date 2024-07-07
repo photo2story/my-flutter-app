@@ -47,11 +47,15 @@ def plot_results(file_path, total_account_balance, total_rate, str_strategy, sto
     # plt.title("\nTotal_account_balance: {:,.0f} won,".format(total_account_balance) +
               # "Total_rate: {:,.0f} %".format(total_rate) +"\nStrategy: {} %".format(str_strategy))
 
-    plt.title("\nTotal_account_balance: {:,.0f} won,".format(total_account_balance) +
-          "Total_rate: {:,.0f} %".format(total_rate) +
-          "\nInvested_amount: {:,.0f} $".format(invested_amount) +
-          "\nStrategy: {} %".format(str_strategy))
+    # 주식 이름 가져오기
+    stock_name = get_ticker_name(stock)
 
+    # 제목 설정
+    plt.title(f"{stock} ({stock_name})\n" +
+              "\nTotal_account_balance: {:,.0f} won,".format(total_account_balance) +
+              "Total_rate: {:,.0f} %".format(total_rate) +
+              "\nInvested_amount: {:,.0f} $".format(invested_amount) +
+              "\nStrategy: {} %".format(str_strategy))
 
     # x축 라벨 설정
     ax2.xaxis.set_major_locator(dates.YearLocator())
