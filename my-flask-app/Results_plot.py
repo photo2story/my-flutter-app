@@ -96,7 +96,7 @@ def plot_results(file_path, total_account_balance, total_rate, str_strategy, sto
 
 
 def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy,invested_amount,min_stock_data_date):
-    fig, ax2 = plt.subplots(figsize=(12, 7))
+    fig, ax2 = plt.subplots(figsize=(10, 6))
 
     # 각 주식의 데이터프레임을 읽어옵니다.
     # 파일 경로 변환
@@ -132,7 +132,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     plt.title(f"{stock1} ({stock1_name}) vs {stock2} \n" +
               f"\nTotal Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} %\n" +
               f"Invested Amount: {invested_amount:,.0f} $, Strategy: {str_strategy}",
-              pad=20)  # 제목과 그래프 사이의 여백을 추가합니다.
+              pad=15)  # 제목과 그래프 사이의 여백을 추가합니다.
 
     # x축 라벨 설정
     ax2.xaxis.set_major_locator(dates.YearLocator())
