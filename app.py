@@ -67,6 +67,7 @@ stocks = [
     'KDP', 'MAR', 'KLAC', 'WMT', 'JPM',
     'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO', 'SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'VFH', 'coin'
 ]
+ticker_path='https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'
 
 for stock in stocks:
     try:
