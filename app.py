@@ -172,7 +172,6 @@ async def buddy(ctx):
     move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
 
 @bot.command()
-@bot.command()
 async def ticker(ctx, *, query: str = None):
     print(f'Command received: ticker with query: {query}')
     if query is None:
