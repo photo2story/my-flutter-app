@@ -6,6 +6,7 @@ from github_operations import ticker_path  # stock_market.csv 파일 경로
 import yfinance as yf
 import investpy
 
+ticker_path = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv')
 def get_ticker_name(ticker):
     df = pd.read_csv(ticker_path)  # stock_market.csv 파일 경로
     result = df.loc[df['Symbol'] == ticker, 'Name']
