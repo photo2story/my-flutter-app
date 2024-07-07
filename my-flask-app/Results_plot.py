@@ -204,6 +204,8 @@ async def plot_results_all():
             response = requests.post(DISCORD_WEBHOOK_URL, json=message)
             if response.status_code != 204:
                 print('Discord 메시지 전송 실패')
+                print(response.status_code)
+                print(response.text)
             else:
                 print('Discord 메시지 전송 성공')
 
@@ -214,13 +216,14 @@ async def plot_results_all():
             continue
 
         image_data = image_response.content
-        response = requests.post(
-            DISCORD_WEBHOOK_URL,
-            files={'image': ('image.png', image_data)}
-        )
+        files = {'image': ('image.png', image_data, 'image/png')}
+        response = requests.post(DISCORD_WEBHOOK_URL, files=files)
         if response.status_code != 204:
             print(f'Graph 전송 실패: {stock}')
+            print(response.status_code)
+            print(response.text)
         else:
             print(f'Graph 전송 성공: {stock}')
 
         await asyncio.sleep(1)  # 1초 대기
+
