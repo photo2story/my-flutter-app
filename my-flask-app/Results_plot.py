@@ -38,7 +38,7 @@ def plot_results(file_path, total_account_balance, total_rate, str_strategy, sto
     # 해당 주식 데이터만 추출하여 새로운 DataFrame 생성
     stock_df = result_df[result_df['stock_ticker'] == stock]
 
-    fig, ax2 = plt.subplots(figsize=(12, 7))
+    fig, ax2 = plt.subplots(figsize=(8, 6))
 
     # 하단 그래프
     ax2.plot(stock_df['rate'], label='Daily Return')
@@ -96,7 +96,7 @@ def plot_results(file_path, total_account_balance, total_rate, str_strategy, sto
 
 
 def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy,invested_amount,min_stock_data_date):
-    fig, ax2 = plt.subplots(figsize=(9, 6))
+    fig, ax2 = plt.subplots(figsize=(8, 6))
 
     # 각 주식의 데이터프레임을 읽어옵니다.
     # 파일 경로 변환
