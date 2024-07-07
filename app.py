@@ -15,6 +15,9 @@ import requests
 
 sys.stdout.reconfigure(encoding='utf-8')
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
+import io
+# CSV 파일 URL
+csv_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'
 
 from datetime import datetime
 import pandas as pd
