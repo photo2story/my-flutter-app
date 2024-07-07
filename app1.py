@@ -30,8 +30,6 @@ from github_operations import save_csv_to_github, save_image_to_github, is_valid
 # Load environment variables from .env file
 load_dotenv()
 
-
-
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
 
