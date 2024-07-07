@@ -15,6 +15,10 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @bot.event
 async def on_ready():
     send_msg.start()
