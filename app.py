@@ -11,7 +11,6 @@ import numpy as np
 from flask import Flask, render_template, send_from_directory, jsonify, request
 from flask_cors import CORS
 import requests
-import asyncio
 import io
 import git
 
@@ -27,13 +26,10 @@ from Results_plot_mpl import plot_results_mpl
 from get_ticker import get_ticker_from_korean_name
 from git_operations import move_files_to_images_folder
 from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
-from backtest_and_send import backtest_and_send  # import the function from the new file
+from backtest_send import backtest_and_send  # 추가된 부분
 
-# Load environment variables from .env file
-load_dotenv()
-
-TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
-CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
+# Load configuration from config.py
+import config
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -47,74 +43,20 @@ async def on_ready():
 
 @tasks.loop(minutes=5)
 async def send_msg():
-    channel = bot.get_channel(CHANNEL_ID)
+    channel = bot.get_channel(config.DISCORD_CHANNEL_ID)
     if channel:
         await channel.send('Hello')
     else:
-        print("Failed to find channel with ID:", CHANNEL_ID)
+        print("Failed to find channel with ID:", config.DISCORD_CHANNEL_ID)
 
-stocks = [
-    'AAPL', 'MSFT', 'AMZN', 'FB', 'GOOG', 'GOOGL', 'BRK.B', 'JNJ', 'V', 'PG', 'NVDA', 'UNH', 'HD', 'MA', 
-    'PYPL', 'DIS', 'NFLX', 'XOM', 'VZ', 'PFE', 'T', 'KO', 'ABT', 'MRK', 'CSCO', 'ADBE', 'CMCSA', 'NKE', 
-    'INTC', 'PEP', 'TMO', 'CVX', 'ORCL', 'ABBV', 'AVGO', 'MCD', 'QCOM', 'MDT', 'BMY', 'AMGN', 'UPS', 'CRM', 
-    'MS', 'HON', 'C', 'GILD', 'DHR', 'BA', 'IBM', 'MMM', 'TSLA', 'TXN', 'SBUX', 'COST', 'AMD', 'TMUS', 
-    'CHTR', 'INTU', 'ADP', 'MU', 'MDLZ', 'ISRG', 'BKNG', 'ADI', 'ATVI', 'LRCX', 'AMAT', 'REGN', 'NXPI', 
-    'KDP', 'MAR', 'KLAC', 'WMT', 'JPM',
-    'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO', 'SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'VFH', 'coin'
-]
-
-for stock in stocks:
-    try:
-        print(f"Processing {stock}...")
-    except Exception as e:
-        print(f"Error processing {stock}: {e}")
-
-start_date = "2022-01-01"
-end_date = datetime.today().strftime('%Y-%m-%d')
-initial_investment = 30000000
-monthly_investment = 1000000
-
-processed_message_ids = set()
-login_once_flag = False
-
-# async def backtest_and_send(ctx, stock, option_strategy):
-#     await ctx.send(f'backtest_and_send.command1: {stock}')  # 주식 이름을 출력
-#     if not is_valid_stock(stock):
-#         message = f"Stock market information updates needed. {stock}"
-#         await ctx.send(message)
-#         print(message)
-#         return
-
-#     try:
-#         total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df = estimate_stock(
-#             stock, start_date, end_date, initial_investment, monthly_investment, option_strategy)
-#         await ctx.send(f'backtest_and_send.command2: {stock}')  # 주식 이름을 출력
-#         min_stock_data_date = str(min_stock_data_date).split(' ')[0]
-#         user_stock_file_path1 = file_path
-
-#         file_path = estimate_snp(stock, 'VOO', min_stock_data_date, end_date, initial_investment, monthly_investment, option_strategy, result_df)
-#         user_stock_file_path2 = file_path
-
-#         name = get_ticker_name(stock)
-#         DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-#         message = {
-#             'content': f"Stock: {stock} ({name})\n"
-#                     f"Total_rate: {total_rate:,.0f} %\n"
-#                     f"Invested_amount: {invested_amount:,.0f} $\n"
-#                     f"Total_account_balance: {total_account_balance:,.0f} $\n"
-#                     f"Last_signal: {str_last_signal} \n"
-#         }
-#         response = requests.post(DISCORD_WEBHOOK_URL, json=message)
-#         if response.status_code != 204:
-#             print('Failed to send Discord message')
-#         else:
-#             print('Successfully sent Discord message')
-
-#         plot_comparison_results(user_stock_file_path1, user_stock_file_path2, stock, 'VOO', total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date)
-#         await bot.change_presence(status=discord.Status.online, activity=discord.Game("Waiting"))
-#     except Exception as e:
-#         await ctx.send(f"An error occurred while processing {stock}: {e}")
-#         print(f"Error processing {stock}: {e}")
+# Assign configuration values
+stocks = config.STOCKS
+start_date = config.START_DATE
+end_date = config.END_DATE
+initial_investment = config.INITIAL_INVESTMENT
+monthly_investment = config.MONTHLY_INVESTMENT
+csv_url = config.CSV_URL
+github_api_url = config.GITHUB_API_URL
 
 @bot.command()
 async def buddy(ctx):
@@ -169,7 +111,6 @@ async def ticker(ctx, *, query: str = None):
         await ctx.send(message)
     print(f'Sent messages for query: {query}')
 
-
 @bot.command()
 async def stock(ctx, *args):
     stock_name = ' '.join(args)
@@ -185,7 +126,7 @@ async def stock(ctx, *args):
             else:
                 info_stock = korean_stock_code
 
-        await backtest_and_send(ctx, info_stock, option_strategy='1', start_date=start_date, end_date=end_date, initial_investment=initial_investment, monthly_investment=monthly_investment, bot=bot)
+        await backtest_and_send(ctx, info_stock, option_strategy='1')
         plot_results_mpl(info_stock, start_date, end_date)
         move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
     except Exception as e:
@@ -203,20 +144,17 @@ async def show_all(ctx):
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
-    channel = bot.get_channel(int(CHANNEL_ID))
+    channel = bot.get_channel(int(config.DISCORD_CHANNEL_ID))
     if channel:
         await channel.send(f'Bot has successfully logged in: {bot.user.name}')
     else:
-        print(f'Failed to get channel with ID {CHANNEL_ID}')
+        print(f'Failed to get channel with ID {config.DISCORD_CHANNEL_ID}')
 
 @bot.command()
 async def ping(ctx):
     if ctx.message.id not in processed_message_ids:
         processed_message_ids.add(ctx.message.id)
         await ctx.send(f'pong: {bot.user.name}')
-
-# CSV 파일 URL
-csv_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'
 
 def fetch_csv_data(url):
     try:
@@ -228,7 +166,7 @@ def fetch_csv_data(url):
         print(f'Error fetching CSV data: {e}')
         return None
 
-bot.run(TOKEN)
+bot.run(config.DISCORD_APPLICATION_TOKEN)
 
 app = Flask(__name__)
 CORS(app)
@@ -275,11 +213,12 @@ reset_sent_messages()
 
 @app.route('/data')
 def data():
-    df = fetch_csv_data(csv_url)
+    df = fetch_csv_data(config.CSV_URL)
     if df is None:
         return "Error fetching data", 500
 
     return df.to_html()
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
