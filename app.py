@@ -27,6 +27,7 @@ from Results_plot_mpl import plot_results_mpl
 from get_ticker import get_ticker_from_korean_name
 from git_operations import move_files_to_images_folder
 from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
+from backtest_and_send import backtest_and_send  # import the function from the new file
 
 # Load environment variables from .env file
 load_dotenv()
