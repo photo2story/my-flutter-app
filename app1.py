@@ -4,26 +4,17 @@ from dotenv import load_dotenv
 import discord
 from discord.ext import tasks, commands
 import logging
-# import threading
-# import asyncio
-from flask import Flask, render_template, send_from_directory, jsonify, request
-from flask_cors import CORS
-from dotenv import load_dotenv
-# from discord.ext import commands
-# import discord
-import requests
-import certifi
 import sys
-# import nest_asyncio
-import git
-
-logging.basicConfig(level=logging.INFO)  # Set logging level to INFO
-sys.stdout.reconfigure(encoding='utf-8') # 한글 출력을 위한 인코딩 설정
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
-
 from datetime import datetime
 import pandas as pd
 import numpy as np
+from flask import Flask, render_template, send_from_directory, jsonify, request
+from flask_cors import CORS
+import requests
+import io
+import git
+
+# Import custom modules
 from get_ticker import load_tickers, search_tickers, get_ticker_name, update_stock_market_csv
 from estimate_stock import estimate_snp, estimate_stock
 from Results_plot import plot_comparison_results, plot_results_all
@@ -32,8 +23,12 @@ from Results_plot_mpl import plot_results_mpl
 from get_ticker import get_ticker_from_korean_name
 from git_operations import move_files_to_images_folder
 from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
+
 # Load environment variables from .env file
 load_dotenv()
+
+# Add my-flask-app directory to sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
@@ -55,15 +50,6 @@ async def send_msg():
         await channel.send('Hello')
     else:
         print("Failed to find channel with ID:", CHANNEL_ID)
-        
-
-TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
-CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
-DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-
-intents = discord.Intents.all()
-intents.message_content = True
-bot = commands.Bot(command_prefix='', intents=intents)
 
 stocks = [
     'AAPL', 'MSFT', 'AMZN', 'FB', 'GOOG', 'GOOGL', 'BRK.B', 'JNJ', 'V', 'PG', 'NVDA', 'UNH', 'HD', 'MA', 
@@ -226,8 +212,6 @@ async def ping(ctx):
         processed_message_ids.add(ctx.message.id)
         await ctx.send(f'pong: {bot.user.name}')
 
-import io
-
 # CSV 파일 URL
 csv_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'
 
@@ -240,7 +224,6 @@ def fetch_csv_data(url):
     except requests.exceptions.RequestException as e:
         print(f'Error fetching CSV data: {e}')
         return None
-
 
 bot.run(TOKEN)
 
@@ -294,6 +277,7 @@ def data():
         return "Error fetching data", 500
 
     return df.to_html()
+
 
  
 # #  .\.venv\Scripts\activate
