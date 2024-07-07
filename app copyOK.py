@@ -1,21 +1,22 @@
 # app.py
-from flask import Flask, send_from_directory, render_template, request, jsonify
-from flask_cors import CORS
 import os
-from dotenv import load_dotenv
-import discord
-from discord.ext import commands
-import asyncio
-import requests
-import sys
-import certifi
-import threading
 import logging
+import threading
+import asyncio
+from flask import Flask, render_template, send_from_directory, jsonify, request
+from flask_cors import CORS
+from dotenv import load_dotenv
+from discord.ext import commands
+import discord
+import requests
+import certifi
+import sys
 import nest_asyncio
+import git
 
-logging.basicConfig(level=logging.INFO)
-
+logging.basicConfig(level=logging.INFO) # Set logging level to INFO
 sys.stdout.reconfigure(encoding='utf-8')
+
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 
 from datetime import datetime
@@ -27,8 +28,8 @@ from Results_plot import plot_comparison_results, plot_results_all
 from get_compare_stock_data import merge_csv_files, load_sector_info
 from Results_plot_mpl import plot_results_mpl
 from get_ticker import get_ticker_from_korean_name
-import shutil# 이미지 파일을 images 폴더로 이동
-import glob# 이미지 파일을 images 폴더로 이동
+from git_operations import move_files_to_images_folder
+from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 load_dotenv()
@@ -40,9 +41,16 @@ CORS(app)
 def index():
     return render_template('index.html')
 
-@app.route('/static/<path:filename>')
-def static_files(filename):
-    return send_from_directory('static', filename)
+@app.route('/<path:path>')
+def static_proxy(path):
+    return send_from_directory(app.static_folder, path)
+
+@app.route('/generate_description', methods=['POST'])
+def generate_description():
+    data = request.get_json()
+    stock_ticker = data.get('stock_ticker')
+    description = f"Description for {stock_ticker}"
+    return jsonify({"description": description})
 
 @app.route('/save_search_history', methods=['POST'])
 def save_search_history():
@@ -86,40 +94,23 @@ stocks = [
     'KDP', 'MAR', 'KLAC', 'WMT', 'JPM',
     'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO', 'SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'VFH', 'coin'
 ]
+
 for stock in stocks:
     try:
-        # 백테스팅 코드 (예: 데이터 가져오기, 계산 등)
         print(f"Processing {stock}...")
-        # Example function call: backtest(stock, start_date, end_date, initial_investment)
     except Exception as e:
         print(f"Error processing {stock}: {e}")
-        
+
 start_date = "2022-01-01"
 end_date = datetime.today().strftime('%Y-%m-%d')
 initial_investment = 30000000
 monthly_investment = 1000000
 
 processed_message_ids = set()
-login_once_flag = False  # 로그인 중복을 방지하기 위한 플래그
+login_once_flag = False
 
-def move_files_to_images_folder():# 이미지 파일을 images 폴더로 이동
-    # 이동할 파일 패턴
-    patterns = ["*.png", "result_*.csv"]
-    # 이동할 폴더 경로
-    destination_folder = os.path.join(app.static_folder, 'images')
-
-    for pattern in patterns:
-        for file in glob.glob(pattern):
-            shutil.move(file, os.path.join(destination_folder, os.path.basename(file)))
-            
-def is_valid_stock(stock):# Check if the stock is in the stock market CSV
-    try:
-        stock_market_df = pd.read_csv('stock_market.csv')
-        return stock in stock_market_df['Symbol'].values
-    except Exception as e:
-        print(f"Error checking stock market CSV: {e}")
-        return False
 async def backtest_and_send(ctx, stock, option_strategy):
+    await ctx.send(f'backtest_and_send.command1: {stock}') # 주식 이름을 출력
     if not is_valid_stock(stock):
         message = f"Stock market information updates needed. {stock}"
         await ctx.send(message)
@@ -129,6 +120,7 @@ async def backtest_and_send(ctx, stock, option_strategy):
     try:
         total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df = estimate_stock(
             stock, start_date, end_date, initial_investment, monthly_investment, option_strategy)
+        await ctx.send(f'backtest_and_send.command2: {stock}') # 주식 이름을 출력
         min_stock_data_date = str(min_stock_data_date).split(' ')[0]
         user_stock_file_path1 = file_path
 
@@ -156,7 +148,6 @@ async def backtest_and_send(ctx, stock, option_strategy):
         await ctx.send(f"An error occurred while processing {stock}: {e}")
         print(f"Error processing {stock}: {e}")
 
-
 @bot.command()
 async def buddy(ctx):
     loop = asyncio.get_running_loop()  # Get the current event loop
@@ -172,7 +163,7 @@ async def buddy(ctx):
         await asyncio.sleep(2)
 
     # Run synchronous functions in the executor
-    await loop.run_in_executor(None, update_stock_market_csv, 'stock_market.csv', stocks)
+    await loop.run_in_executor(None, update_stock_market_csv, ticker_path, stocks)
     sector_dict = await loop.run_in_executor(None, load_sector_info) # run_in_executor returns a future, await it if function is synchronous
     path = '.'  # Assuming folder path
     await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
@@ -230,7 +221,6 @@ async def stock(ctx, *args):
         move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
     except Exception as e:
         await ctx.send(f'An error occurred: {e}')
-
 @bot.command()
 async def show_all(ctx):
     try:
@@ -242,25 +232,43 @@ async def show_all(ctx):
 
 @bot.event
 async def on_ready():
-    global login_once_flag
-    if not login_once_flag:
-        login_once_flag = True
-        print(f'Logged in as {bot.user.name}')
-        channel = bot.get_channel(int(CHANNEL_ID))
-        if channel:
-            await channel.send(f'Bot has successfully logged in: {bot.user.name}')
+    print(f'Logged in as {bot.user.name}')
+    channel = bot.get_channel(int(CHANNEL_ID))
+    if channel:
+        await channel.send(f'Bot has successfully logged in: {bot.user.name}')
+    else:
+        print(f'Failed to get channel with ID {CHANNEL_ID}')
 
 @bot.command()
 async def ping(ctx):
     if ctx.message.id not in processed_message_ids:
         processed_message_ids.add(ctx.message.id)
         await ctx.send(f'pong: {bot.user.name}')
+        
+import io
+
+# CSV 파일 URL
+csv_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'
+
+def fetch_csv_data(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        csv_data = response.content.decode('utf-8')
+        return pd.read_csv(io.StringIO(csv_data))
+    except requests.exceptions.RequestException as e:
+        print(f'Error fetching CSV data: {e}')
+        return None
+
+@app.route('/data')
+def data():
+    df = fetch_csv_data(csv_url)
+    if df is None:
+        return "Error fetching data", 500
+
+    return df.to_html()
 
 if __name__ == '__main__':
-    nest_asyncio.apply()
-    
-    loop = asyncio.get_event_loop()
-
     async def run_bot():
         await bot.start(TOKEN)
     
@@ -270,8 +278,19 @@ if __name__ == '__main__':
     flask_thread = threading.Thread(target=run_flask)
     flask_thread.start()
 
+    loop = asyncio.get_event_loop()
     loop.run_until_complete(run_bot())
-
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
+# pip install huggingface_hub
+# huggingface-cli login
+# EEVE-Korean-Instruct-10.8B-v1.0-GGUF
+# ollama create EEVE-Korean-Instruct-10.8B -f Modelfile-V02
+# ollama create EEVE-Korean-10.8B -f EEVE-Korean-Instruct-10.8B-v1.0-GGUF/Modelfile
+# pip install ollama
+# pip install chromadb
+# pip install langchain
+# ollama create EEVE-Korean-10.8B -f Modelfile
+# git push heroku main
+# heroku logs --tail
