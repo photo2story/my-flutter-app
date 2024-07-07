@@ -129,7 +129,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     stock1_name = get_ticker_name(stock1)
     stock2_name = get_ticker_name(stock2)
 
-    plt.title(f"{stock1} ({stock1_name}) vs {stock2} ({stock2_name})\n" +
+    plt.title(f"{stock1} ({stock1_name}) vs {stock2} \n" +
               f"\nTotal Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} %\n" +
               f"Invested Amount: {invested_amount:,.0f} $, Strategy: {str_strategy}",
               pad=20)  # 제목과 그래프 사이의 여백을 추가합니다.
