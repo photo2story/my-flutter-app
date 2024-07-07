@@ -139,11 +139,6 @@ async def search_tickers_and_respond(ctx, query):
         await ctx.send(message)
     print(f'Sent messages for query: {query}')
 
-# def is_valid_stock(stock):
-#     """주식 심볼이 유효한지 확인하는 함수"""
-#     ticker_dict = load_tickers()
-#     return stock in ticker_dict
-
 def is_valid_stock(stock):  # Check if the stock is in the stock market CSV
     try:
         url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'

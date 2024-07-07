@@ -25,13 +25,13 @@ async def backtest_and_send(ctx, stock, option_strategy):
         await ctx.send(f'backtest_and_send.command2: {stock}')  # 주식 이름을 출력
         
         # 디버깅 로그 추가
-        print(f"total_account_balance: {total_account_balance}")
-        print(f"total_rate: {total_rate}")
-        print(f"str_strategy: {str_strategy}")
-        print(f"invested_amount: {invested_amount}")
-        print(f"str_last_signal: {str_last_signal}")
-        print(f"min_stock_data_date: {min_stock_data_date}")
-        print(f"file_path: {file_path}")
+        # print(f"total_account_balance: {total_account_balance}")
+        # print(f"total_rate: {total_rate}")
+        # print(f"str_strategy: {str_strategy}")
+        # print(f"invested_amount: {invested_amount}")
+        # print(f"str_last_signal: {str_last_signal}")
+        # print(f"min_stock_data_date: {min_stock_data_date}")
+        # print(f"file_path: {file_path}")
         
         min_stock_data_date = str(min_stock_data_date).split(' ')[0]
         user_stock_file_path1 = file_path
