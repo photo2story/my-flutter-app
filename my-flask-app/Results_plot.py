@@ -126,7 +126,11 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     plt.ylabel('7-Day Average Daily Return (%)')
     plt.legend(loc='upper left')
 
-    plt.title(f"\nTotal Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} %\n" +
+    stock1_name = get_ticker_name(stock1)
+    stock2_name = get_ticker_name(stock2)
+
+    plt.title(f"{stock1} ({stock1_name}) vs {stock2} ({stock2_name})\n" +
+              f"\nTotal Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} %\n" +
               f"Invested Amount: {invested_amount:,.0f} $, Strategy: {str_strategy}")
 
     # x축 라벨 설정
