@@ -9,7 +9,7 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <style>
         body {
-            padding-top: 200px; /* 상단 고정 부분을 위한 패딩 */
+            padding-top: 100px; /* 상단 고정 부분을 위한 패딩 조정 */
         }
         .fixed-header {
             position: fixed;
@@ -59,6 +59,9 @@
         <h2>검토한 주식</h2>
     </div>
     <!-- 정적 파일 경로를 동적으로 생성하여 JavaScript 파일 로드 -->
-    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    <!-- Flask 템플릿에서 사용할 때 아래 주석을 해제 -->
+    <!-- <script src="{{ url_for('static', filename='js/scripts.js') }}"></script> -->
+    <!-- 로컬 HTML 파일에서 사용할 때는 아래 경로를 수정하여 사용 -->
+    <script src="scripts.js"></script>
 </body>
 </html>
