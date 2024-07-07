@@ -295,4 +295,5 @@ if __name__ == '__main__':
 # pip install langchain
 # ollama create EEVE-Korean-10.8B -f Modelfile
 # git push heroku main
-# heroku logs --tail
+# heroku logs --tail -a he-flutter-app
+

@@ -163,58 +163,60 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
 import time  # 추가
 
 async def plot_results_all():
-  image_files = glob.glob("comparison_*.png")
-  DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
+    DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
+    github_api_url = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images'
+    
+    # GitHub API를 통해 이미지 파일 목록 가져오기
+    response = requests.get(github_api_url)
+    if response.status_code != 200:
+        print('GitHub API 요청 실패')
+        return
+    
+    images = response.json()
+    image_files = [img['download_url'] for img in images if img['name'].startswith('comparison_') and img['name'].endswith('.png')]
+    
+    for image_url in image_files:
+        stock = image_url.split('comparison_')[1].split('_VOO.png')[0]
+        name = get_ticker_name(stock)
+        
+        # 해당 주식의 CSV 파일 경로 생성
+        csv_file_path = f"static/images/result_{stock}.csv"
+        
+        if os.path.exists(csv_file_path):
+            df = pd.read_csv(csv_file_path)
+            last_row = df.iloc[-1]
+            total_account_balance = last_row['account_balance']
+            total_rate = last_row['rate']
+            invested_amount = last_row['invested_amount']
+            str_last_signal = last_row['signal']
 
-  for image_path in image_files:
-      stock = image_path.split('comparison_')[1].split('_VOO.png')[0]
-      # 티커 이름 가져오기
-      name = get_ticker_name(stock)
-      
-      # 해당 주식의 CSV 파일 경로 생성
-      csv_file_path = f"result_{stock}.csv"
-      # print(csv_file_path)
+            # 결과 메시지 전송
+            message = {
+                'content': f"Stock: {stock} ({name})\n" f"Rate: {total_rate:,.2f} %\n"
+                           f"Invested_amount: {invested_amount:,.0f} $\n"
+                           f"Total_account_balance: {total_account_balance:,.0f} $\n"
+                           f"Last_signal: {str_last_signal} \n"
+            }
+            response = requests.post(DISCORD_WEBHOOK_URL, json=message)
+            if response.status_code != 204:
+                print('Discord 메시지 전송 실패')
+            else:
+                print('Discord 메시지 전송 성공')
 
-      if os.path.exists(csv_file_path):
-          df = pd.read_csv(csv_file_path)
-          # print(df)
-          last_row = df.iloc[-1]
-          total_account_balance = last_row['account_balance']
-          # print(str(total_account_balance))
-          total_rate = last_row['rate']
-          # print(str(total_rate))
-          
-          # str_strategy = last_row['Strategy']
-          invested_amount = last_row['invested_amount']
-          str_last_signal = last_row['signal']
-          print(str_last_signal)
+        # GitHub에서 이미지 파일 가져오기
+        image_response = requests.get(image_url)
+        if image_response.status_code != 200:
+            print(f'Graph 전송 실패: {stock}')
+            continue
 
-          # 결과 메시지 전송
-          message = {
-              'content': f"Stock: {stock} ({name})\n" f"Rate: {total_rate:,.2f} %\n"
-                         f"InvestIed_amount: {invested_amount:,.0f} $\n"
-                         f"Total_account_balance: {total_account_balance:,.0f} $\n"
-                         f"Last_signal: {str_last_signal} \n"
-          }
-          response = requests.post(DISCORD_WEBHOOK_URL, data=message)
-          if response.status_code != 204:
-              print('Discord 메시지 전송 실패')
-          else:
-              print('Discord 메시지 전송 성공')
+        image_data = image_response.content
+        response = requests.post(
+            DISCORD_WEBHOOK_URL,
+            files={'image': ('image.png', image_data)}
+        )
+        if response.status_code != 204:
+            print(f'Graph 전송 실패: {stock}')
+        else:
+            print(f'Graph 전송 성공: {stock}')
 
-      # 이미지 파일 전송
-      with open(image_path, 'rb') as image:
-          response = requests.post(
-              DISCORD_WEBHOOK_URL,
-              files={'image': image}
-          )
-          if response.status_code != 204:
-              print(f'Graph 전송 실패: {stock}')
-          else:
-              print(f'Graph 전송 성공: {stock}')
-
-      
-      
-      # plot_results_mpl(stock, start_date, end_date)
-
-  await asyncio.sleep(1)  # 1초 대기
+        await asyncio.sleep(1)  # 1초 대기
