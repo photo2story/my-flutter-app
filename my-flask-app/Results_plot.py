@@ -19,7 +19,7 @@ def convert_file_path_for_reading(file_path):
 
 def save_figure(fig, file_path):
   file_path = convert_file_path_for_saving(file_path)
-  fig.savefig(file_path)
+  fig.savefig(file_path, bbox_inches='tight')
   plt.close(fig)  # 닫지 않으면 메모리를 계속 차지할 수 있음
 
 from PIL import Image
