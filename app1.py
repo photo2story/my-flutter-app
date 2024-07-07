@@ -21,45 +21,13 @@ async def on_ready():
     print(f"Logged in as {bot.user.name}")
 
 @tasks.loop(minutes=5)
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/<path:path>')
-def static_proxy(path):
-    return send_from_directory(app.static_folder, path)
-
-@app.route('/generate_description', methods=['POST'])
-def generate_description():
-    data = request.get_json()
-    stock_ticker = data.get('stock_ticker')
-    description = f"Description for {stock_ticker}"
-    return jsonify({"description": description})
-
-@app.route('/save_search_history', methods=['POST'])
-def save_search_history():
-    data = request.json
-    stock_name = data.get('stock_name')
-    print(f'Saved {stock_name} to search history.')
-    return jsonify({"success": True})
-
-@app.route('/api/get_images', methods=['GET'])
-def get_images():
-    image_folder = os.path.join(app.static_folder, 'images')
-    images = []
-    for filename in os.listdir(image_folder):
-        if filename.endswith('.png'):
-            images.append(filename)
-    return jsonify(images)
-
-sent_messages = {}
-
-def reset_sent_messages():
-    global sent_messages
-    sent_messages = {}
-    threading.Timer(10.0, reset_sent_messages).start()
-
-reset_sent_messages()
+async def send_msg():
+    channel = bot.get_channel(CHANNEL_ID)
+    if channel:
+        await channel.send('Hello')
+    else:
+        print("Failed to find channel with ID:", CHANNEL_ID)
+        
 
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
@@ -245,6 +213,52 @@ def fetch_csv_data(url):
         print(f'Error fetching CSV data: {e}')
         return None
 
+
+bot.run(TOKEN)
+
+app = Flask(__name__)
+CORS(app)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/<path:path>')
+def static_proxy(path):
+    return send_from_directory(app.static_folder, path)
+
+@app.route('/generate_description', methods=['POST'])
+def generate_description():
+    data = request.get_json()
+    stock_ticker = data.get('stock_ticker')
+    description = f"Description for {stock_ticker}"
+    return jsonify({"description": description})
+
+@app.route('/save_search_history', methods=['POST'])
+def save_search_history():
+    data = request.json
+    stock_name = data.get('stock_name')
+    print(f'Saved {stock_name} to search history.')
+    return jsonify({"success": True})
+
+@app.route('/api/get_images', methods=['GET'])
+def get_images():
+    image_folder = os.path.join(app.static_folder, 'images')
+    images = []
+    for filename in os.listdir(image_folder):
+        if filename.endswith('.png'):
+            images.append(filename)
+    return jsonify(images)
+
+sent_messages = {}
+
+def reset_sent_messages():
+    global sent_messages
+    sent_messages = {}
+    threading.Timer(10.0, reset_sent_messages).start()
+
+reset_sent_messages()
+
 @app.route('/data')
 def data():
     df = fetch_csv_data(csv_url)
@@ -252,13 +266,10 @@ def data():
         return "Error fetching data", 500
 
     return df.to_html()
-bot.run(TOKEN)
-
-
 
  
 # #  .\.venv\Scripts\activate
-# #  python app.py 
+# #  python app1.py 
 # pip install huggingface_hub
 # huggingface-cli login
 # EEVE-Korean-Instruct-10.8B-v1.0-GGUF

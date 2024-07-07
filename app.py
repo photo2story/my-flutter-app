@@ -35,6 +35,8 @@ async def ping(ctx):
 
 bot.run(TOKEN)
 
+
+# @app.route('/')('index.html')
 app = Flask(__name__)
 @app.route('/')
 def index():
