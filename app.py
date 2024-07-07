@@ -1,4 +1,5 @@
 # app.py
+# app.py
 import os
 import logging
 import threading
@@ -14,10 +15,10 @@ import sys
 import nest_asyncio
 import git
 
-logging.basicConfig(level=logging.INFO) # Set logging level to INFO
+logging.basicConfig(level=logging.INFO)  # Set logging level to INFO
 sys.stdout.reconfigure(encoding='utf-8')
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
 
 from datetime import datetime
 import pandas as pd
@@ -110,17 +111,17 @@ processed_message_ids = set()
 login_once_flag = False
 
 async def backtest_and_send(ctx, stock, option_strategy):
-    await ctx.send(f'backtest_and_send.command1: {stock}') # 주식 이름을 출력
+    await ctx.send(f'backtest_and_send.command1: {stock}')  # 주식 이름을 출력
     if not is_valid_stock(stock):
         message = f"Stock market information updates needed. {stock}"
         await ctx.send(message)
         print(message)
         return
-    
+
     try:
         total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df = estimate_stock(
             stock, start_date, end_date, initial_investment, monthly_investment, option_strategy)
-        await ctx.send(f'backtest_and_send.command2: {stock}') # 주식 이름을 출력
+        await ctx.send(f'backtest_and_send.command2: {stock}')  # 주식 이름을 출력
         min_stock_data_date = str(min_stock_data_date).split(' ')[0]
         user_stock_file_path1 = file_path
 
@@ -164,7 +165,7 @@ async def buddy(ctx):
 
     # Run synchronous functions in the executor
     await loop.run_in_executor(None, update_stock_market_csv, ticker_path, stocks)
-    sector_dict = await loop.run_in_executor(None, load_sector_info) # run_in_executor returns a future, await it if function is synchronous
+    sector_dict = await loop.run_in_executor(None, load_sector_info)  # run_in_executor returns a future, await it if function is synchronous
     path = '.'  # Assuming folder path
     await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
 
@@ -245,7 +246,7 @@ async def ping(ctx):
     if ctx.message.id not in processed_message_ids:
         processed_message_ids.add(ctx.message.id)
         await ctx.send(f'pong: {bot.user.name}')
-        
+
 import io
 
 # CSV 파일 URL
@@ -281,6 +282,8 @@ if __name__ == '__main__':
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run_bot())
+
+
 
 
 # #  .\.venv\Scripts\activate

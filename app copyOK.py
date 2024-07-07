@@ -221,6 +221,7 @@ async def stock(ctx, *args):
         move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
     except Exception as e:
         await ctx.send(f'An error occurred: {e}')
+
 @bot.command()
 async def show_all(ctx):
     try:
@@ -280,6 +281,7 @@ if __name__ == '__main__':
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run_bot())
+
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
