@@ -1,18 +1,17 @@
 # app.py
-import os
+import os,sys
 import logging
 import threading
 import asyncio
 from flask import Flask, render_template, send_from_directory, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
-from discord.ext import commands
+from discord.ext import tasks, commands
 import discord
 import requests
-import certifi
-import sys
-import nest_asyncio
-import git
+# import certifi
+# import nest_asyncio
+# import git
 
 sys.stdout.reconfigure(encoding='utf-8')
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
