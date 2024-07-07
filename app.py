@@ -15,9 +15,6 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-@bot.route('/')
-def index():
-    return render_template('index.html')
 
 @bot.event
 async def on_ready():
@@ -38,7 +35,10 @@ async def ping(ctx):
 
 bot.run(TOKEN)
 
-
+app = Flask(__name__)
+@bot.route('/')
+def index():
+    return render_template('index.html')
 
  
 # #  .\.venv\Scripts\activate
