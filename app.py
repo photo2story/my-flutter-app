@@ -14,6 +14,9 @@ import sys
 import nest_asyncio
 import git
 
+sys.stdout.reconfigure(encoding='utf-8')
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
+
 from datetime import datetime
 import pandas as pd
 import numpy as np
@@ -26,10 +29,6 @@ from get_ticker import get_ticker_from_korean_name
 from git_operations import move_files_to_images_folder
 from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
 
-
-sys.stdout.reconfigure(encoding='utf-8')
-
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 # Load environment variables from .env file
 load_dotenv()
 
