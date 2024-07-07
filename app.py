@@ -32,13 +32,14 @@ async def send_msg():
 async def ping(ctx):
     await ctx.send('pong')
 
-bot.run(TOKEN)
+if __name__ == "__main__":
+    print("Starting bot...")
+    print(f"TOKEN: {TOKEN}")
+    print(f"CHANNEL_ID: {CHANNEL_ID}")
+    bot.run(TOKEN)
 
 
-
-
-#  .\.venv\Scripts\activate
-# python flask-discord.py    
+ 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
 # pip install huggingface_hub
