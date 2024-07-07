@@ -32,11 +32,8 @@ async def send_msg():
 async def ping(ctx):
     await ctx.send('pong')
 
-if __name__ == "__main__":
-    print("Starting bot...")
-    print(f"TOKEN: {TOKEN}")
-    print(f"CHANNEL_ID: {CHANNEL_ID}")
-    bot.run(TOKEN)
+bot.run(TOKEN)
+
 
 
  
