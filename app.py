@@ -185,7 +185,7 @@ async def stock(ctx, *args):
             else:
                 info_stock = korean_stock_code
 
-        await backtest_and_send(ctx, info_stock, option_strategy='1')
+        await backtest_and_send(ctx, info_stock, option_strategy='1', start_date=start_date, end_date=end_date, initial_investment=initial_investment, monthly_investment=monthly_investment, bot=bot)
         plot_results_mpl(info_stock, start_date, end_date)
         move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
     except Exception as e:
