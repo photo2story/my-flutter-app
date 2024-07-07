@@ -1,7 +1,11 @@
 # app.py
 import os
+from dotenv import load_dotenv
 import discord
 from discord.ext import tasks, commands
+
+# Load environment variables from .env file
+load_dotenv()
 
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
