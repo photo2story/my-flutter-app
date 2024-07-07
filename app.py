@@ -29,7 +29,7 @@ from get_ticker import get_ticker_from_korean_name
 from git_operations import move_files_to_images_folder
 from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
 
-os.environ['SSL_CERT_FILE'] = certifi.where()
+# os.environ['SSL_CERT_FILE'] = certifi.where()
 # Load environment variables from .env file
 load_dotenv()
 
