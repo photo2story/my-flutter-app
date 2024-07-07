@@ -7,6 +7,7 @@ import yfinance as yf
 import investpy
 
 ticker_path = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv')
+
 def get_ticker_name(ticker):
     df = pd.read_csv(ticker_path)  # stock_market.csv 파일 경로
     result = df.loc[df['Symbol'] == ticker, 'Name']
@@ -137,6 +138,11 @@ async def search_tickers_and_respond(ctx, query):
     for message in response_messages:
         await ctx.send(message)
     print(f'Sent messages for query: {query}')
+
+def is_valid_stock(stock):
+    """주식 심볼이 유효한지 확인하는 함수"""
+    ticker_dict = load_tickers()
+    return stock in ticker_dict
 
 if __name__ == "__main__":
     # 사용 예시 python get_ticker.py
