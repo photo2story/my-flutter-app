@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flsak-app'))
 # Load environment variables from .env file
 load_dotenv()
 
