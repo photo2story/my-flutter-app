@@ -58,24 +58,6 @@ async def send_msg():
 async def ping(ctx):
     await ctx.send('pong')
 
-@bot.command(name='stock')
-async def stock(ctx, symbol: str):
-    try:
-        # 주식 데이터 가져오기
-        stock_data = yf.download(symbol, period='1y')
-        stock_data['Close'].plot(title=f'{symbol} Stock Price')
-        
-        # 그래프 저장
-        plt.savefig('stock_price.png')
-        plt.close()
-
-        # 그래프를 디스코드 채널로 전송
-        with open('stock_price.png', 'rb') as f:
-            picture = discord.File(f)
-            await ctx.send(file=picture)
-    except Exception as e:
-        await ctx.send(f"An error occurred: {e}")
-        print(f"Error: {e}")
 
 @bot.command(name='show_all')
 async def show_all(ctx):
@@ -83,20 +65,6 @@ async def show_all(ctx):
         # 모든 결과를 표시하는 함수 호출
         plot_results_all()
         await ctx.send("All results have been successfully displayed.")
-    except Exception as e:
-        await ctx.send(f"An error occurred: {e}")
-        print(f"Error: {e}")
-
-@bot.command(name='compare')
-async def compare(ctx, symbol1: str, symbol2: str):
-    try:
-        # 주식 데이터를 가져와 비교 분석하는 함수 호출
-        plot_comparison_results(symbol1, symbol2)
-        
-        # 비교 분석 결과 그래프를 디스코드 채널로 전송
-        with open('comparison_results.png', 'rb') as f:
-            picture = discord.File(f)
-            await ctx.send(file=picture)
     except Exception as e:
         await ctx.send(f"An error occurred: {e}")
         print(f"Error: {e}")
