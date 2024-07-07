@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flsak-app'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 # Load environment variables from .env file
 load_dotenv()
 
@@ -83,11 +83,7 @@ async def compare(ctx, symbol1: str, symbol2: str):
         print(f"Error: {e}")
 
 bot.run(TOKEN)
-
-
-
-#  .\.venv\Scripts\activate
-# python flask-discord.py    
+ 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
 # pip install huggingface_hub
