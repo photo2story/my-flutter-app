@@ -1,4 +1,5 @@
 # app.py
+# app.py
 import os
 import asyncio
 import threading
@@ -95,6 +96,7 @@ if __name__ == "__main__":
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run_bot())
+
 
 #  .\.venv\Scripts\activate
 # python flask-discord.py    
