@@ -14,6 +14,9 @@ import requests
 import io
 import git
 
+# Add my-flask-app directory to sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
+
 # Import custom modules
 from get_ticker import load_tickers, search_tickers, get_ticker_name, update_stock_market_csv
 from estimate_stock import estimate_snp, estimate_stock
@@ -27,8 +30,7 @@ from github_operations import save_csv_to_github, save_image_to_github, is_valid
 # Load environment variables from .env file
 load_dotenv()
 
-# Add my-flask-app directory to sys.path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
+
 
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
