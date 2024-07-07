@@ -57,7 +57,57 @@ async def send_msg():
 @bot.command(name='ping')
 async def ping(ctx):
     await ctx.send('pong')
+    
+@bot.command()
+async def ticker(ctx, *, query: str = None):
+    print(f'Command received: ticker with query: {query}')
+    if query is None:
+        await ctx.send("Please enter ticker stock name or ticker.")
+        return
 
+    ticker_dict = load_tickers()
+    matching_tickers = search_tickers(query, ticker_dict)
+
+    if not matching_tickers:
+        await ctx.send("No search results.")
+        return
+
+    response_message = "Search results:\n"
+    response_messages = []
+    for symbol, name in matching_tickers:
+        line = f"{symbol} - {name}\n"
+        if len(response_message) + len(line) > 2000:
+            response_messages.append(response_message)
+            response_message = "Search results (continued):\n"
+        response_message += line
+
+    if response_message:
+        response_messages.append(response_message)
+
+    for message in response_messages:
+        await ctx.send(message)
+    print(f'Sent messages for query: {query}')
+
+@bot.command()
+async def stock(ctx, *args):
+    stock_name = ' '.join(args)
+    await ctx.send(f'Arguments passed by command: {stock_name}')
+    try:
+        info_stock = str(stock_name).upper()
+        if info_stock.startswith('K '):
+            korean_stock_name = info_stock[2:].upper()
+            korean_stock_code = get_ticker_from_korean_name(korean_stock_name)
+            if korean_stock_code is None:
+                await ctx.send(f'Cannot find the stock {korean_stock_name}.')
+                return
+            else:
+                info_stock = korean_stock_code
+
+        await backtest_and_send(ctx, info_stock, option_strategy='1')
+        plot_results_mpl(info_stock, start_date, end_date)
+        move_files_to_images_folder()  # 모든 백테스트 작업이 완료된 후 파일 이동
+    except Exception as e:
+        await ctx.send(f'An error occurred: {e}')
 
 @bot.command(name='show_all')
 async def show_all(ctx):
