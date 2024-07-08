@@ -30,27 +30,27 @@ class _MyHomePageState extends State<MyHomePage> {
   String _resultImageUrl = '';
   String _message = '';
   String _description = '';
-  final TextEditingController _controller = TextEditingController();
   List<String> _reviewedTickers = [];
+  final TextEditingController _controller = TextEditingController();
 
   // 환경 변수 직접 포함
-  final String apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
-  final String descriptionApiUrl = 'https://he-flutter-app.herokuapp.com/generate_description';
-  final String reviewedTickersApiUrl = 'https://he-flutter-app.herokuapp.com/api/get_reviewed_tickers';
+  final String apiUrl = 'http://localhost:5000/api/get_reviewed_tickers';
+  final String fetchImagesApiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
+  final String flaskApiUrl = 'http://localhost:5000/api/stock';
 
   @override
   void initState() {
     super.initState();
-    fetchReviewedTickers(); // 앱이 시작될 때 검토된 티커 리스트를 불러옵니다.
+    fetchReviewedTickers();
   }
 
   Future<void> fetchReviewedTickers() async {
     try {
-      final response = await http.get(Uri.parse(reviewedTickersApiUrl));
+      final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
         final List<dynamic> tickers = json.decode(response.body);
         setState(() {
-          _reviewedTickers = tickers.cast<String>();
+          _reviewedTickers = List<String>.from(tickers);
         });
       } else {
         setState(() {
@@ -59,14 +59,14 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     } catch (e) {
       setState(() {
-        _message = 'Error fetching reviewed tickers: $e';
+        _message = 'Error: $e';
       });
     }
   }
 
   Future<void> fetchImages(String stockTicker) async {
     try {
-      final response = await http.get(Uri.parse(apiUrl));
+      final response = await http.get(Uri.parse(fetchImagesApiUrl));
       if (response.statusCode == 200) {
         final List<dynamic> files = json.decode(response.body);
         final comparisonFile = files.firstWhere(
@@ -82,52 +82,49 @@ class _MyHomePageState extends State<MyHomePage> {
             _resultImageUrl = resultFile['download_url'];
             _message = '';
           });
-          await generateDescription(stockTicker); // 그래프 설명 생성
         } else {
           setState(() {
             _comparisonImageUrl = '';
             _resultImageUrl = '';
-            _message = '해당 주식 티커에 대한 이미지를 찾을 수 없습니다';
+            _message = 'No images found for stock ticker $stockTicker';
           });
         }
       } else {
         setState(() {
           _comparisonImageUrl = '';
           _resultImageUrl = '';
-          _message = 'GitHub API 호출 실패: ${response.statusCode}';
+          _message = 'Failed to fetch images: ${response.statusCode}';
         });
       }
     } catch (e) {
       setState(() {
         _comparisonImageUrl = '';
         _resultImageUrl = '';
-        _message = '오류 발생: $e';
+        _message = 'Error: $e';
       });
     }
   }
 
-  Future<void> generateDescription(String stockTicker) async {
+  Future<void> sendStockCommand(String stockTicker) async {
     try {
       final response = await http.post(
-        Uri.parse(descriptionApiUrl),
+        Uri.parse(flaskApiUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'stock_ticker': stockTicker}),
       );
 
       if (response.statusCode == 200) {
-        final responseBody = json.decode(response.body);
-        final description = responseBody['description'];
         setState(() {
-          _description = description;
+          _message = 'Stock command executed successfully for $stockTicker';
         });
       } else {
         setState(() {
-          _description = '설명 생성 실패: ${response.statusCode}';
+          _message = 'Failed to execute stock command: ${response.statusCode}';
         });
       }
     } catch (e) {
       setState(() {
-        _description = '오류 발생: $e';
+        _message = 'Error: $e';
       });
     }
   }
@@ -168,15 +165,32 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                   onSubmitted: (value) {
-                    fetchImages(_controller.text.toUpperCase());
+                    sendStockCommand(_controller.text.toUpperCase());
                   },
                 ),
               ),
               ElevatedButton(
                 onPressed: () {
-                  fetchImages(_controller.text.toUpperCase());
+                  sendStockCommand(_controller.text.toUpperCase());
                 },
                 child: Text('Fetch Stock Images'),
+              ),
+              SizedBox(height: 20),
+              Wrap(
+                children: _reviewedTickers
+                    .map((ticker) => GestureDetector(
+                          onTap: () => fetchImages(ticker),
+                          child: Container(
+                            padding: EdgeInsets.all(4),
+                            child: Text(
+                              ticker,
+                              style: TextStyle(
+                                  color: Colors.blue,
+                                  decoration: TextDecoration.underline),
+                            ),
+                          ),
+                        ))
+                    .toList(),
               ),
               SizedBox(height: 20),
               _comparisonImageUrl.isNotEmpty
@@ -209,31 +223,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       style: TextStyle(fontSize: 16, color: Colors.red),
                     )
                   : Container(),
-              SizedBox(height: 20),
-              _description.isNotEmpty
-                  ? Text(
-                      _description,
-                      style: TextStyle(fontSize: 16, color: Colors.green),
-                    )
-                  : Container(),
-              SizedBox(height: 20),
-              _reviewedTickers.isNotEmpty
-                  ? Column(
-                      children: _reviewedTickers.map((ticker) {
-                        return GestureDetector(
-                          onTap: () => fetchImages(ticker),
-                          child: Text(
-                            ticker,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.blue,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    )
-                  : Container(),
             ],
           ),
         ),
@@ -241,6 +230,30 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+class ImageScreen extends StatelessWidget {
+  final String imageUrl;
+
+  ImageScreen({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Image Preview'),
+      ),
+      body: Center(
+        child: PhotoView(
+          imageProvider: NetworkImage(imageUrl),
+          errorBuilder: (context, error, stackTrace) {
+            return Text('Failed to load image');
+          },
+        ),
+      ),
+    );
+  }
+}
+
 
 class ImageScreen extends StatelessWidget {
   final String imageUrl;
