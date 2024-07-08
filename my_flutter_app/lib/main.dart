@@ -39,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
   final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
   final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
- final String discordWebhookUrl = 'https://discord.com/api/webhooks/{webhook.id}/{webhook.token}';
+//  final String discordWebhookUrl = 'https://discord.com/api/webhooks/{webhook.id}/{webhook.token}';
 
   @override
   void initState() {
