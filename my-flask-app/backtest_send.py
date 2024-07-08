@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from discord.ext import commands
+import discord  # discord 모듈 추가
 from Results_plot import plot_comparison_results
 from get_ticker import get_ticker_name, is_valid_stock
 from estimate_stock import estimate_stock, estimate_snp
