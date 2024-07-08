@@ -30,19 +30,13 @@ class _MyHomePageState extends State<MyHomePage> {
   String _resultImageUrl = '';
   String _message = '';
   String _description = '';
-  List<String> _reviewedTickers = [];
+  List<String> _tickers = [];
   final TextEditingController _controller = TextEditingController();
 
   // 환경 변수 직접 포함
-  final String apiUrl = 'http://localhost:5000/api/get_reviewed_tickers';
-  final String fetchImagesApiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
-  final String flaskApiUrl = 'http://localhost:5000/execute_stock_command';
-
-  @override
-  void initState() {
-    super.initState();
-    fetchReviewedTickers();
-  }
+  final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
+  final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
+  final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
 
   Future<void> fetchReviewedTickers() async {
     try {
@@ -50,11 +44,11 @@ class _MyHomePageState extends State<MyHomePage> {
       if (response.statusCode == 200) {
         final List<dynamic> tickers = json.decode(response.body);
         setState(() {
-          _reviewedTickers = tickers.cast<String>();
+          _tickers = List<String>.from(tickers);
         });
       } else {
         setState(() {
-          _message = 'Failed to load reviewed tickers';
+          _message = 'Error occurred while fetching tickers: ${response.statusCode}';
         });
       }
     } catch (e) {
@@ -66,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> fetchImages(String stockTicker) async {
     try {
-      final response = await http.get(Uri.parse(fetchImagesApiUrl));
+      final response = await http.get(Uri.parse('https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images'));
       if (response.statusCode == 200) {
         final List<dynamic> files = json.decode(response.body);
         final comparisonFile = files.firstWhere(
@@ -109,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> generateDescription(String stockTicker) async {
     try {
       final response = await http.post(
-        Uri.parse(flaskApiUrl),
+        Uri.parse(descriptionApiUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'stock_ticker': stockTicker}),
       );
@@ -132,6 +126,31 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> executeStockCommand(String stockTicker) async {
+    try {
+      final response = await http.post(
+        Uri.parse(executeCommandApiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'stock_ticker': stockTicker}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        setState(() {
+          _message = responseBody['message'];
+        });
+      } else {
+        setState(() {
+          _message = '명령 실행 실패: ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _message = '오류 발생: $e';
+      });
+    }
+  }
+
   void _openImage(BuildContext context, String imageUrl) {
     Navigator.push(
       context,
@@ -139,6 +158,12 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context) => ImageScreen(imageUrl: imageUrl),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchReviewedTickers();
   }
 
   @override
@@ -175,8 +200,22 @@ class _MyHomePageState extends State<MyHomePage> {
               ElevatedButton(
                 onPressed: () {
                   fetchImages(_controller.text.toUpperCase());
+                  executeStockCommand(_controller.text.toUpperCase());
                 },
                 child: Text('Fetch Stock Images'),
+              ),
+              SizedBox(height: 20),
+              Wrap(
+                children: _tickers.map((ticker) {
+                  return GestureDetector(
+                    onTap: () {
+                      fetchImages(ticker);
+                    },
+                    child: Chip(
+                      label: Text(ticker),
+                    ),
+                  );
+                }).toList(),
               ),
               SizedBox(height: 20),
               _comparisonImageUrl.isNotEmpty
@@ -214,21 +253,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ? Text(
                       _description,
                       style: TextStyle(fontSize: 16, color: Colors.green),
-                    )
-                  : Container(),
-              SizedBox(height: 20),
-              _reviewedTickers.isNotEmpty
-                  ? Wrap(
-                      children: _reviewedTickers.map((ticker) {
-                        return GestureDetector(
-                          onTap: () {
-                            fetchImages(ticker);
-                          },
-                          child: Chip(
-                            label: Text(ticker),
-                          ),
-                        );
-                      }).toList(),
                     )
                   : Container(),
             ],
