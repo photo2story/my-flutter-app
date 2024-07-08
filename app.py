@@ -1,5 +1,4 @@
 # app.py
-
 import os
 import sys
 import asyncio
@@ -12,8 +11,8 @@ from discord.ext import tasks, commands
 from datetime import datetime
 import pandas as pd
 import numpy as np
-from flask import Flask, render_template, send_from_directory, jsonify, request
-from flask_cors import CORS
+from quart import Quart, render_template, send_from_directory, jsonify, request
+from quart_cors import cors
 
 # my-flask-app 디렉토리를 sys.path에 추가
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
@@ -35,9 +34,6 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="", intents=intents)
-
-# processed_message_ids 변수를 정의하고 초기화합니다.
-processed_message_ids = set()
 
 @bot.event
 async def on_ready():
@@ -66,7 +62,7 @@ async def buddy(ctx):
     loop = asyncio.get_running_loop()
 
     for stock in stocks:
-        await backtest_and_send(ctx, stock, 'modified_monthly', bot=bot)  # bot 변수를 전달
+        await backtest_and_send(ctx, stock, 'modified_monthly', bot)
         if is_valid_stock(stock):
             try:
                 plot_results_mpl(stock, start_date, end_date)
@@ -106,7 +102,7 @@ async def stock(ctx, *args):
             else:
                 info_stock = korean_stock_code
 
-        await backtest_and_send(ctx, info_stock, option_strategy='1', bot=bot)  # bot 변수를 전달
+        await backtest_and_send(ctx, info_stock, option_strategy='1', bot=bot)
         plot_results_mpl(info_stock, start_date, end_date)
         move_files_to_images_folder()
     except Exception as e:
@@ -120,6 +116,15 @@ async def show_all(ctx):
     except Exception as e:
         await ctx.send(f"An error occurred: {e}")
         print(f"Error: {e}")
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user.name}')
+    channel = bot.get_channel(int(config.DISCORD_CHANNEL_ID))
+    if channel:
+        await channel.send(f'Bot has successfully logged in: {bot.user.name}')
+    else:
+        print(f'Failed to get channel with ID {config.DISCORD_CHANNEL_ID}')
 
 @bot.command()
 async def ping(ctx):
@@ -137,33 +142,35 @@ def fetch_csv_data(url):
         print(f'Error fetching CSV data: {e}')
         return None
 
-app = Flask(__name__)
+bot.run(config.DISCORD_APPLICATION_TOKEN)
+
+app = Quart(__name__)
 CORS(app)
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+async def index():
+    return await render_template('index.html')
 
 @app.route('/<path:path>')
-def static_proxy(path):
-    return send_from_directory(app.static_folder, path)
+async def static_proxy(path):
+    return await send_from_directory(app.static_folder, path)
 
 @app.route('/generate_description', methods=['POST'])
-def generate_description():
-    data = request.get_json()
+async def generate_description():
+    data = await request.get_json()
     stock_ticker = data.get('stock_ticker')
     description = f"Description for {stock_ticker}"
     return jsonify({"description": description})
 
 @app.route('/save_search_history', methods=['POST'])
-def save_search_history():
-    data = request.json
+async def save_search_history():
+    data = await request.json
     stock_name = data.get('stock_name')
     print(f'Saved {stock_name} to search history.')
     return jsonify({"success": True})
 
 @app.route('/api/get_images', methods=['GET'])
-def get_images():
+async def get_images():
     image_folder = os.path.join(app.static_folder, 'images')
     images = []
     for filename in os.listdir(image_folder):
@@ -171,33 +178,41 @@ def get_images():
             images.append(filename)
     return jsonify(images)
 
-@app.route('/api/get_reviewed_tickers', methods=['GET'])
-def get_reviewed_tickers():
-    image_folder = os.path.join(app.static_folder, 'images')
-    tickers = []
-    for filename in os.listdir(image_folder):
-        if filename.startswith('comparison_') and filename.endswith('_VOO.png'):
-            ticker = filename.split('_')[1]  # 티커를 추출합니다.
-            tickers.append(ticker)
-    return jsonify(tickers)
+sent_messages = {}
+
+def reset_sent_messages():
+    global sent_messages
+    sent_messages = {}
+    threading.Timer(10.0, reset_sent_messages).start()
+
+reset_sent_messages()
+
+@app.route('/data')
+async def data():
+    df = fetch_csv_data(config.CSV_URL)
+    if df is None:
+        return "Error fetching data", 500
+
+    return df.to_html()
 
 @app.route('/execute_stock_command', methods=['POST'])
 async def execute_stock_command():
-    data = request.get_json()
+    data = await request.get_json()
     stock_ticker = data.get('stock_ticker')
     if not stock_ticker:
         return jsonify({'error': 'No stock ticker provided'}), 400
 
     try:
-        # stock 명령을 실행
-        command = f'stock {stock_ticker}'
-        response = requests.post(config.DISCORD_WEBHOOK_URL, json={'content': command})
-        if response.status_code == 204:
-            return jsonify({'message': 'Command executed successfully'}), 200
-        else:
-            return jsonify({'error': 'Failed to execute command'}), 500
+        loop = asyncio.get_event_loop()
+        ctx = None  # You need to define the context properly if you need it
+        await backtest_and_send(ctx, stock_ticker, option_strategy='1', bot=bot)
+        return jsonify({'message': 'Command executed successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# if __name__ == '__main__':
+#     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
 
 def run_flask_app():
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
