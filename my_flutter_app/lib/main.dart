@@ -37,7 +37,9 @@ class _MyHomePageState extends State<MyHomePage> {
   final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
   final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
   final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
-  final String discordWebhookUrl = dotenv.env['DISCORD_WEBHOOK_URL']!;  // 환경 변수
+  final String discordWebhookUrl = dotenv.env['DISCORD_WEBHOOK_URL']!;  // 환경 변수 불러오기
+
+  Future<void> fetchReviewedTickers() async {
 
   Future<void> fetchReviewedTickers() async {
     try {
