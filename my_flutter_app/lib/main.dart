@@ -193,7 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                   onSubmitted: (value) {
-                    fetchImages(_controller.text.toUpperCase());
+                    executeStockCommand(_controller.text.toUpperCase());
                   },
                 ),
               ),
@@ -295,6 +295,7 @@ class ImageScreen extends StatelessWidget {
     );
   }
 }
+
 
 // flutter devices
 
