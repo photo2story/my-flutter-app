@@ -205,17 +205,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text('Fetch Stock Images'),
               ),
               SizedBox(height: 20),
-              Wrap(
-                children: _tickers.map((ticker) {
-                  return GestureDetector(
-                    onTap: () {
-                      fetchImages(ticker);
-                    },
-                    child: Chip(
-                      label: Text(ticker),
-                    ),
-                  );
-                }).toList(),
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Reviewed Stocks:',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  _tickers.join(' '),
+                  style: TextStyle(fontSize: 14, color: Colors.blue),
+                ),
               ),
               SizedBox(height: 20),
               _comparisonImageUrl.isNotEmpty
