@@ -255,30 +255,6 @@ class ImageScreen extends StatelessWidget {
 }
 
 
-class ImageScreen extends StatelessWidget {
-  final String imageUrl;
-
-  ImageScreen({required this.imageUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Image Preview'),
-      ),
-      body: Center(
-        child: PhotoView(
-          imageProvider: NetworkImage(imageUrl),
-          errorBuilder: (context, error, stackTrace) {
-            return Text('Failed to load image');
-          },
-        ),
-      ),
-    );
-  }
-}
-
-
 // flutter devices
 
 // flutter run -d R3CX404VPHE
