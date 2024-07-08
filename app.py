@@ -1,4 +1,5 @@
 # app.py
+
 import os
 import sys
 import asyncio
@@ -195,9 +196,28 @@ def data():
 
     return df.to_html()
 
+# 새로운 엔드포인트 추가
+@app.route('/execute_stock_command', methods=['POST'])
+def execute_stock_command():
+    data = request.get_json()
+    stock_ticker = data.get('stock_ticker')
+    if not stock_ticker:
+        return jsonify({'error': 'No stock ticker provided'}), 400
+
+    try:
+        # stock 명령을 실행
+        command = f'stock {stock_ticker}'
+        response = requests.post(config.DISCORD_WEBHOOK_URL, json={'content': command})
+        if response.status_code == 204:
+            return jsonify({'message': 'Command executed successfully'}), 200
+        else:
+            return jsonify({'error': 'Failed to execute command'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
 
 
 # #  .\.venv\Scripts\activate

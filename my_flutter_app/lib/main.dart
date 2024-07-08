@@ -35,6 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // 환경 변수 직접 포함
   final String apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
   final String descriptionApiUrl = 'https://he-flutter-app.herokuapp.com/generate_description';
+  final String executeCommandUrl = 'https://he-flutter-app.herokuapp.com/execute_stock_command';
 
   Future<void> fetchImages(String stockTicker) async {
     try {
@@ -104,6 +105,32 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> executeStockCommand(String stockTicker) async {
+    try {
+      final response = await http.post(
+        Uri.parse(executeCommandUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'stock_ticker': stockTicker}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final message = responseBody['message'];
+        setState(() {
+          _message = message;
+        });
+      } else {
+        setState(() {
+          _message = '명령 실행 실패: ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _message = '오류 발생: $e';
+      });
+    }
+  }
+
   void _openImage(BuildContext context, String imageUrl) {
     Navigator.push(
       context,
@@ -139,13 +166,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       selection: _controller.selection,
                     );
                   },
-                  onSubmitted: (value) {
+                  onSubmitted: (value) async {
+                    await executeStockCommand(_controller.text.toUpperCase());
                     fetchImages(_controller.text.toUpperCase());
                   },
                 ),
               ),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  await executeStockCommand(_controller.text.toUpperCase());
                   fetchImages(_controller.text.toUpperCase());
                 },
                 child: Text('Fetch Stock Images'),
@@ -218,3 +247,10 @@ class ImageScreen extends StatelessWidget {
     );
   }
 }
+
+
+// flutter devices
+
+// flutter run -d R3CX404VPHE
+
+// flutter run -d chrome
