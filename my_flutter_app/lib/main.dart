@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:photo_view/photo_view.dart';
-import 'dart:html' as html;  // 웹 환경에서 HTML 관련 기능 사용
+import 'dart:html' as html;
+import 'dart:js' as js;  // dart:js 패키지 사용
 
 void main() {
   runApp(MyApp());
@@ -44,7 +45,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     if (kIsWeb) {
-      discordWebhookUrl = html.window.getProperty('env')['DISCORD_WEBHOOK_URL'];
+      final env = js.context['env'];
+      discordWebhookUrl = env['DISCORD_WEBHOOK_URL'];
     } else {
       // 모바일 환경이나 다른 환경에서 사용할 변수를 설정하세요
       discordWebhookUrl = 'YOUR_FALLBACK_DISCORD_WEBHOOK_URL';
@@ -327,6 +329,7 @@ class ImageScreen extends StatelessWidget {
     );
   }
 }
+
 
 // flutter devices
 
