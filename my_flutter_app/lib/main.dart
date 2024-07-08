@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:photo_view/photo_view.dart';
-import 'dart:html' as html;
-import 'dart:js' as js;  // dart:js 패키지 사용
 
 void main() {
   runApp(MyApp());
@@ -36,23 +33,10 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> _tickers = [];
   final TextEditingController _controller = TextEditingController();
 
+  // 환경 변수 직접 포함
   final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
   final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
   final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
-  late final String discordWebhookUrl;
-
-  @override
-  void initState() {
-    super.initState();
-    if (kIsWeb) {
-      final env = js.context['env'];
-      discordWebhookUrl = env['DISCORD_WEBHOOK_URL'];
-    } else {
-      // 모바일 환경이나 다른 환경에서 사용할 변수를 설정하세요
-      discordWebhookUrl = 'YOUR_FALLBACK_DISCORD_WEBHOOK_URL';
-    }
-    fetchReviewedTickers();
-  }
 
   Future<void> fetchReviewedTickers() async {
     try {
@@ -142,32 +126,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> sendDiscordMessage(String stockTicker) async {
-    try {
-      final response = await http.post(
-        Uri.parse(discordWebhookUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'content': 'stock $stockTicker'}),
-      );
-
-      if (response.statusCode != 204) {
-        setState(() {
-          _message = 'Failed to send message to Discord: ${response.statusCode}';
-        });
-        throw Exception('Failed to send message to Discord');
-      }
-    } catch (e) {
-      setState(() {
-        _message = 'Error occurred while sending message to Discord: $e';
-      });
-      throw Exception('Error occurred while sending message to Discord');
-    }
-  }
-
   Future<void> executeStockCommand(String stockTicker) async {
     try {
-      await sendDiscordMessage(stockTicker);
-
       final response = await http.post(
         Uri.parse(executeCommandApiUrl),
         headers: {'Content-Type': 'application/json'},
@@ -181,12 +141,12 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       } else {
         setState(() {
-          _message = 'Command execution failed: ${response.statusCode}';
+          _message = '명령 실행 실패: ${response.statusCode}';
         });
       }
     } catch (e) {
       setState(() {
-        _message = 'Error occurred: $e';
+        _message = '오류 발생: $e';
       });
     }
   }
@@ -198,6 +158,12 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context) => ImageScreen(imageUrl: imageUrl),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchReviewedTickers();
   }
 
   @override
@@ -227,7 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                   onSubmitted: (value) {
-                    executeStockCommand(_controller.text.toUpperCase());
+                    fetchImages(_controller.text.toUpperCase());
                   },
                 ),
               ),
@@ -329,7 +295,6 @@ class ImageScreen extends StatelessWidget {
     );
   }
 }
-
 
 // flutter devices
 
