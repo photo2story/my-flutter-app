@@ -36,8 +36,6 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="", intents=intents)
 
-processed_message_ids = set()  # 전역 변수로 processed_message_ids 초기화
-
 @bot.event
 async def on_ready():
     send_msg.start()
@@ -145,8 +143,7 @@ def fetch_csv_data(url):
         print(f'Error fetching CSV data: {e}')
         return None
 
-bot.run(config.DISCORD_APPLICATION_TOKEN)
-
+# Flask 설정
 app = Flask(__name__)
 CORS(app)
 
@@ -208,9 +205,10 @@ def execute_stock_command():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# 디스코드 봇 및 플라스크 서버 동시 실행
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-
+    threading.Thread(target=lambda: app.run(host='0.0.0.0', port=5000)).start()
+    bot.run(config.DISCORD_APPLICATION_TOKEN)
 
 
 # #  .\.venv\Scripts\activate
