@@ -122,7 +122,7 @@ async def on_ready():
     print(f'Logged in as {bot.user.name}')
     channel = bot.get_channel(int(config.DISCORD_CHANNEL_ID))
     if channel:
-        await channel.send(f'Bot has successfully logged in: {bot.user.name}')
+        await channel.send(f'Bot has successfully logged in as {bot.user.name}')
     else:
         print(f'Failed to get channel with ID {config.DISCORD_CHANNEL_ID}')
 
@@ -225,19 +225,16 @@ async def execute_stock_command():
 
         ctx = Context()
         
-        loop = asyncio.get_running_loop()
-        await loop.run_in_executor(None, asyncio.run, backtest_and_send(ctx, stock_ticker, option_strategy='1', bot=bot))
+        loop = asyncio.get_event_loop()
+        await backtest_and_send(ctx, stock_ticker, option_strategy='1', bot=bot)
         return jsonify({'message': 'Command executed successfully'}), 200
     except Exception as e:
         print(f"Error while executing stock command: {str(e)}")  # 로그에 구체적인 에러 메시지 출력
         return jsonify({'error': str(e)}), 500
 
-
-
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
