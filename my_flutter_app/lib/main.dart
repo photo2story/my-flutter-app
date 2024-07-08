@@ -199,6 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               ElevatedButton(
                 onPressed: () {
+                  fetchImages(_controller.text.toUpperCase());
                   executeStockCommand(_controller.text.toUpperCase());
                 },
                 child: Text('Test Stock'),
@@ -211,21 +212,24 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
-              Wrap(
-                children: _tickers.map((ticker) {
-                  return Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: GestureDetector(
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Wrap(
+                  spacing: 8.0,
+                  runSpacing: 4.0,
+                  children: _tickers.map((ticker) {
+                    return GestureDetector(
                       onTap: () {
                         fetchImages(ticker);
+                        executeStockCommand(ticker);
                       },
                       child: Text(
                         ticker,
                         style: TextStyle(fontSize: 14, color: Colors.blue),
                       ),
-                    ),
-                  );
-                }).toList(),
+                    );
+                  }).toList(),
+                ),
               ),
               SizedBox(height: 20),
               _comparisonImageUrl.isNotEmpty
@@ -295,6 +299,7 @@ class ImageScreen extends StatelessWidget {
     );
   }
 }
+
 
 // flutter devices
 
