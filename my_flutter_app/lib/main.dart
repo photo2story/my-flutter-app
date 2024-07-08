@@ -37,6 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
   final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
   final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
+
   final String discordWebhookUrl = 'YOUR_DISCORD_WEBHOOK_URL';
 
   Future<void> fetchReviewedTickers() async {
