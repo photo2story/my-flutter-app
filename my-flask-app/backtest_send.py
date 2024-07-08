@@ -17,14 +17,9 @@ async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
         raise ValueError("bot 변수는 None일 수 없습니다.")
     
     # 예시로, bot 변수를 이용한 메시지 전송
-    await bot.send(f"backtest_and_send.command1: {stock}")
-    await bot.send(f"backtest_and_send.command2: {stock}")
+    await ctx.send(f"backtest_and_send.command1: {stock}")
+    await ctx.send(f"backtest_and_send.command2: {stock}")
     
-    # 임시로 ctx 설정
-    if ctx is None:
-        ctx = type('', (), {})()
-        ctx.send = bot.send
-
     await ctx.send(f'backtest_and_send.command1: {stock}')  # 주식 이름을 출력
     if not is_valid_stock(stock):
         message = f"Stock market information updates needed. {stock}"

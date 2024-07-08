@@ -216,13 +216,18 @@ async def execute_stock_command():
     try:
         global bot  # bot 변수를 전역으로 선언
         loop = asyncio.get_event_loop()
-        ctx = None  # You need to define the context properly if you need it
+        channel = bot.get_channel(config.DISCORD_CHANNEL_ID)
+        if channel is None:
+            return jsonify({'error': 'Discord channel not found'}), 500
+        
+        ctx = type('', (), {})()  # 임시로 ctx 객체 생성
+        ctx.send = channel.send
+        
         await backtest_and_send(ctx, stock_ticker, option_strategy='1', bot=bot)
         return jsonify({'message': 'Command executed successfully'}), 200
     except Exception as e:
         print(f"Error while executing stock command: {str(e)}")  # 로그에 구체적인 에러 메시지 출력
         return jsonify({'error': str(e)}), 500
-
 
 
 if __name__ == '__main__':
