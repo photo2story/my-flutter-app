@@ -33,10 +33,10 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> _tickers = [];
   final TextEditingController _controller = TextEditingController();
 
-  // 환경 변수 직접 포함
   final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
   final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
   final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
+  final String discordWebhookUrl = 'YOUR_DISCORD_WEBHOOK_URL';  // Add your Discord webhook URL here
 
   Future<void> fetchReviewedTickers() async {
     try {
@@ -58,76 +58,32 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> fetchImages(String stockTicker) async {
-    try {
-      final response = await http.get(Uri.parse('https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images'));
-      if (response.statusCode == 200) {
-        final List<dynamic> files = json.decode(response.body);
-        final comparisonFile = files.firstWhere(
-            (file) => file['name'] == 'comparison_${stockTicker}_VOO.png',
-            orElse: () => null);
-        final resultFile = files.firstWhere(
-            (file) => file['name'] == 'result_mpl_${stockTicker}.png',
-            orElse: () => null);
-
-        if (comparisonFile != null && resultFile != null) {
-          setState(() {
-            _comparisonImageUrl = comparisonFile['download_url'];
-            _resultImageUrl = resultFile['download_url'];
-            _message = '';
-          });
-          await generateDescription(stockTicker); // 그래프 설명 생성
-        } else {
-          setState(() {
-            _comparisonImageUrl = '';
-            _resultImageUrl = '';
-            _message = '해당 주식 티커에 대한 이미지를 찾을 수 없습니다';
-          });
-        }
-      } else {
-        setState(() {
-          _comparisonImageUrl = '';
-          _resultImageUrl = '';
-          _message = 'GitHub API 호출 실패: ${response.statusCode}';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _comparisonImageUrl = '';
-        _resultImageUrl = '';
-        _message = '오류 발생: $e';
-      });
-    }
-  }
-
-  Future<void> generateDescription(String stockTicker) async {
+  Future<void> sendDiscordMessage(String stockTicker) async {
     try {
       final response = await http.post(
-        Uri.parse(descriptionApiUrl),
+        Uri.parse(discordWebhookUrl),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'stock_ticker': stockTicker}),
+        body: jsonEncode({'content': 'stock $stockTicker'}),
       );
 
-      if (response.statusCode == 200) {
-        final responseBody = json.decode(response.body);
-        final description = responseBody['description'];
+      if (response.statusCode != 204) {
         setState(() {
-          _description = description;
+          _message = 'Failed to send message to Discord: ${response.statusCode}';
         });
-      } else {
-        setState(() {
-          _description = '설명 생성 실패: ${response.statusCode}';
-        });
+        throw Exception('Failed to send message to Discord');
       }
     } catch (e) {
       setState(() {
-        _description = '오류 발생: $e';
+        _message = 'Error occurred while sending message to Discord: $e';
       });
+      throw Exception('Error occurred while sending message to Discord');
     }
   }
 
   Future<void> executeStockCommand(String stockTicker) async {
     try {
+      await sendDiscordMessage(stockTicker);
+
       final response = await http.post(
         Uri.parse(executeCommandApiUrl),
         headers: {'Content-Type': 'application/json'},
@@ -141,12 +97,12 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       } else {
         setState(() {
-          _message = '명령 실행 실패: ${response.statusCode}';
+          _message = 'Command execution failed: ${response.statusCode}';
         });
       }
     } catch (e) {
       setState(() {
-        _message = '오류 발생: $e';
+        _message = 'Error occurred: $e';
       });
     }
   }
