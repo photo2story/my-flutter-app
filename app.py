@@ -218,8 +218,10 @@ def execute_stock_command():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# 디스코드 봇 및 플라스크 서버 동시 실행
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    threading.Thread(target=lambda: app.run(host='0.0.0.0', port=5000)).start()
+    bot.run(config.DISCORD_APPLICATION_TOKEN)
 
 
 # #  .\.venv\Scripts\activate
