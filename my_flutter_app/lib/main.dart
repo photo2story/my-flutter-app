@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';  // dotenv 패키지 사용
+import 'package:photo_view/photo_view.dart';
+
 
 void main() async {
   await dotenv.load(fileName: ".env");
