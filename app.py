@@ -15,7 +15,7 @@ from quart import Quart, render_template, send_from_directory, jsonify, request
 from quart_cors import cors
 
 # my-flask-app 디렉토리를 sys.path에 추가
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
 
 # 사용자 정의 모듈 임포트
 from get_ticker import get_ticker_name, get_ticker_from_korean_name, search_tickers_and_respond, update_stock_market_csv
@@ -179,6 +179,16 @@ async def get_images():
             images.append(filename)
     return jsonify(images)
 
+@app.route('/api/get_reviewed_tickers', methods=['GET'])
+async def get_reviewed_tickers():
+    image_folder = os.path.join(app.static_folder, 'images')
+    tickers = []
+    for filename in os.listdir(image_folder):
+        if filename.startswith('comparison_') and filename.endswith('_VOO.png'):
+            ticker = filename.split('_')[1]
+            tickers.append(ticker)
+    return jsonify(tickers)
+
 sent_messages = {}
 
 def reset_sent_messages():
@@ -214,7 +224,8 @@ async def execute_stock_command():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='192.168.0.5', port=port)
+    app.run(host='0.0.0.0', port=port)
+
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
