@@ -182,7 +182,7 @@ def get_reviewed_tickers():
     return jsonify(tickers)
 
 @app.route('/execute_stock_command', methods=['POST'])
-def execute_stock_command():
+async def execute_stock_command():
     data = request.get_json()
     stock_ticker = data.get('stock_ticker')
     if not stock_ticker:
