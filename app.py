@@ -14,8 +14,8 @@ import numpy as np
 from quart import Quart, render_template, send_from_directory, jsonify, request
 from quart_cors import cors
 
-# my-flutter-app 디렉토리를 sys.path에 추가
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
+# my-flask-app 디렉토리를 sys.path에 추가
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 
 # 사용자 정의 모듈 임포트
 from get_ticker import get_ticker_name, get_ticker_from_korean_name, search_tickers_and_respond, update_stock_market_csv
