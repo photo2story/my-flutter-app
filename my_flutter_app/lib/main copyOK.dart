@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:photo_view/photo_view.dart';
 
 void main() {
   runApp(MyApp());
@@ -28,13 +29,38 @@ class _MyHomePageState extends State<MyHomePage> {
   String _comparisonImageUrl = '';
   String _resultImageUrl = '';
   String _message = '';
-  final TextEditingController _controller = TextEditingController();
+  String _description = '';
   List<String> _tickers = [];
+  final TextEditingController _controller = TextEditingController();
 
-  Future<void> fetchImages(String stockTicker) async {
-    final apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
+  // 환경 변수 직접 포함
+  final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
+  final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
+  final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
+
+  Future<void> fetchReviewedTickers() async {
     try {
       final response = await http.get(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        final List<dynamic> tickers = json.decode(response.body);
+        setState(() {
+          _tickers = List<String>.from(tickers);
+        });
+      } else {
+        setState(() {
+          _message = 'Error occurred while fetching tickers: ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _message = 'Error occurred while fetching tickers: $e';
+      });
+    }
+  }
+
+  Future<void> fetchImages(String stockTicker) async {
+    try {
+      final response = await http.get(Uri.parse('https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images'));
       if (response.statusCode == 200) {
         final List<dynamic> files = json.decode(response.body);
         final comparisonFile = files.firstWhere(
@@ -50,14 +76,13 @@ class _MyHomePageState extends State<MyHomePage> {
             _resultImageUrl = resultFile['download_url'];
             _message = '';
           });
-          await sendToFlaskServer('$stockTicker 리뷰했습니다.');
+          await generateDescription(stockTicker); // 그래프 설명 생성
         } else {
           setState(() {
             _comparisonImageUrl = '';
             _resultImageUrl = '';
             _message = '해당 주식 티커에 대한 이미지를 찾을 수 없습니다';
           });
-          await sendToFlaskServer('$stockTicker 리뷰 추가가 필요합니다.');
         }
       } else {
         setState(() {
@@ -75,49 +100,70 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> sendToFlaskServer(String message) async {
-    final apiUrl = 'http://127.0.0.1:5000/send_discord_message'; // Flask 서버 URL로 수정하세요
+  Future<void> generateDescription(String stockTicker) async {
     try {
       final response = await http.post(
-        Uri.parse(apiUrl),
+        Uri.parse(descriptionApiUrl),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'message': message}),
+        body: jsonEncode({'stock_ticker': stockTicker}),
       );
 
-      if (response.statusCode != 200) {
-        print('Failed to send message to Flask server: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final description = responseBody['description'];
+        setState(() {
+          _description = description;
+        });
+      } else {
+        setState(() {
+          _description = '설명 생성 실패: ${response.statusCode}';
+        });
       }
     } catch (e) {
-      print('Error sending message to Flask server: $e');
+      setState(() {
+        _description = '오류 발생: $e';
+      });
     }
   }
 
-  Future<void> fetchTickers() async {
-    final apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
+  Future<void> executeStockCommand(String stockTicker) async {
     try {
-      final response = await http.get(Uri.parse(apiUrl));
-      if (response.statusCode == 200) {
-        final List<dynamic> files = json.decode(response.body);
-        final tickers = files
-            .where((file) => file['name'].toString().startsWith('comparison_') && file['name'].toString().endsWith('_VOO.png'))
-            .map((file) => file['name'].toString().replaceAll('comparison_', '').replaceAll('_VOO.png', ''))
-            .toList();
+      final response = await http.post(
+        Uri.parse(executeCommandApiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'stock_ticker': stockTicker}),
+      );
 
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
         setState(() {
-          _tickers = tickers.cast<String>();
+          _message = responseBody['message'];
         });
       } else {
-        print('Failed to fetch tickers: ${response.statusCode}');
+        setState(() {
+          _message = '명령 실행 실패: ${response.statusCode}';
+        });
       }
     } catch (e) {
-      print('Error fetching tickers: $e');
+      setState(() {
+        _message = '오류 발생: $e';
+      });
     }
+  }
+
+  void _openImage(BuildContext context, String imageUrl) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImageScreen(imageUrl: imageUrl),
+      ),
+    );
   }
 
   @override
   void initState() {
     super.initState();
-    fetchTickers();
+    fetchReviewedTickers();
   }
 
   @override
@@ -153,26 +199,29 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  fetchImages(_controller.text.toUpperCase());
+                  executeStockCommand(_controller.text.toUpperCase());
                 },
-                child: Text('Fetch Stock Images'),
+                child: Text('Test Stock'),
               ),
               SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Reviewed Stocks:',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
               Wrap(
                 children: _tickers.map((ticker) {
                   return Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: InkWell(
+                    child: GestureDetector(
                       onTap: () {
-                        _controller.text = ticker;
                         fetchImages(ticker);
                       },
                       child: Text(
                         ticker,
-                        style: TextStyle(
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.blue),
                       ),
                     ),
                   );
@@ -180,20 +229,26 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               SizedBox(height: 20),
               _comparisonImageUrl.isNotEmpty
-                  ? Image.network(
-                      _comparisonImageUrl,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Text('Failed to load comparison image');
-                      },
+                  ? GestureDetector(
+                      onTap: () => _openImage(context, _comparisonImageUrl),
+                      child: Image.network(
+                        _comparisonImageUrl,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Text('Failed to load comparison image');
+                        },
+                      ),
                     )
                   : Container(),
               SizedBox(height: 20),
               _resultImageUrl.isNotEmpty
-                  ? Image.network(
-                      _resultImageUrl,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Text('Failed to load result image');
-                      },
+                  ? GestureDetector(
+                      onTap: () => _openImage(context, _resultImageUrl),
+                      child: Image.network(
+                        _resultImageUrl,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Text('Failed to load result image');
+                        },
+                      ),
                     )
                   : Container(),
               SizedBox(height: 20),
@@ -203,6 +258,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       style: TextStyle(fontSize: 16, color: Colors.red),
                     )
                   : Container(),
+              SizedBox(height: 20),
+              _description.isNotEmpty
+                  ? Text(
+                      _description,
+                      style: TextStyle(fontSize: 16, color: Colors.green),
+                    )
+                  : Container(),
             ],
           ),
         ),
@@ -210,3 +272,32 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+class ImageScreen extends StatelessWidget {
+  final String imageUrl;
+
+  ImageScreen({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Image Preview'),
+      ),
+      body: Center(
+        child: PhotoView(
+          imageProvider: NetworkImage(imageUrl),
+          errorBuilder: (context, error, stackTrace) {
+            return Text('Failed to load image');
+          },
+        ),
+      ),
+    );
+  }
+}
+
+// flutter devices
+
+// flutter run -d R3CX404VPHE
+
+// flutter run -d chrome
