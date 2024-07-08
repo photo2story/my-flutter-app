@@ -121,15 +121,6 @@ async def show_all(ctx):
         await ctx.send(f"An error occurred: {e}")
         print(f"Error: {e}")
 
-@bot.event
-async def on_ready():
-    print(f'Logged in as {bot.user.name}')
-    channel = bot.get_channel(int(config.DISCORD_CHANNEL_ID))
-    if channel:
-        await channel.send(f'Bot has successfully logged in: {bot.user.name}')
-    else:
-        print(f'Failed to get channel with ID {config.DISCORD_CHANNEL_ID}')
-
 @bot.command()
 async def ping(ctx):
     if ctx.message.id not in processed_message_ids:
@@ -212,6 +203,7 @@ def run_flask_app():
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
 async def main():
+    global bot  # Ensure bot is global
     loop = asyncio.get_running_loop()
 
     # Flask 앱을 별도의 스레드에서 실행합니다.
@@ -223,6 +215,7 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
+
 
 
 
