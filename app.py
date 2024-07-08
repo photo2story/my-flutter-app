@@ -146,8 +146,6 @@ def fetch_csv_data(url):
         print(f'Error fetching CSV data: {e}')
         return None
 
-bot.run(config.DISCORD_APPLICATION_TOKEN)
-
 app = Flask(__name__)
 CORS(app)
 
@@ -182,24 +180,16 @@ def get_images():
             images.append(filename)
     return jsonify(images)
 
-sent_messages = {}
+@app.route('/api/get_reviewed_tickers', methods=['GET'])
+def get_reviewed_tickers():
+    image_folder = os.path.join(app.static_folder, 'images')
+    tickers = []
+    for filename in os.listdir(image_folder):
+        if filename.startswith('comparison_') and filename.endswith('_VOO.png'):
+            ticker = filename.split('_')[1]  # 티커를 추출합니다.
+            tickers.append(ticker)
+    return jsonify(tickers)
 
-def reset_sent_messages():
-    global sent_messages
-    sent_messages = {}
-    threading.Timer(10.0, reset_sent_messages).start()
-
-reset_sent_messages()
-
-@app.route('/data')
-def data():
-    df = fetch_csv_data(config.CSV_URL)
-    if df is None:
-        return "Error fetching data", 500
-
-    return df.to_html()
-
-# 새로운 엔드포인트 추가
 @app.route('/execute_stock_command', methods=['POST'])
 def execute_stock_command():
     data = request.get_json()
@@ -218,10 +208,22 @@ def execute_stock_command():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# 디스코드 봇 및 플라스크 서버 동시 실행
+def run_flask_app():
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
+async def main():
+    loop = asyncio.get_running_loop()
+
+    # Flask 앱을 별도의 스레드에서 실행합니다.
+    flask_thread = threading.Thread(target=run_flask_app)
+    flask_thread.start()
+
+    # Discord 봇을 실행합니다.
+    await bot.start(config.DISCORD_APPLICATION_TOKEN)
+
 if __name__ == '__main__':
-    threading.Thread(target=lambda: app.run(host='0.0.0.0', port=5000)).start()
-    bot.run(config.DISCORD_APPLICATION_TOKEN)
+    asyncio.run(main())
+
 
 
 # #  .\.venv\Scripts\activate
