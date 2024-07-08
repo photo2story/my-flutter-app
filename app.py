@@ -16,6 +16,7 @@ from quart_cors import cors
 # my-flask-app 디렉토리를 sys.path에 추가
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 
+
 # 사용자 정의 모듈 임포트
 from get_ticker import get_ticker_name, get_ticker_from_korean_name, search_tickers_and_respond, update_stock_market_csv
 from estimate_stock import estimate_snp, estimate_stock
@@ -141,9 +142,6 @@ def fetch_csv_data(url):
         print(f'Error fetching CSV data: {e}')
         return None
 
-# 봇 실행
-threading.Thread(target=lambda: asyncio.run(bot.start(config.DISCORD_APPLICATION_TOKEN))).start()
-
 app = Quart(__name__)
 app = cors(app)
 
@@ -218,7 +216,6 @@ async def execute_stock_command():
         if channel is None:
             return jsonify({'error': 'Discord channel not found'}), 500
 
-        # 봇 명령을 위한 새로운 asyncio 태스크 생성
         async def send_stock_command():
             class Context:
                 async def send(self, message):
@@ -237,8 +234,12 @@ async def execute_stock_command():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    asyncio.run(app.run_task(host='0.0.0.0', port=port))
 
+    def run_app():
+        asyncio.run(app.run_task(host='0.0.0.0', port=port))
+
+    bot.loop.create_task(run_app())
+    bot.run(config.DISCORD_APPLICATION_TOKEN)
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
