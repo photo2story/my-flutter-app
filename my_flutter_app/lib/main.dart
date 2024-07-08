@@ -40,8 +40,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final String discordWebhookUrl = dotenv.env['DISCORD_WEBHOOK_URL']!;  // 환경 변수 불러오기
 
   Future<void> fetchReviewedTickers() async {
-
-  Future<void> fetchReviewedTickers() async {
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
