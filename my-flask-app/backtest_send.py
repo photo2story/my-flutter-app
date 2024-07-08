@@ -15,6 +15,15 @@ async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
     # bot 변수를 이용한 작업 수행
     if bot is None:
         raise ValueError("bot 변수는 None일 수 없습니다.")
+    
+    # 예시로, bot 변수를 이용한 메시지 전송
+    await bot.send(f"backtest_and_send.command1: {stock}")
+    await bot.send(f"backtest_and_send.command2: {stock}")
+    
+    # 임시로 ctx 설정
+    if ctx is None:
+        ctx = type('', (), {})()
+        ctx.send = bot.send
 
     await ctx.send(f'backtest_and_send.command1: {stock}')  # 주식 이름을 출력
     if not is_valid_stock(stock):
@@ -26,9 +35,8 @@ async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
     try:
         total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df = estimate_stock(
             stock, config.START_DATE, config.END_DATE, config.INITIAL_INVESTMENT, config.MONTHLY_INVESTMENT, option_strategy)
-        
         await ctx.send(f'backtest_and_send.command2: {stock}')  # 주식 이름을 출력
-
+        
         min_stock_data_date = str(min_stock_data_date).split(' ')[0]
         user_stock_file_path1 = file_path
 
@@ -50,7 +58,7 @@ async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
             print('Successfully sent Discord message')
 
         plot_comparison_results(user_stock_file_path1, user_stock_file_path2, stock, 'VOO', total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date)
-        await ctx.send(f'Processing completed for {stock}.')
+        await bot.change_presence(status=discord.Status.online, activity=discord.Game("Waiting"))
     except Exception as e:
         await ctx.send(f"An error occurred while processing {stock}: {e}")
         print(f"Error processing {stock}: {e}")
