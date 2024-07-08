@@ -4,7 +4,8 @@ import 'dart:convert';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';  // flutter_dotenv 패키지 추가
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");  // .env 파일 로드
   runApp(MyApp());
 }
 
@@ -101,6 +102,32 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> generateDescription(String stockTicker) async {
+    try {
+      final response = await http.post(
+        Uri.parse(descriptionApiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'stock_ticker': stockTicker}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final description = responseBody['description'];
+        setState(() {
+          _description = description;
+        });
+      } else {
+        setState(() {
+          _description = '설명 생성 실패: ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _description = '오류 발생: $e';
+      });
+    }
+  }
+
   Future<void> sendDiscordMessage(String stockTicker) async {
     try {
       final response = await http.post(
@@ -165,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
     fetchReviewedTickers();
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -294,6 +321,7 @@ class ImageScreen extends StatelessWidget {
     );
   }
 }
+
 
 // flutter devices
 
