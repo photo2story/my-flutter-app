@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:photo_view/photo_view.dart';  // photo_view 패키지 사용
+import 'package:photo_view/photo_view.dart';
 
 void main() {
   runApp(MyApp());
@@ -37,8 +37,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
   final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
   final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
-
-  final String discordWebhookUrl = 'YOUR_DISCORD_WEBHOOK_URL';
 
   Future<void> fetchReviewedTickers() async {
     try {
@@ -130,19 +128,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> executeStockCommand(String stockTicker) async {
     try {
-      final discordResponse = await http.post(
-        Uri.parse(discordWebhookUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'content': 'stock $stockTicker'}),
-      );
-
-      if (discordResponse.statusCode != 204) {
-        setState(() {
-          _message = 'Discord 메시지 전송 실패: ${discordResponse.statusCode}';
-        });
-        return;
-      }
-
       final response = await http.post(
         Uri.parse(executeCommandApiUrl),
         headers: {'Content-Type': 'application/json'},
