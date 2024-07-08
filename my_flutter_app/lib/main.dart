@@ -44,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     if (kIsWeb) {
-      discordWebhookUrl = html.window.env['DISCORD_WEBHOOK_URL']!;
+      discordWebhookUrl = html.window.getProperty('env')['DISCORD_WEBHOOK_URL'];
     } else {
       // 모바일 환경이나 다른 환경에서 사용할 변수를 설정하세요
       discordWebhookUrl = 'YOUR_FALLBACK_DISCORD_WEBHOOK_URL';
@@ -198,7 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
