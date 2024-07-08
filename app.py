@@ -232,14 +232,14 @@ async def execute_stock_command():
         print(f"Error while executing stock command: {str(e)}")  # 구체적인 에러 메시지를 로그에 출력
         return jsonify({'error': str(e)}), 500
 
+async def main():
+    async with bot:
+        bot.loop.create_task(app.run_task(host='0.0.0.0', port=int(os.environ.get('PORT', 5000))))
+        await bot.start(config.DISCORD_APPLICATION_TOKEN)
+
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    asyncio.run(main())
 
-    def run_app():
-        asyncio.run(app.run_task(host='0.0.0.0', port=port))
-
-    bot.loop.create_task(run_app())
-    bot.run(config.DISCORD_APPLICATION_TOKEN)
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
