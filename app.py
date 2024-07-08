@@ -36,6 +36,8 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="", intents=intents)
 
+processed_message_ids = set()  # 전역 변수로 processed_message_ids 초기화
+
 @bot.event
 async def on_ready():
     send_msg.start()
@@ -179,24 +181,16 @@ def get_images():
             images.append(filename)
     return jsonify(images)
 
-sent_messages = {}
+@app.route('/api/get_reviewed_tickers', methods=['GET'])
+def get_reviewed_tickers():
+    image_folder = os.path.join(app.static_folder, 'images')
+    tickers = []
+    for filename in os.listdir(image_folder):
+        if filename.startswith('comparison_') and filename.endswith('_VOO.png'):
+            ticker = filename.split('_')[1]
+            tickers.append(ticker)
+    return jsonify(tickers)
 
-def reset_sent_messages():
-    global sent_messages
-    sent_messages = {}
-    threading.Timer(10.0, reset_sent_messages).start()
-
-reset_sent_messages()
-
-@app.route('/data')
-def data():
-    df = fetch_csv_data(config.CSV_URL)
-    if df is None:
-        return "Error fetching data", 500
-
-    return df.to_html()
-
-# 새로운 엔드포인트 추가
 @app.route('/execute_stock_command', methods=['POST'])
 def execute_stock_command():
     data = request.get_json()
@@ -205,7 +199,6 @@ def execute_stock_command():
         return jsonify({'error': 'No stock ticker provided'}), 400
 
     try:
-        # stock 명령을 실행
         command = f'stock {stock_ticker}'
         response = requests.post(config.DISCORD_WEBHOOK_URL, json={'content': command})
         if response.status_code == 204:
