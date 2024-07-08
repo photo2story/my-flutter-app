@@ -36,6 +36,9 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="", intents=intents)
 
+# processed_message_ids 변수를 정의하고 초기화합니다.
+processed_message_ids = set()
+
 @bot.event
 async def on_ready():
     send_msg.start()
@@ -143,7 +146,8 @@ def fetch_csv_data(url):
         print(f'Error fetching CSV data: {e}')
         return None
 
-# Flask 설정
+bot.run(config.DISCORD_APPLICATION_TOKEN)
+
 app = Flask(__name__)
 CORS(app)
 
@@ -178,16 +182,24 @@ def get_images():
             images.append(filename)
     return jsonify(images)
 
-@app.route('/api/get_reviewed_tickers', methods=['GET'])
-def get_reviewed_tickers():
-    image_folder = os.path.join(app.static_folder, 'images')
-    tickers = []
-    for filename in os.listdir(image_folder):
-        if filename.startswith('comparison_') and filename.endswith('_VOO.png'):
-            ticker = filename.split('_')[1]
-            tickers.append(ticker)
-    return jsonify(tickers)
+sent_messages = {}
 
+def reset_sent_messages():
+    global sent_messages
+    sent_messages = {}
+    threading.Timer(10.0, reset_sent_messages).start()
+
+reset_sent_messages()
+
+@app.route('/data')
+def data():
+    df = fetch_csv_data(config.CSV_URL)
+    if df is None:
+        return "Error fetching data", 500
+
+    return df.to_html()
+
+# 새로운 엔드포인트 추가
 @app.route('/execute_stock_command', methods=['POST'])
 def execute_stock_command():
     data = request.get_json()
@@ -196,6 +208,7 @@ def execute_stock_command():
         return jsonify({'error': 'No stock ticker provided'}), 400
 
     try:
+        # stock 명령을 실행
         command = f'stock {stock_ticker}'
         response = requests.post(config.DISCORD_WEBHOOK_URL, json={'content': command})
         if response.status_code == 204:
@@ -205,10 +218,8 @@ def execute_stock_command():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# 디스코드 봇 및 플라스크 서버 동시 실행
 if __name__ == '__main__':
-    threading.Thread(target=lambda: app.run(host='0.0.0.0', port=5000)).start()
-    bot.run(config.DISCORD_APPLICATION_TOKEN)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
 
 # #  .\.venv\Scripts\activate
