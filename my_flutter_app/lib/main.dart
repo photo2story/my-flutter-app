@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view.dart';  // photo_view 패키지 사용
 
 void main() {
   runApp(MyApp());
@@ -287,7 +287,28 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class Image
+class ImageScreen extends StatelessWidget {
+  final String imageUrl;
+
+  ImageScreen({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Image Preview'),
+      ),
+      body: Center(
+        child: PhotoView(
+          imageProvider: NetworkImage(imageUrl),
+          errorBuilder: (context, error, stackTrace) {
+            return Text('Failed to load image');
+          },
+        ),
+      ),
+    );
+  }
+}
 
 // flutter devices
 
