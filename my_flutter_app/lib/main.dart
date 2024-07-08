@@ -37,7 +37,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
   final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
   final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
-  final String discordWebhookUrl = 'https://discord.com/api/webhooks/{webhook.id}/{webhook.token}';
 
   Future<void> fetchReviewedTickers() async {
     try {
@@ -152,30 +151,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> sendDiscordCommand(String command) async {
-    try {
-      final response = await http.post(
-        Uri.parse(discordWebhookUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'content': command}),
-      );
-
-      if (response.statusCode == 204) {
-        setState(() {
-          _message = 'Discord 명령이 성공적으로 전송되었습니다.';
-        });
-      } else {
-        setState(() {
-          _message = 'Discord 명령 전송 실패: ${response.statusCode}';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _message = '오류 발생: $e';
-      });
-    }
-  }
-
   void _openImage(BuildContext context, String imageUrl) {
     Navigator.push(
       context,
@@ -219,16 +194,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   onSubmitted: (value) {
                     fetchImages(_controller.text.toUpperCase());
-                    executeStockCommand(_controller.text.toUpperCase());
-                    sendDiscordCommand('stock ${_controller.text.toUpperCase()}');
                   },
                 ),
               ),
               ElevatedButton(
                 onPressed: () {
-                  fetchImages(_controller.text.toUpperCase());
                   executeStockCommand(_controller.text.toUpperCase());
-                  sendDiscordCommand('stock ${_controller.text.toUpperCase()}');
                 },
                 child: Text('Fetch Stock Images'),
               ),
@@ -240,23 +211,21 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Wrap(
-                  spacing: 4.0,
-                  runSpacing: 4.0,
-                  children: _tickers.map((ticker) {
-                    return GestureDetector(
+              Wrap(
+                children: _tickers.map((ticker) {
+                  return Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: GestureDetector(
                       onTap: () {
                         fetchImages(ticker);
                       },
                       child: Text(
                         ticker,
-                        style: TextStyle(fontSize: 14, color: Colors.blue, decoration: TextDecoration.underline),
+                        style: TextStyle(fontSize: 14, color: Colors.blue),
                       ),
-                    );
-                  }).toList(),
-                ),
+                    ),
+                  );
+                }).toList(),
               ),
               SizedBox(height: 20),
               _comparisonImageUrl.isNotEmpty
