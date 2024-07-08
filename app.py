@@ -225,7 +225,6 @@ async def execute_stock_command():
 
         ctx = Context()
         
-        loop = asyncio.get_event_loop()
         await backtest_and_send(ctx, stock_ticker, option_strategy='1', bot=bot)
         return jsonify({'message': 'Command executed successfully'}), 200
     except Exception as e:
@@ -235,6 +234,7 @@ async def execute_stock_command():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
