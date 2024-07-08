@@ -66,7 +66,7 @@ async def buddy(ctx):
     loop = asyncio.get_running_loop()
 
     for stock in stocks:
-        await backtest_and_send(ctx, stock, 'modified_monthly')
+        await backtest_and_send(ctx, stock, 'modified_monthly', bot=bot)  # bot 변수를 전달
         if is_valid_stock(stock):
             try:
                 plot_results_mpl(stock, start_date, end_date)
@@ -106,7 +106,7 @@ async def stock(ctx, *args):
             else:
                 info_stock = korean_stock_code
 
-        await backtest_and_send(ctx, info_stock, option_strategy='1')
+        await backtest_and_send(ctx, info_stock, option_strategy='1', bot=bot)  # bot 변수를 전달
         plot_results_mpl(info_stock, start_date, end_date)
         move_files_to_images_folder()
     except Exception as e:
@@ -215,7 +215,6 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
-
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
