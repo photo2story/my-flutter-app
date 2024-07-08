@@ -142,7 +142,7 @@ def fetch_csv_data(url):
         return None
 
 # 봇 실행
-threading.Thread(target=lambda: bot.run(config.DISCORD_APPLICATION_TOKEN)).start()
+threading.Thread(target=lambda: asyncio.run(bot.start(config.DISCORD_APPLICATION_TOKEN))).start()
 
 app = Quart(__name__)
 app = cors(app)
@@ -219,8 +219,6 @@ async def execute_stock_command():
             return jsonify({'error': 'Discord channel not found'}), 500
 
         # 봇 명령을 위한 새로운 asyncio 태스크 생성
-        loop = asyncio.get_event_loop()
-
         async def send_stock_command():
             class Context:
                 async def send(self, message):
@@ -230,7 +228,7 @@ async def execute_stock_command():
             await backtest_and_send(ctx, stock_ticker, option_strategy='1', bot=bot)
 
         # 비동기 태스크 실행
-        loop.create_task(send_stock_command())
+        asyncio.create_task(send_stock_command())
 
         return jsonify({'message': 'Command executed successfully'}), 200
     except Exception as e:
@@ -239,7 +237,7 @@ async def execute_stock_command():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    asyncio.run(app.run_task(host='0.0.0.0', port=port))
 
 
 # #  .\.venv\Scripts\activate
