@@ -11,7 +11,15 @@ from estimate_stock import estimate_stock, estimate_snp
 # Import configuration
 import config
 
-async def backtest_and_send(ctx, stock, option_strategy):
+async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
+    # bot 변수를 이용한 작업 수행
+    if bot is None:
+        raise ValueError("bot 변수는 None일 수 없습니다.")
+    
+    # 예시로, bot 변수를 이용한 메시지 전송
+    await bot.send(f"backtest_and_send.command1: {stock}")
+    await bot.send(f"backtest_and_send.command2: {stock}")
+    
     await ctx.send(f'backtest_and_send.command1: {stock}')  # 주식 이름을 출력
     if not is_valid_stock(stock):
         message = f"Stock market information updates needed. {stock}"
