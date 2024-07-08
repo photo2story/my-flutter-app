@@ -33,11 +33,10 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> _tickers = [];
   final TextEditingController _controller = TextEditingController();
 
-  // 환경 변수 직접 포함
   final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
   final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
   final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
-  final String discordWebhookUrl = 'https://your-discord-webhook-url';  // 여기에 실제 URL을 넣어야 합니다.
+  final String sendCommandUrl = 'http://192.168.0.5:5000/send_discord_command';
 
   Future<void> fetchReviewedTickers() async {
     try {
@@ -127,178 +126,177 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> executeStockCommand(String stockTicker) async {
-    try {
-      final response = await http.post(
-        Uri.parse(executeCommandApiUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'stock_ticker': stockTicker}),
-      );
+Future<void> executeStockCommand(String stockTicker) async {
+  try {
+    final response = await http.post(
+      Uri.parse(executeCommandApiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'stock_ticker': stockTicker}),
+    );
 
-      if (response.statusCode == 200) {
-        final responseBody = json.decode(response.body);
-        setState(() {
-          _message = responseBody['message'];
-        });
-      } else {
-        setState(() {
-          _message = '명령 실행 실패: ${response.statusCode}';
-        });
-      }
-    } catch (e) {
+    if (response.statusCode == 200) {
+      final responseBody = json.decode(response.body);
       setState(() {
-        _message = '오류 발생: $e';
+        _message = responseBody['message'];
+      });
+    } else {
+      setState(() {
+        _message = '명령 실행 실패: ${response.statusCode}';
       });
     }
-  }
-
-  Future<void> sendDiscordCommand(String command) async {
-    try {
-      final response = await http.post(
-        Uri.parse(discordWebhookUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'content': command}),
-      );
-
-      if (response.statusCode != 204) {
-        setState(() {
-          _message = 'Failed to send Discord command: ${response.statusCode}';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _message = 'Error sending Discord command: $e';
-      });
-    }
-  }
-
-  void _executeStockCommand(String stockTicker) {
-    sendDiscordCommand('stock $stockTicker');
-    executeStockCommand(stockTicker);
-  }
-
-  void _openImage(BuildContext context, String imageUrl) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ImageScreen(imageUrl: imageUrl),
-      ),
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchReviewedTickers();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Stock Comparison Review'),
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: _controller,
-                  textCapitalization: TextCapitalization.characters,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Enter Stock Ticker',
-                  ),
-                  onChanged: (value) {
-                    _controller.value = TextEditingValue(
-                      text: value.toUpperCase(),
-                      selection: _controller.selection,
-                    );
-                  },
-                  onSubmitted: (value) {
-                    _executeStockCommand(_controller.text.toUpperCase());
-                  },
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _executeStockCommand(_controller.text.toUpperCase());
-                },
-                child: Text('Test Stock'),
-              ),
-              SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Reviewed Stocks:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Wrap(
-                children: _tickers.map((ticker) {
-                  return Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        fetchImages(ticker);
-                      },
-                      child: Text(
-                        ticker,
-                        style: TextStyle(fontSize: 14, color: Colors.blue),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              SizedBox(height: 20),
-              _comparisonImageUrl.isNotEmpty
-                  ? GestureDetector(
-                      onTap: () => _openImage(context, _comparisonImageUrl),
-                      child: Image.network(
-                        _comparisonImageUrl,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Text('Failed to load comparison image');
-                        },
-                      ),
-                    )
-                  : Container(),
-              SizedBox(height: 20),
-              _resultImageUrl.isNotEmpty
-                  ? GestureDetector(
-                      onTap: () => _openImage(context, _resultImageUrl),
-                      child: Image.network(
-                        _resultImageUrl,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Text('Failed to load result image');
-                        },
-                      ),
-                    )
-                  : Container(),
-              SizedBox(height: 20),
-              _message.isNotEmpty
-                  ? Text(
-                      _message,
-                      style: TextStyle(fontSize: 16, color: Colors.red),
-                    )
-                  : Container(),
-              SizedBox(height: 20),
-              _description.isNotEmpty
-                  ? Text(
-                      _description,
-                      style: TextStyle(fontSize: 16, color: Colors.green),
-                    )
-                  : Container(),
-            ],
-          ),
-        ),
-      ),
-    );
+  } catch (e) {
+    setState(() {
+      _message = '오류 발생: $e';
+    });
   }
 }
 
+Future<void> sendDiscordCommand(String command) async {
+  try {
+    final response = await http.post(
+      Uri.parse(sendCommandUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'command': command}),
+    );
+
+    if (response.statusCode != 200) {
+      setState(() {
+        _message = 'Failed to send Discord command: ${response.statusCode}';
+      });
+    }
+  } catch (e) {
+    setState(() {
+      _message = 'Error sending Discord command: $e';
+    });
+  }
+}
+
+void _executeStockCommand(String stockTicker) {
+  sendDiscordCommand('stock $stockTicker');
+  executeStockCommand(stockTicker);
+}
+
+void _openImage(BuildContext context, String imageUrl) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ImageScreen(imageUrl: imageUrl),
+    ),
+  );
+}
+
+@override
+void initState() {
+  super.initState();
+  fetchReviewedTickers();
+}
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text('Stock Comparison Review'),
+    ),
+    body: Center(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: _controller,
+                textCapitalization: TextCapitalization.characters,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Enter Stock Ticker',
+                ),
+                onChanged: (value) {
+                  _controller.value = TextEditingValue(
+                    text: value.toUpperCase(),
+                    selection: _controller.selection,
+                  );
+                },
+                onSubmitted: (value) {
+                  _executeStockCommand(_controller.text.toUpperCase());
+                },
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _executeStockCommand(_controller.text.toUpperCase());
+              },
+              child: Text('Test Stock'),
+            ),
+            SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Reviewed Stocks:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Wrap(
+              children: _tickers.map((ticker) {
+                return Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      fetchImages(ticker);
+                    },
+                    child: Text(
+                      ticker,
+                      style: TextStyle(fontSize: 14, color: Colors.blue),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 20),
+            _comparisonImageUrl.isNotEmpty
+                ? GestureDetector(
+                    onTap: () => _openImage(context, _comparisonImageUrl),
+                    child: Image.network(
+                      _comparisonImageUrl,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Text('Failed to load comparison image');
+                      },
+                    ),
+                  )
+                : Container(),
+            SizedBox(height: 20),
+            _resultImageUrl.isNotEmpty
+                ? GestureDetector(
+                    onTap: () => _openImage(context, _resultImageUrl),
+                    child: Image.network(
+                      _resultImageUrl,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Text('Failed to load result image');
+                      },
+                    ),
+                  )
+                : Container(),
+            SizedBox(height: 20),
+            _message.isNotEmpty
+                ? Text(
+                    _message,
+                    style: TextStyle(fontSize: 16, color: Colors.red),
+                  )
+                : Container(),
+            SizedBox(height: 20),
+            _description.isNotEmpty
+                ? Text(
+                    _description,
+                    style: TextStyle(fontSize: 16, color: Colors.green),
+                  )
+                : Container(),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+}
 
 class ImageScreen extends StatelessWidget {
   final String imageUrl;
@@ -322,6 +320,7 @@ class ImageScreen extends StatelessWidget {
     );
   }
 }
+
 
 // flutter devices
 

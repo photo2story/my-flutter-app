@@ -237,6 +237,24 @@ async def execute_stock_command():
         print(f"Error while executing stock command: {str(e)}")  # 구체적인 에러 메시지를 로그에 출력
         return jsonify({'error': str(e)}), 500
 
+    
+DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL', 'your_webhook_url_here')
+
+@app.route('/send_discord_command', methods=['POST'])
+def send_discord_command():
+    data = request.json
+    command = data.get('command')
+    if command:
+        response = requests.post(
+            DISCORD_WEBHOOK_URL,
+            json={'content': command},
+            headers={'Content-Type': 'application/json'}
+        )
+        if response.status_code == 204:
+            return jsonify({'message': 'Command sent successfully'}), 200
+        else:
+            return jsonify({'message': 'Failed to send command'}), 500
+    return jsonify({'message': 'Invalid command'}), 400
 
 async def main():
     async with bot:
