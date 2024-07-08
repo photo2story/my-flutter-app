@@ -31,11 +31,38 @@ class _MyHomePageState extends State<MyHomePage> {
   String _message = '';
   String _description = '';
   final TextEditingController _controller = TextEditingController();
+  List<String> _reviewedTickers = [];
 
   // 환경 변수 직접 포함
   final String apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
   final String descriptionApiUrl = 'https://he-flutter-app.herokuapp.com/generate_description';
-  final String executeCommandUrl = 'https://he-flutter-app.herokuapp.com/execute_stock_command';
+  final String reviewedTickersApiUrl = 'https://he-flutter-app.herokuapp.com/api/get_reviewed_tickers';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchReviewedTickers(); // 앱이 시작될 때 검토된 티커 리스트를 불러옵니다.
+  }
+
+  Future<void> fetchReviewedTickers() async {
+    try {
+      final response = await http.get(Uri.parse(reviewedTickersApiUrl));
+      if (response.statusCode == 200) {
+        final List<dynamic> tickers = json.decode(response.body);
+        setState(() {
+          _reviewedTickers = tickers.cast<String>();
+        });
+      } else {
+        setState(() {
+          _message = 'Failed to fetch reviewed tickers: ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _message = 'Error fetching reviewed tickers: $e';
+      });
+    }
+  }
 
   Future<void> fetchImages(String stockTicker) async {
     try {
@@ -105,32 +132,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> executeStockCommand(String stockTicker) async {
-    try {
-      final response = await http.post(
-        Uri.parse(executeCommandUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'stock_ticker': stockTicker}),
-      );
-
-      if (response.statusCode == 200) {
-        final responseBody = json.decode(response.body);
-        final message = responseBody['message'];
-        setState(() {
-          _message = message;
-        });
-      } else {
-        setState(() {
-          _message = '명령 실행 실패: ${response.statusCode}';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _message = '오류 발생: $e';
-      });
-    }
-  }
-
   void _openImage(BuildContext context, String imageUrl) {
     Navigator.push(
       context,
@@ -166,15 +167,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       selection: _controller.selection,
                     );
                   },
-                  onSubmitted: (value) async {
-                    await executeStockCommand(_controller.text.toUpperCase());
+                  onSubmitted: (value) {
                     fetchImages(_controller.text.toUpperCase());
                   },
                 ),
               ),
               ElevatedButton(
-                onPressed: () async {
-                  await executeStockCommand(_controller.text.toUpperCase());
+                onPressed: () {
                   fetchImages(_controller.text.toUpperCase());
                 },
                 child: Text('Fetch Stock Images'),
@@ -215,6 +214,24 @@ class _MyHomePageState extends State<MyHomePage> {
                   ? Text(
                       _description,
                       style: TextStyle(fontSize: 16, color: Colors.green),
+                    )
+                  : Container(),
+              SizedBox(height: 20),
+              _reviewedTickers.isNotEmpty
+                  ? Column(
+                      children: _reviewedTickers.map((ticker) {
+                        return GestureDetector(
+                          onTap: () => fetchImages(ticker),
+                          child: Text(
+                            ticker,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.blue,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     )
                   : Container(),
             ],
