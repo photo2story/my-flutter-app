@@ -194,6 +194,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   onSubmitted: (value) {
                     fetchImages(_controller.text.toUpperCase());
+                    executeStockCommand(_controller.text.toUpperCase());
                   },
                 ),
               ),
@@ -214,9 +215,18 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(
-                  _tickers.join(' '),
-                  style: TextStyle(fontSize: 14, color: Colors.blue),
+                child: Wrap(
+                  spacing: 5.0,
+                  runSpacing: 5.0,
+                  children: _tickers.map((ticker) => GestureDetector(
+                    onTap: () {
+                      fetchImages(ticker);
+                    },
+                    child: Text(
+                      ticker,
+                      style: TextStyle(fontSize: 14, color: Colors.blue, decoration: TextDecoration.underline),
+                    ),
+                  )).toList(),
                 ),
               ),
               SizedBox(height: 20),
