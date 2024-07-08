@@ -16,11 +16,9 @@ async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
     if bot is None:
         raise ValueError("bot 변수는 None일 수 없습니다.")
     
-    # 예시로, bot 변수를 이용한 메시지 전송
     await ctx.send(f"backtest_and_send.command1: {stock}")
     await ctx.send(f"backtest_and_send.command2: {stock}")
     
-    await ctx.send(f'backtest_and_send.command1: {stock}')  # 주식 이름을 출력
     if not is_valid_stock(stock):
         message = f"Stock market information updates needed. {stock}"
         await ctx.send(message)
@@ -57,4 +55,5 @@ async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
     except Exception as e:
         await ctx.send(f"An error occurred while processing {stock}: {e}")
         print(f"Error processing {stock}: {e}")
+
 
