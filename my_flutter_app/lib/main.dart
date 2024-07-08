@@ -201,7 +201,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onPressed: () {
                   executeStockCommand(_controller.text.toUpperCase());
                 },
-                child: Text('Fetch Stock Images'),
+                child: Text('Test Stock'),
               ),
               SizedBox(height: 20),
               Container(
