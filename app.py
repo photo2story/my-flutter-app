@@ -1,4 +1,3 @@
-# app.py
 import os
 import sys
 import asyncio
@@ -13,9 +12,6 @@ import pandas as pd
 import numpy as np
 from quart import Quart, render_template, send_from_directory, jsonify, request
 from quart_cors import cors
-
-# my-flask-app 디렉토리를 sys.path에 추가
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 
 # 사용자 정의 모듈 임포트
 from get_ticker import get_ticker_name, get_ticker_from_korean_name, search_tickers_and_respond, update_stock_market_csv
@@ -218,17 +214,24 @@ async def execute_stock_command():
         channel = bot.get_channel(config.DISCORD_CHANNEL_ID)
         if channel is None:
             return jsonify({'error': 'Discord channel not found'}), 500
-        
-        class Context:
-            async def send(self, message):
-                await channel.send(message)
 
-        ctx = Context()
-        
-        await backtest_and_send(ctx, stock_ticker, option_strategy='1', bot=bot)
+        # 봇 명령을 위한 새로운 asyncio 태스크 생성
+        loop = asyncio.get_event_loop()
+
+        async def send_stock_command():
+            class Context:
+                async def send(self, message):
+                    await channel.send(message)
+
+            ctx = Context()
+            await backtest_and_send(ctx, stock_ticker, option_strategy='1', bot=bot)
+
+        # 비동기 태스크 실행
+        loop.create_task(send_stock_command())
+
         return jsonify({'message': 'Command executed successfully'}), 200
     except Exception as e:
-        print(f"Error while executing stock command: {str(e)}")  # 로그에 구체적인 에러 메시지 출력
+        print(f"Error while executing stock command: {str(e)}")  # 구체적인 에러 메시지를 로그에 출력
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
