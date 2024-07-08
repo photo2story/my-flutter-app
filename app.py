@@ -207,7 +207,7 @@ async def data():
     return df.to_html()
 
 @app.route('/execute_stock_command', methods=['POST'])
-def execute_stock_command():
+async def execute_stock_command():
     data = await request.get_json()
     stock_ticker = data.get('stock_ticker')
     if not stock_ticker:
@@ -222,6 +222,7 @@ def execute_stock_command():
     except Exception as e:
         print(f"Error while executing stock command: {str(e)}")  # 로그에 구체적인 에러 메시지 출력
         return jsonify({'error': str(e)}), 500
+
 
 
 if __name__ == '__main__':
