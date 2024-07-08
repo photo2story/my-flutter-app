@@ -35,9 +35,10 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _controller = TextEditingController();
 
   // 환경 변수 직접 포함
-  final String apiUrl = dotenv.env['API_URL']!;
-  final String descriptionApiUrl = dotenv.env['DESCRIPTION_API_URL']!;
-  final String executeCommandApiUrl = dotenv.env['EXECUTE_COMMAND_API_URL']!;
+  final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
+  final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
+  final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
+
   final String discordWebhookUrl = dotenv.env['DISCORD_WEBHOOK_URL']!;
 
   Future<void> fetchReviewedTickers() async {
