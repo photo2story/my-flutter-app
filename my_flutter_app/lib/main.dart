@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:photo_view/photo_view.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';  // flutter_dotenv 패키지 추가
+import 'dart:html' as html;  // 웹 환경에서 HTML 관련 기능 사용
 
-void main() async {
-  await dotenv.load(fileName: ".env");  // .env 파일 로드
+void main() {
   runApp(MyApp());
 }
 
@@ -38,7 +38,19 @@ class _MyHomePageState extends State<MyHomePage> {
   final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
   final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
   final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
-  final String discordWebhookUrl = dotenv.env['DISCORD_WEBHOOK_URL']!;  // 환경 변수 불러오기
+  late final String discordWebhookUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    if (kIsWeb) {
+      discordWebhookUrl = html.window.env['DISCORD_WEBHOOK_URL']!;
+    } else {
+      // 모바일 환경이나 다른 환경에서 사용할 변수를 설정하세요
+      discordWebhookUrl = 'YOUR_FALLBACK_DISCORD_WEBHOOK_URL';
+    }
+    fetchReviewedTickers();
+  }
 
   Future<void> fetchReviewedTickers() async {
     try {
@@ -186,12 +198,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchReviewedTickers();
-  }
-
 @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -321,7 +327,6 @@ class ImageScreen extends StatelessWidget {
     );
   }
 }
-
 
 // flutter devices
 

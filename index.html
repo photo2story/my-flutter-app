@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <meta name="DISCORD_WEBHOOK_URL" content="https://your-discord-webhook-url"> <!-- 환경 변수 추가 -->
     <style>
         .ticker-list {
             margin-top: 20px;
@@ -32,6 +33,12 @@
     <div id="searched-tickers" class="ticker-list">
         <h2>검토한 주식</h2>
     </div>
+    <script>
+        // This script will set the variables for the Dart code to read
+        window.env = {
+            DISCORD_WEBHOOK_URL: document.querySelector('meta[name="DISCORD_WEBHOOK_URL"]').content,
+        };
+    </script>
     <script src="scripts.js"></script>
 </body>
 </html>
