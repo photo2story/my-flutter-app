@@ -14,8 +14,8 @@ import numpy as np
 from quart import Quart, render_template, send_from_directory, jsonify, request
 from quart_cors import cors
 
-# my-flask-app 디렉토리를 sys.path에 추가
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
+# my-flutter-app 디렉토리를 sys.path에 추가
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
 
 # 사용자 정의 모듈 임포트
 from get_ticker import get_ticker_name, get_ticker_from_korean_name, search_tickers_and_respond, update_stock_market_csv
@@ -142,10 +142,11 @@ def fetch_csv_data(url):
         print(f'Error fetching CSV data: {e}')
         return None
 
-bot.run(config.DISCORD_APPLICATION_TOKEN)
+# 봇 실행
+threading.Thread(target=lambda: bot.run(config.DISCORD_APPLICATION_TOKEN)).start()
 
 app = Quart(__name__)
-CORS(app)
+app = cors(app)
 
 @app.route('/')
 async def index():
@@ -203,6 +204,7 @@ async def execute_stock_command():
         return jsonify({'error': 'No stock ticker provided'}), 400
 
     try:
+        global bot  # bot 변수를 전역으로 선언
         loop = asyncio.get_event_loop()
         ctx = None  # You need to define the context properly if you need it
         await backtest_and_send(ctx, stock_ticker, option_strategy='1', bot=bot)
@@ -210,26 +212,8 @@ async def execute_stock_command():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-
-
-def run_flask_app():
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-
-async def main():
-    global bot  # Ensure bot is global
-    loop = asyncio.get_running_loop()
-
-    # Flask 앱을 별도의 스레드에서 실행합니다.
-    flask_thread = threading.Thread(target=run_flask_app)
-    flask_thread.start()
-
-    # Discord 봇을 실행합니다.
-    await bot.start(config.DISCORD_APPLICATION_TOKEN)
-
 if __name__ == '__main__':
-    asyncio.run(main())
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
