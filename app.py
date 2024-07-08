@@ -222,7 +222,12 @@ async def execute_stock_command():
                     await channel.send(message)
 
             ctx = Context()
-            await backtest_and_send(ctx, stock_ticker, option_strategy='1', bot=bot)
+            try:
+                await backtest_and_send(ctx, stock_ticker, option_strategy='1', bot=bot)  # bot 변수를 전달
+                plot_results_mpl(stock_ticker, config.START_DATE, config.END_DATE)
+                move_files_to_images_folder()
+            except Exception as e:
+                await ctx.send(f'An error occurred: {e}')
 
         # 비동기 태스크 실행
         asyncio.create_task(send_stock_command())
@@ -231,6 +236,7 @@ async def execute_stock_command():
     except Exception as e:
         print(f"Error while executing stock command: {str(e)}")  # 구체적인 에러 메시지를 로그에 출력
         return jsonify({'error': str(e)}), 500
+
 
 async def main():
     async with bot:
