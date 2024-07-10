@@ -10,13 +10,12 @@ matplotlib==3.9.1
 mojito2==0.1.6
 mplchart==0.0.9
 nest_asyncio==1.6.0
-numpy==2.0.0
+numpy==1.19.3  # 변경된 부분
 pandas==2.2.2
 pandas_ta==0.3.14b0
 Pillow==10.4.0
 python-dotenv==1.0.1
-PyYAML==6.0.1
-PyYAML==6.0.1
+PyYAML==6.0.1  # 중복 제거
 quart==0.19.6
 quart_cors==0.7.0
 Requests==2.32.3
