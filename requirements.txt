@@ -10,9 +10,9 @@ matplotlib
 mojito2
 mplchart
 nest_asyncio
-numpy
-pandas
-pandas_ta
+numpy==1.26.4
+pandas==2.2.1
+pandas_ta==0.3.14b0
 Pillow
 python-dotenv
 PyYAML
@@ -23,3 +23,4 @@ tabulate
 tradingview_ta
 yfinance
 plotly
+google-cloud-secret-manager
