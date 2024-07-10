@@ -138,10 +138,16 @@ def fetch_csv_data(url):
         response = requests.get(url)
         response.raise_for_status()
         csv_data = response.content.decode('utf-8')
-        return pd.read_csv(io.StringIO(csv_data))
+        df = pd.read_csv(io.StringIO(csv_data))
+        
+        # NaN 값을 빈 문자열로 대체
+        df.fillna('', inplace=True)
+        
+        return df
     except requests.exceptions.RequestException as e:
         print(f'Error fetching CSV data: {e}')
         return None
+
 
 app = Quart(__name__)
 app = cors(app)
@@ -202,6 +208,13 @@ async def data():
     if df is None:
         return "Error fetching data", 500
 
+    # 데이터프레임에 NaN 값이 있는지 확인
+    print("NaN count per column:")
+    print(df.isna().sum())
+    
+    # NaN 값을 빈 문자열로 대체
+    df.fillna('', inplace=True)
+    
     return df.to_html()
 
 @app.route('/execute_stock_command', methods=['POST'])
