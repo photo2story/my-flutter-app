@@ -93,7 +93,7 @@ def get_ticker_info(key,secret,acc_no,exchange,ticker,price,quantity):
 
 def get_market_from_ticker(ticker):
     # us_stock_market.csv 파일을 읽어옵니다.
-    df = pd.read_csv('stock_market.csv')
+    df = pd.read_csv('stock_market.csv', na_values=['', 'NaN'])
     #print(df)
     # ticker를 대문자로 변환하여 일치 여부를 확인합니다.
     ticker = ticker.upper()
@@ -151,7 +151,7 @@ def get_ticker_price(key, secret, acc_no, exchange, ticker):
 
 def get_ticker_from_korean_name(korean_name):
   # stock_market.csv 파일을 읽어옵니다.
-  df = pd.read_csv('stock_market.csv')
+  df = pd.read_csv('stock_market.csv', na_values=['', 'NaN'])
 
   # 한국 주식 이름을 대문자로 변환하여 일치 여부를 확인합니다.
   # korean_name = korean_name.upper()

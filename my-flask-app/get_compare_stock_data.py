@@ -7,7 +7,7 @@ from collections import defaultdict
 import asyncio
 
 def load_sector_info():
-    sector_df = pd.read_csv('stock_market.csv')
+    sector_df = pd.read_csv('stock_market.csv', na_values=['', 'NaN'])
     sector_dict = dict(zip(sector_df['Symbol'], sector_df['Sector']))
     return sector_dict
   
@@ -60,5 +60,5 @@ if __name__ == "__main__":
   ticker = 'NVDA'  # 알고 싶은 특정 티커
   sector = get_ticker_sector(ticker)
   print(f"The sector of {ticker} is {sector}")
-  df = pd.read_csv('stock_market.csv')
+  df = pd.read_csv('stock_market.csv', na_values=['', 'NaN'])
   print(df[df['Symbol'] == 'NVDA'])

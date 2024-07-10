@@ -113,7 +113,7 @@ def move_files_to_images_folder():# 이미지 파일을 images 폴더로 이동
             
 def is_valid_stock(stock):# Check if the stock is in the stock market CSV
     try:
-        stock_market_df = pd.read_csv('stock_market.csv')
+        stock_market_df = pd.read_csv('stock_market.csv', na_values=['', 'NaN'])
         return stock in stock_market_df['Symbol'].values
     except Exception as e:
         print(f"Error checking stock market CSV: {e}")
