@@ -3,6 +3,7 @@
 
 import pandas as pd
 import numpy as np
+NaN = np.nan
 
 def monthly_deposit(current_date, prev_month, monthly_investment, cash, invested_amount):
     signal = '' # Initialize signal with an empty string

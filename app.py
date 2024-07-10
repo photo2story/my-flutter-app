@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 from quart import Quart, render_template, send_from_directory, jsonify, request
 from quart_cors import cors
-
+NaN = np.nan
 # my-flask-app 디렉토리를 sys.path에 추가
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 

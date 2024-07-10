@@ -8,7 +8,7 @@ import requests
 import numpy as np
 import FinanceDataReader as fdr
 from github_operations import ticker_path # stock_market.csv 파일 경로
-
+NaN = np.nan
 
 def calculate_mfi(high_prices, low_prices, close_prices, volumes, length=14):
     typical_prices = (high_prices + low_prices + close_prices) / 3
