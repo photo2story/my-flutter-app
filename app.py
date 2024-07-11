@@ -1,5 +1,4 @@
-import os
-import sys
+import os,sys
 import asyncio
 import threading
 import requests
@@ -7,21 +6,10 @@ import io
 from dotenv import load_dotenv
 from flask import Flask, render_template, send_from_directory, jsonify, request
 from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
-
-# 현재 디렉토리를 sys.path에 추가
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-# Add my-flutter-app directory to sys.path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
-
-# Import custom modules
-from get_ticker import load_tickers, search_tickers, get_ticker_name, update_stock_market_csv
-from get_ticker import get_ticker_from_korean_name
-from estimate_stock import estimate_snp, estimate_stock
-from Results_plot import plot_comparison_results, plot_results_all
-from get_compare_stock_data import merge_csv_files, load_sector_info
-from Results_plot_mpl import plot_results_mpl
+# Add my-flask-app directory to sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
+# 사용자 정의 모듈 임포트
 from git_operations import move_files_to_images_folder
-from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
 
 load_dotenv()
 
@@ -130,20 +118,3 @@ if __name__ == '__main__':
     from bot import run_bot
     threading.Thread(target=run_flask).start()
     asyncio.run(run_bot())
-
-
-
-# #  .\.venv\Scripts\activate
-# #  python app.py 
-# pip install huggingface_hub
-# huggingface-cli login
-# EEVE-Korean-Instruct-10.8B-v1.0-GGUF
-# ollama create EEVE-Korean-Instruct-10.8B -f Modelfile-V02
-# ollama create EEVE-Korean-10.8B -f EEVE-Korean-Instruct-10.8B-v1.0-GGUF/Modelfile
-# pip install ollama
-# pip install chromadb
-# pip install langchain
-# ollama create EEVE-Korean-10.8B -f Modelfile
-# git push heroku main
-# heroku logs --tail -a he-flutter-app
-
