@@ -33,18 +33,26 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> _tickers = [];
   final TextEditingController _controller = TextEditingController();
 
-  final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
-  final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
-  final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
-  final String sendCommandUrl = 'http://192.168.0.5:5000/send_discord_command';
+  final String apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchReviewedTickers();
+  }
 
   Future<void> fetchReviewedTickers() async {
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
-        final List<dynamic> tickers = json.decode(response.body);
+        final List<dynamic> files = json.decode(response.body);
+        final tickers = files
+            .where((file) => file['name'].startsWith('comparison_') && file['name'].endsWith('_VOO.png'))
+            .map<String>((file) => file['name'].replaceAll('comparison_', '').replaceAll('_VOO.png', ''))
+            .toList();
+
         setState(() {
-          _tickers = List<String>.from(tickers);
+          _tickers = tickers;
         });
       } else {
         setState(() {
@@ -60,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> fetchImages(String stockTicker) async {
     try {
-      final response = await http.get(Uri.parse('https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images'));
+      final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
         final List<dynamic> files = json.decode(response.body);
         final comparisonFile = files.firstWhere(
@@ -76,226 +84,136 @@ class _MyHomePageState extends State<MyHomePage> {
             _resultImageUrl = resultFile['download_url'];
             _message = '';
           });
-          await generateDescription(stockTicker); // 그래프 설명 생성
         } else {
           setState(() {
             _comparisonImageUrl = '';
             _resultImageUrl = '';
-            _message = '해당 주식 티커에 대한 이미지를 찾을 수 없습니다';
+            _message = 'Unable to find images for the stock ticker $stockTicker';
           });
         }
       } else {
         setState(() {
           _comparisonImageUrl = '';
           _resultImageUrl = '';
-          _message = 'GitHub API 호출 실패: ${response.statusCode}';
+          _message = 'GitHub API call failed: ${response.statusCode}';
         });
       }
     } catch (e) {
       setState(() {
         _comparisonImageUrl = '';
         _resultImageUrl = '';
-        _message = '오류 발생: $e';
+        _message = 'Error occurred: $e';
       });
     }
   }
 
-  Future<void> generateDescription(String stockTicker) async {
-    try {
-      final response = await http.post(
-        Uri.parse(descriptionApiUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'stock_ticker': stockTicker}),
-      );
-
-      if (response.statusCode == 200) {
-        final responseBody = json.decode(response.body);
-        final description = responseBody['description'];
-        setState(() {
-          _description = description;
-        });
-      } else {
-        setState(() {
-          _description = '설명 생성 실패: ${response.statusCode}';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _description = '오류 발생: $e';
-      });
-    }
-  }
-
-Future<void> executeStockCommand(String stockTicker) async {
-  try {
-    final response = await http.post(
-      Uri.parse(executeCommandApiUrl),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'stock_ticker': stockTicker}),
+  void _openImage(BuildContext context, String imageUrl) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImageScreen(imageUrl: imageUrl),
+      ),
     );
-
-    if (response.statusCode == 200) {
-      final responseBody = json.decode(response.body);
-      setState(() {
-        _message = responseBody['message'];
-      });
-    } else {
-      setState(() {
-        _message = '명령 실행 실패: ${response.statusCode}';
-      });
-    }
-  } catch (e) {
-    setState(() {
-      _message = '오류 발생: $e';
-    });
   }
-}
 
-Future<void> sendDiscordCommand(String command) async {
-  try {
-    final response = await http.post(
-      Uri.parse(sendCommandUrl),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'command': command}),
-    );
-
-    if (response.statusCode != 200) {
-      setState(() {
-        _message = 'Failed to send Discord command: ${response.statusCode}';
-      });
-    }
-  } catch (e) {
-    setState(() {
-      _message = 'Error sending Discord command: $e';
-    });
-  }
-}
-
-void _executeStockCommand(String stockTicker) {
-  sendDiscordCommand('stock $stockTicker');
-  executeStockCommand(stockTicker);
-}
-
-void _openImage(BuildContext context, String imageUrl) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => ImageScreen(imageUrl: imageUrl),
-    ),
-  );
-}
-
-@override
-void initState() {
-  super.initState();
-  fetchReviewedTickers();
-}
-
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text('Stock Comparison Review'),
-    ),
-    body: Center(
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _controller,
-                textCapitalization: TextCapitalization.characters,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Enter Stock Ticker',
-                ),
-                onChanged: (value) {
-                  _controller.value = TextEditingValue(
-                    text: value.toUpperCase(),
-                    selection: _controller.selection,
-                  );
-                },
-                onSubmitted: (value) {
-                  _executeStockCommand(_controller.text.toUpperCase());
-                },
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _executeStockCommand(_controller.text.toUpperCase());
-              },
-              child: Text('Test Stock'),
-            ),
-            SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                'Reviewed Stocks:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-            Wrap(
-              children: _tickers.map((ticker) {
-                return Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      fetchImages(ticker);
-                    },
-                    child: Text(
-                      ticker,
-                      style: TextStyle(fontSize: 14, color: Colors.blue),
-                    ),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Stock Comparison Review'),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _controller,
+                  textCapitalization: TextCapitalization.characters,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Enter Stock Ticker',
                   ),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 20),
-            _comparisonImageUrl.isNotEmpty
-                ? GestureDetector(
-                    onTap: () => _openImage(context, _comparisonImageUrl),
-                    child: Image.network(
-                      _comparisonImageUrl,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Text('Failed to load comparison image');
+                  onChanged: (value) {
+                    _controller.value = TextEditingValue(
+                      text: value.toUpperCase(),
+                      selection: _controller.selection,
+                    );
+                  },
+                  onSubmitted: (value) {
+                    fetchImages(_controller.text.toUpperCase());
+                  },
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  fetchImages(_controller.text.toUpperCase());
+                },
+                child: Text('Search Review'),
+              ),
+              SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Reviewed Stocks:',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Wrap(
+                children: _tickers.map((ticker) {
+                  return Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        fetchImages(ticker);
                       },
+                      child: Text(
+                        ticker,
+                        style: TextStyle(fontSize: 14, color: Colors.blue),
+                      ),
                     ),
-                  )
-                : Container(),
-            SizedBox(height: 20),
-            _resultImageUrl.isNotEmpty
-                ? GestureDetector(
-                    onTap: () => _openImage(context, _resultImageUrl),
-                    child: Image.network(
-                      _resultImageUrl,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Text('Failed to load result image');
-                      },
-                    ),
-                  )
-                : Container(),
-            SizedBox(height: 20),
-            _message.isNotEmpty
-                ? Text(
-                    _message,
-                    style: TextStyle(fontSize: 16, color: Colors.red),
-                  )
-                : Container(),
-            SizedBox(height: 20),
-            _description.isNotEmpty
-                ? Text(
-                    _description,
-                    style: TextStyle(fontSize: 16, color: Colors.green),
-                  )
-                : Container(),
-          ],
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 20),
+              _comparisonImageUrl.isNotEmpty
+                  ? GestureDetector(
+                      onTap: () => _openImage(context, _comparisonImageUrl),
+                      child: Image.network(
+                        _comparisonImageUrl,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Text('Failed to load comparison image');
+                        },
+                      ),
+                    )
+                  : Container(),
+              SizedBox(height: 20),
+              _resultImageUrl.isNotEmpty
+                  ? GestureDetector(
+                      onTap: () => _openImage(context, _resultImageUrl),
+                      child: Image.network(
+                        _resultImageUrl,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Text('Failed to load result image');
+                        },
+                      ),
+                    )
+                  : Container(),
+              SizedBox(height: 20),
+              _message.isNotEmpty
+                  ? Text(
+                      _message,
+                      style: TextStyle(fontSize: 16, color: Colors.red),
+                    )
+                  : Container(),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
 
 class ImageScreen extends StatelessWidget {
@@ -320,7 +238,6 @@ class ImageScreen extends StatelessWidget {
     );
   }
 }
-
 
 // flutter devices
 
