@@ -9,7 +9,7 @@ from discord.ext import tasks, commands
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
 
 # 사용자 정의 모듈 임포트
-from github_operations import move_files_to_images_folder
+from git_operations import move_files_to_images_folder
 from get_ticker import get_ticker_from_korean_name, search_tickers_and_respond, update_stock_market_csv
 from estimate_stock import estimate_stock
 from Results_plot_mpl import plot_results_mpl
