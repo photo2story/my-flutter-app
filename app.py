@@ -119,3 +119,18 @@ if __name__ == '__main__':
     from bot import run_bot
     threading.Thread(target=run_flask).start()
     asyncio.run(run_bot())
+
+# source .venv/bin/activate
+# #  .\.venv\Scripts\activate
+# #  python app.py 
+# pip install huggingface_hub
+# huggingface-cli login
+# EEVE-Korean-Instruct-10.8B-v1.0-GGUF
+# ollama create EEVE-Korean-Instruct-10.8B -f Modelfile-V02
+# ollama create EEVE-Korean-10.8B -f EEVE-Korean-Instruct-10.8B-v1.0-GGUF/Modelfile
+# pip install ollama
+# pip install chromadb
+# pip install langchain
+# ollama create EEVE-Korean-10.8B -f Modelfile
+# git push heroku main
+# heroku logs --tail -a he-flutter-app
