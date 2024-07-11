@@ -13,10 +13,15 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # Add my-flutter-app directory to sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
 
-# 사용자 정의 모듈 임포트
-from git_operations import move_files_to_images_folder
+# Import custom modules
 from get_ticker import load_tickers, search_tickers, get_ticker_name, update_stock_market_csv
 from get_ticker import get_ticker_from_korean_name
+from estimate_stock import estimate_snp, estimate_stock
+from Results_plot import plot_comparison_results, plot_results_all
+from get_compare_stock_data import merge_csv_files, load_sector_info
+from Results_plot_mpl import plot_results_mpl
+from git_operations import move_files_to_images_folder
+from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path
 
 load_dotenv()
 
