@@ -8,9 +8,12 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, send_from_directory, jsonify, request
 from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
 
+# 현재 디렉토리를 sys.path에 추가
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Add my-flutter-app directory to sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
 
+# 사용자 정의 모듈 임포트
 from github_operations import move_files_to_images_folder
 
 load_dotenv()
@@ -75,7 +78,7 @@ def fetch_csv_data(url):
 
 @app.route('/data')
 def data():
-    df = fetch_csv_data(csv_url)
+    df = fetch_csv_data(config.CSV_URL)
     if df is None:
         return "Error fetching data", 500
     return df.to_html()
@@ -120,6 +123,7 @@ if __name__ == '__main__':
     from bot import run_bot
     threading.Thread(target=run_flask).start()
     asyncio.run(run_bot())
+
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
