@@ -7,8 +7,12 @@ import io
 from dotenv import load_dotenv
 from flask import Flask, render_template, send_from_directory, jsonify, request
 from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
-# Add my-flask-app directory to sys.path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
+
+# 현재 디렉토리를 sys.path에 추가
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Add my-flutter-app directory to sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
+
 # 사용자 정의 모듈 임포트
 from git_operations import move_files_to_images_folder
 
