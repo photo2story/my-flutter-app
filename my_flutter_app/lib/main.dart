@@ -239,3 +239,10 @@ class ImageScreen extends StatelessWidget {
     );
   }
 }
+
+
+// flutter devices
+
+// flutter run -d R3CX404VPHE
+
+// flutter run -d chrome
