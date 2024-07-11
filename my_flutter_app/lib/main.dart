@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 
 void main() {
   runApp(MyApp());
@@ -238,9 +239,3 @@ class ImageScreen extends StatelessWidget {
     );
   }
 }
-
-// flutter devices
-
-// flutter run -d R3CX404VPHE
-
-// flutter run -d chrome
