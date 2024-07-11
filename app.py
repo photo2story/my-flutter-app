@@ -111,8 +111,10 @@ def run_flask():
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
 
 if __name__ == '__main__':
+    from bot import run_bot
     threading.Thread(target=run_flask).start()
     asyncio.run(run_bot())
+
 
 # #  .\.venv\Scripts\activate
 # #  python app.py 
