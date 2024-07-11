@@ -5,10 +5,9 @@ from dotenv import load_dotenv
 import discord
 from discord.ext import tasks, commands
 
-# Add my-flask-app directory to sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
 
-# 사용자 정의 모듈 임포트
+from github_operations import move_files_to_images_folder
 from get_ticker import get_ticker_from_korean_name, search_tickers_and_respond, update_stock_market_csv
 from estimate_stock import estimate_stock
 from Results_plot_mpl import plot_results_mpl
@@ -26,7 +25,6 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='', intents=intents)
 
-# 봇이 이미 시작되었는지 확인하는 플래그
 bot_started = False
 
 @bot.event
@@ -50,7 +48,6 @@ async def send_msg():
     else:
         print(f"Failed to find channel with ID: {CHANNEL_ID}")
 
-# 메시지 수신 ID를 추적하는 세트
 processed_message_ids = set()
 
 @bot.command()
@@ -125,3 +122,4 @@ async def run_bot():
 
 if __name__ == '__main__':
     asyncio.run(run_bot())
+
