@@ -1,4 +1,5 @@
-import os,sys
+import os
+import sys
 import asyncio
 import threading
 import requests
@@ -6,6 +7,9 @@ import io
 from dotenv import load_dotenv
 from flask import Flask, render_template, send_from_directory, jsonify, request
 from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
+
+# 현재 디렉토리를 sys.path에 추가
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # Add my-flask-app directory to sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 

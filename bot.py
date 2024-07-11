@@ -1,10 +1,12 @@
-import os,sys
+import os
+import sys
 import asyncio
 from dotenv import load_dotenv
 import discord
 from discord.ext import tasks, commands
+
 # Add my-flask-app directory to sys.path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
 
 # 사용자 정의 모듈 임포트
 from get_ticker import get_ticker_from_korean_name, search_tickers_and_respond, update_stock_market_csv
@@ -24,14 +26,20 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='', intents=intents)
 
+# 봇이 이미 시작되었는지 확인하는 플래그
+bot_started = False
+
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user.name}')
-    channel = bot.get_channel(CHANNEL_ID)
-    if channel:
-        await channel.send(f'Bot has successfully logged in as {bot.user.name}')
-    else:
-        print(f'Failed to get channel with ID {CHANNEL_ID}')
+    global bot_started
+    if not bot_started:
+        print(f'Logged in as {bot.user.name}')
+        channel = bot.get_channel(CHANNEL_ID)
+        if channel:
+            await channel.send(f'Bot has successfully logged in as {bot.user.name}')
+        else:
+            print(f'Failed to get channel with ID {CHANNEL_ID}')
+        bot_started = True
 
 @tasks.loop(minutes=5)
 async def send_msg():
