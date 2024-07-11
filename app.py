@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flutter-app'))
 
 # 사용자 정의 모듈 임포트
-from github_operations import move_files_to_images_folder
+from git_operations import move_files_to_images_folder
 
 load_dotenv()
 
