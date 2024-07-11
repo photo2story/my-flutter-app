@@ -1,8 +1,10 @@
-import os
+import os,sys
 import asyncio
 from dotenv import load_dotenv
 import discord
 from discord.ext import tasks, commands
+# Add my-flask-app directory to sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 
 # 사용자 정의 모듈 임포트
 from get_ticker import get_ticker_from_korean_name, search_tickers_and_respond, update_stock_market_csv

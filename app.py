@@ -1,4 +1,4 @@
-import os
+import os,sys
 import asyncio
 import threading
 import requests
@@ -6,6 +6,8 @@ import io
 from dotenv import load_dotenv
 from flask import Flask, render_template, send_from_directory, jsonify, request
 from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
+# Add my-flask-app directory to sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'my-flask-app'))
 
 load_dotenv()
 
