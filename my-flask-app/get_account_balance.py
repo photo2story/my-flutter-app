@@ -7,6 +7,7 @@ import os
 import pandas as pd
 import yfinance as yf
 from dotenv import load_dotenv
+import config  # config.py 임포트
 
 load_dotenv()
 
@@ -86,7 +87,7 @@ def get_ticker_info(key, secret, acc_no, exchange, ticker, price, quantity):
 
 # 미국 주식 마켓정보(나스닥, 뉴욕) 가져오기
 def get_market_from_ticker(ticker):
-    df = pd.read_csv('stock_market.csv', na_values=['', 'NaN'])
+    df = pd.read_csv(config.STOCK_MARKET_CSV_PATH, na_values=['', 'NaN'])
     ticker = ticker.upper()
     row = df[df['Symbol'] == ticker]
     if not row.empty:
@@ -135,6 +136,8 @@ def get_ticker_from_korean_name(korean_name):
 
 # 테스트 코드
 if __name__ == "__main__":
+    
+    load_dotenv()
     key = os.environ['H_APIKEY']
     secret = os.environ['H_SECRET']
     acc_no = os.environ['H_ACCOUNT']

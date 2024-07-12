@@ -27,3 +27,6 @@ STOCKS = [
     'KDP', 'MAR', 'KLAC', 'WMT', 'JPM',
     'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO', 'SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'VFH', 'coin'
 ]
+
+# Stock market CSV path
+STOCK_MARKET_CSV_PATH = os.getenv('STOCK_MARKET_CSV_PATH', 'path/to/stock_market.csv')

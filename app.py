@@ -15,7 +15,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flut
 # 사용자 정의 모듈 임포트
 from git_operations import move_files_to_images_folder
 
-load_dotenv()
+# 명시적으로 .env 파일 경로를 지정하여 환경 변수 로드
+env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+load_dotenv(dotenv_path=env_path)
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")

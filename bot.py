@@ -8,6 +8,7 @@ from discord.ext import tasks, commands
 import certifi
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import threading
+import config  # config.py 임포트
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 
@@ -24,10 +25,16 @@ from github_operations import is_valid_stock, ticker_path
 from backtest_send import backtest_and_send
 import config
 
+# get_account_balance 모듈 임포트
+from get_account_balance import get_balance, get_ticker_price, get_market_from_ticker
+
 load_dotenv()
 
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
 CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
+H_APIKEY = os.getenv('H_APIKEY')
+H_SECRET = os.getenv('H_SECRET')
+H_ACCOUNT = os.getenv('H_ACCOUNT')
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -134,6 +141,17 @@ async def ping(ctx):
         processed_message_ids.add(ctx.message.id)
         await ctx.send(f'pong: {bot.user.name}')
         print(f'Ping command received and responded with pong.')
+
+@bot.command()
+async def account(ctx, ticker: str):
+    try:
+        exchange = get_market_from_ticker(ticker)
+        last_price = get_ticker_price(H_APIKEY, H_SECRET, H_ACCOUNT, exchange, ticker)
+        await ctx.send(f'The exchange for {ticker} is {exchange}')
+        await ctx.send(f'Last price of {ticker} is {last_price}')
+    except Exception as e:
+        await ctx.send(f'An error occurred: {e}')
+        print(f'Error processing account for {ticker}: {e}')
 
 async def run_bot():
     await bot.start(TOKEN)
