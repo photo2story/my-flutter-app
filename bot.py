@@ -24,9 +24,6 @@ from github_operations import is_valid_stock, ticker_path
 from backtest_send import backtest_and_send
 import config
 
-# plot_results_all 임포트 추가
-from some_module import plot_results_all
-
 load_dotenv()
 
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
