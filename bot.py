@@ -8,12 +8,13 @@ from discord.ext import tasks, commands
 import certifi
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import threading
+
 import config  # config.py 임포트
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 
 # Add my-flutter-app directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flask-app')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flutter-app')))
 
 # 사용자 정의 모듈 임포트
 from git_operations import move_files_to_images_folder
@@ -23,15 +24,12 @@ from Results_plot import plot_results_all
 from Results_plot_mpl import plot_results_mpl
 from github_operations import is_valid_stock, ticker_path
 from backtest_send import backtest_and_send
-import config
-
-# get_account_balance 모듈 임포트
 from get_account_balance import get_balance, get_ticker_price, get_market_from_ticker
 
 load_dotenv()
 
-TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
-CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
+TOKEN = config.DISCORD_APPLICATION_TOKEN
+CHANNEL_ID = config.DISCORD_CHANNEL_ID
 H_APIKEY = os.getenv('H_APIKEY')
 H_SECRET = os.getenv('H_SECRET')
 H_ACCOUNT = os.getenv('H_ACCOUNT')
@@ -146,7 +144,7 @@ async def ping(ctx):
 async def account(ctx, ticker: str):
     try:
         exchange = get_market_from_ticker(ticker)
-        last_price = get_ticker_price(H_APIKEY, H_SECRET, H_ACCOUNT, exchange, ticker)
+        last_price = await asyncio.to_thread(get_ticker_price, H_APIKEY, H_SECRET, H_ACCOUNT, exchange, ticker)
         await ctx.send(f'The exchange for {ticker} is {exchange}')
         await ctx.send(f'Last price of {ticker} is {last_price}')
     except Exception as e:
@@ -171,6 +169,7 @@ if __name__ == '__main__':
     # 봇 실행
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run_bot())
+
 
 
 #  .\.venv\Scripts\activate
