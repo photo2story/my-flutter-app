@@ -114,7 +114,10 @@ def get_ticker_price(key, secret, acc_no, exchange, ticker):
 
         broker = mojito.KoreaInvestment(api_key=key, api_secret=secret, acc_no=acc_no, exchange=exchange)
         price_data = broker.fetch_price(ticker)
+        print(price_data)
         last_price = price_data['output']['last']
+        print(last_price)
+        print(f"Last price for {ticker} on {exchange}: {last_price}")
         if last_price is None:
             stock = yf.Ticker(ticker)
             last_price = stock.history(period='1d')['Close'][0]
@@ -148,8 +151,8 @@ if __name__ == "__main__":
     print(f"The exchange for {ticker} is {exchange}")
 
     # get_balance 함수 테스트
-    output1_list = get_balance(key, secret, acc_no)
-    pprint.pprint(output1_list)
+    # output1_list = get_balance(key, secret, acc_no)
+    # pprint.pprint(output1_list)
 
     # get_ticker_price 함수 테스트
     last_price = get_ticker_price(key, secret, acc_no, exchange, ticker)
