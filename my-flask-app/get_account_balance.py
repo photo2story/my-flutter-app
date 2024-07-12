@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 import config  # config.py 임포트
 
 load_dotenv()
+ticker_path = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv')
 
 def get_balance(key, secret, acc_no):
     broker = mojito.KoreaInvestment(
@@ -87,7 +88,7 @@ def get_ticker_info(key, secret, acc_no, exchange, ticker, price, quantity):
 
 # 미국 주식 마켓정보(나스닥, 뉴욕) 가져오기
 def get_market_from_ticker(ticker):
-    df = pd.read_csv(config.STOCK_MARKET_CSV_PATH, na_values=['', 'NaN'])
+    df = pd.read_csv(ticker_path, na_values=['', 'NaN'])
     ticker = ticker.upper()
     row = df[df['Symbol'] == ticker]
     if not row.empty:
