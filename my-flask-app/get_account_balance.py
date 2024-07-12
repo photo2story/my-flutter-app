@@ -6,6 +6,7 @@ import mojito
 import os
 import pandas as pd
 import yfinance as yf
+from dotenv import load_dotenv
 
 def get_balance(key, secret, acc_no):
     broker = mojito.KoreaInvestment(
@@ -148,3 +149,5 @@ if __name__ == "__main__":
     # get_ticker_price 함수 테스트
     last_price = get_ticker_price(key, secret, acc_no, exchange, ticker)
     print(f"Last price of {ticker} is {last_price}")
+
+# python get_account_balance.py

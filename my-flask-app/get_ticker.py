@@ -6,6 +6,8 @@ from github_operations import ticker_path  # stock_market.csv 파일 경로
 import yfinance as yf
 import investpy
 
+load_dotenv()
+
 ticker_path = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv')
 
 def get_ticker_name(ticker):
@@ -156,4 +158,5 @@ if __name__ == "__main__":
     market = get_ticker_market('086520', ticker_path)
     print(market)
     
-    # python get_ticker.py
+#  .\.venv\Scripts\activate
+#  python get_ticker.py
