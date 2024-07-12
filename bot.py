@@ -85,6 +85,7 @@ async def buddy(ctx):
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
+    print(f'Command received: ticker with query: {query}')
     if query is None:
         await ctx.send("Please enter ticker stock name or ticker.")
         return
