@@ -117,7 +117,6 @@ def get_ticker_price(key, secret, acc_no, exchange, ticker):
         print(price_data)
         last_price = price_data['output']['last']
         print(last_price)
-        print(f"Last price for {ticker} on {exchange}: {last_price}")
         if last_price is None:
             stock = yf.Ticker(ticker)
             last_price = stock.history(period='1d')['Close'][0]
