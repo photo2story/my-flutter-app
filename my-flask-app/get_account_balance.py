@@ -7,7 +7,6 @@ import os
 import pandas as pd
 import yfinance as yf
 from dotenv import load_dotenv
-import config  # config.py 임포트
 
 load_dotenv()
 ticker_path = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv')
