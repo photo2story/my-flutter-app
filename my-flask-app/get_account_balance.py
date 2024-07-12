@@ -8,6 +8,8 @@ import pandas as pd
 import yfinance as yf
 from dotenv import load_dotenv
 
+load_dotenv()
+
 def get_balance(key, secret, acc_no):
     broker = mojito.KoreaInvestment(
         api_key=key,
