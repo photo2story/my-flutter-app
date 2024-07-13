@@ -31,14 +31,20 @@ def get_stock_info(ticker):
     }
 
 def update_stock_market_csv(file_path, tickers_to_update):
-    tickers_info = {ticker: get_stock_info(ticker) for ticker in tickers_to_update}
     df = pd.read_csv(file_path, encoding='utf-8-sig')  # Specify encoding
     for i, row in df.iterrows():
         ticker = row['Symbol']
         if ticker in tickers_to_update:
             stock_info = get_stock_info(ticker)
-            for key, value in stock_info.items():
-                df.at[i, key] = value
+            if stock_info:
+                for key, value in stock_info.items():
+                    df.at[i, key] = value
+            else:
+                # 데이터가 없는 경우 기본값을 설정합니다.
+                df.at[i, 'Sector'] = 'Unknown'
+                df.at[i, 'Stock'] = 'Unknown Stock'
+                df.at[i, 'Industry'] = 'Unknown Industry'
+                df.at[i, 'Beta'] = 0.0
     df.to_csv(file_path, index=False, encoding='utf-8-sig')  # Specify encoding
 
 def load_tickers():
