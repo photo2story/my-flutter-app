@@ -28,6 +28,9 @@ from backtest_send import backtest_and_send
 from get_account_balance import get_balance, get_ticker_price, get_market_from_ticker
 from get_compare_stock_data import load_sector_info, merge_csv_files
 
+# gemini 모듈 임포트
+from gemini import analyze_with_gemini
+
 load_dotenv()
 
 TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN')
@@ -156,6 +159,16 @@ async def account(ctx, ticker: str):
         await ctx.send(f'An error occurred: {e}')
         print(f'Error processing account for {ticker}: {e}')
 
+@bot.command()
+async def gemini(ctx, ticker: str):
+    try:
+        ticker = ticker.upper()  # 티커를 대문자로 변환
+        report = analyze_with_gemini(ticker)
+        await ctx.send(report)
+    except Exception as e:
+        await ctx.send(f'An error occurred while analyzing {ticker} with Gemini API: {e}')
+        print(f'Error processing Gemini analysis for {ticker}: {e}')
+
 async def run_bot():
     await bot.start(TOKEN)
 
@@ -173,6 +186,7 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
 
 #  .\.venv\Scripts\activate
 # source .venv/bin/activate

@@ -24,3 +24,4 @@ tradingview_ta
 yfinance
 plotly
 google-cloud-secret-manager
+google.generativeai
