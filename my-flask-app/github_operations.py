@@ -59,10 +59,10 @@ def save_image_to_github(image_path, commit_message):
     else:
         print(f'Failed to save {os.path.basename(image_path)} to GitHub: {response.json()}')
 
-def is_valid_stock(stock):
-    try:
-        stock_market_df = pd.read_csv(ticker_path)
-        return stock in stock_market_df['Symbol'].values
-    except Exception as e:
-        print(f"Error checking stock market CSV: {e}")
-        return False
+# def is_valid_stock(stock):
+#     try:
+#         stock_market_df = pd.read_csv(ticker_path)
+#         return stock in stock_market_df['Symbol'].values
+#     except Exception as e:
+#         print(f"Error checking stock market CSV: {e}")
+#         return False
