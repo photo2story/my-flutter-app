@@ -52,7 +52,12 @@ def analyze_with_gemini(ticker):
         # Call the Gemini API
         response_voo = model.generate_content(prompt_voo)
 
-        return f'Gemini Analysis for {ticker} (VOO): {response_voo.text}'
+        # Save the report to a file
+        report_file = f'result_{ticker}.report'
+        with open(report_file, 'w', encoding='utf-8') as file:
+            file.write(response_voo.text)
+
+        return f'Gemini Analysis for {ticker} (VOO) has been saved to {report_file}.'
 
     except Exception as e:
         return f'An error occurred while analyzing {ticker} with Gemini API: {e}'
@@ -61,6 +66,7 @@ if __name__ == '__main__':
     ticker = 'AAPL'  # Example ticker
     report = analyze_with_gemini(ticker)
     print(report)
+
 
 
 """
