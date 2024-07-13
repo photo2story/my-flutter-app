@@ -174,8 +174,6 @@ if __name__ == '__main__':
     # 봇 실행
     asyncio.run(run_bot())
 
-
-
 #  .\.venv\Scripts\activate
 # source .venv/bin/activate
 # # python bot.py    
