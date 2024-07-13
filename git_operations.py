@@ -33,7 +33,7 @@ def move_files_to_images_folder():
         print('No valid Git repository. Skipping git operations.')
         return
 
-    patterns = ["*.png", "*.csv"]
+    patterns = ["*.png", "*.csv", "*.report"]
     destination_folder = os.path.join('static', 'images')  # 'app.static_folder' 대신 경로를 명시적으로 설정
 
     # 외부 URL에서 CSV 데이터 다운로드
@@ -71,5 +71,6 @@ if df is not None:
     print(df.head())
 else:
     print("Failed to fetch CSV data.")
+
 
 

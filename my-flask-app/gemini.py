@@ -4,6 +4,7 @@ import pandas as pd
 import requests
 from dotenv import load_dotenv
 import google.generativeai as genai
+from github_operations import save_csv_to_github
 
 # Load environment variables
 load_dotenv()
@@ -45,19 +46,28 @@ def analyze_with_gemini(ticker):
         1) 제공된 주식의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘(간단하게: 최근1년 수익율차이 +50%) {ticker}:\n{voo_data_str}
         2) 제공된 주식의 최근 주가 변동(간단하게: 5일, 20일, 60일 이동평균 수치로)
         3) RSI, PPO 인덱스 지표를 분석해줘 (간단하게: RSI 40 과매도)
-        4) 최근 실적 및 전망(웹검색해서 간단하게: 2분기 매출 $, 3분기 전망 $)
+        4) 최근 실적 및 전망(웹검색해서 간단하게: 최근 매출,영업이익, 다음분기 전망 매출, 영업이익)
         5) 애널리스트 의견(웹검색해서 간단하게: 매수, 강력매수..)
         """
 
         # Call the Gemini API
         response_voo = model.generate_content(prompt_voo)
+        print(response_voo)
 
         # Save the report to a file
         report_file = f'result_{ticker}.report'
         with open(report_file, 'w', encoding='utf-8') as file:
             file.write(response_voo.text)
 
-        return f'Gemini Analysis for {ticker} (VOO) has been saved to {report_file}.'
+        # Move report file to static/images
+        destination_folder = os.path.join('static', 'images')
+        os.makedirs(destination_folder, exist_ok=True)
+        shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
+
+        # Save CSV to GitHub
+        save_csv_to_github(df_voo, f"result_VOO_{ticker}.csv", f"Updated CSV for {ticker}")
+        
+        return f'Gemini Analysis for {ticker} (VOO) has been saved to {os.path.join(destination_folder, os.path.basename(report_file))}.'
 
     except Exception as e:
         return f'An error occurred while analyzing {ticker} with Gemini API: {e}'
@@ -66,6 +76,7 @@ if __name__ == '__main__':
     ticker = 'AAPL'  # Example ticker
     report = analyze_with_gemini(ticker)
     print(report)
+
 
 
 

@@ -161,7 +161,7 @@ if __name__ == "__main__":
     # 사용 예시
     ticker_path = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv')
 
-    tickers_to_update = ['TCTZF']
+    tickers_to_update = ['TCTZF','asmlf']
     update_stock_market_csv(ticker_path, tickers_to_update)
     print("Stock information updated.")
     
