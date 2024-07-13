@@ -23,9 +23,13 @@ from Results_plot import plot_results_all
 from Results_plot_mpl import plot_results_mpl
 from github_operations import is_valid_stock, ticker_path
 from backtest_send import backtest_and_send
+
+# get_account_balance 모듈 임포트
 from get_account_balance import get_balance, get_ticker_price, get_market_from_ticker
 from get_compare_stock_data import load_sector_info, merge_csv_files
-from gemini import analyze_with_gemini  # Import gemini module
+
+# gemini 모듈 임포트
+from gemini import analyze_with_gemini
 
 load_dotenv()
 
@@ -158,11 +162,12 @@ async def account(ctx, ticker: str):
 @bot.command()
 async def gemini(ctx, ticker: str):
     try:
+        ticker = ticker.upper()  # 티커를 대문자로 변환
         report = analyze_with_gemini(ticker)
         await ctx.send(report)
     except Exception as e:
-        await ctx.send(f'An error occurred while analyzing {ticker}: {e}')
-        print(f'Error analyzing {ticker}: {e}')
+        await ctx.send(f'An error occurred while analyzing {ticker} with Gemini API: {e}')
+        print(f'Error processing Gemini analysis for {ticker}: {e}')
 
 async def run_bot():
     await bot.start(TOKEN)
