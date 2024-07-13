@@ -133,14 +133,14 @@ async def show_all(ctx):
         await plot_results_all()
         await ctx.send("All results have been successfully displayed.")
     except Exception as e:
-        await ctx.send f"An error occurred: {e}")
+        await ctx.send(f"An error occurred: {e}")
         print(f"Error: {e}")
 
 @bot.command()
 async def ping(ctx):
     if ctx.message.id not in processed_message_ids:
         processed_message_ids.add(ctx.message.id)
-        await ctx.send f'pong: {bot.user.name}')
+        await ctx.send(f'pong: {bot.user.name}')
         print(f'Ping command received and responded with pong.')
 
 @bot.command()
@@ -149,10 +149,10 @@ async def account(ctx, ticker: str):
         ticker = ticker.upper()  # 티커를 대문자로 변환
         exchange = get_market_from_ticker(ticker)
         last_price = get_ticker_price(H_APIKEY, H_SECRET, H_ACCOUNT, exchange, ticker)
-        await ctx.send f'The exchange for {ticker} is {exchange}')
-        await ctx.send f'Last price of {ticker} is {last_price}')
+        await ctx.send(f'The exchange for {ticker} is {exchange}')
+        await ctx.send(f'Last price of {ticker} is {last_price}')
     except Exception as e:
-        await ctx.send f'An error occurred: {e}')
+        await ctx.send(f'An error occurred: {e}')
         print(f'Error processing account for {ticker}: {e}')
 
 @bot.command()
@@ -168,7 +168,7 @@ async def run_bot():
     await bot.start(TOKEN)
 
 def run_server():
-    port = int os.environ.get('PORT', 8080))
+    port = int(os.environ.get('PORT', 8080))
     server_address = ('', port)
     httpd = HTTPServer(server_address, SimpleHTTPRequestHandler)
     print(f'Starting server on port {port}')
