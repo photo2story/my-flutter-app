@@ -26,6 +26,7 @@ from backtest_send import backtest_and_send
 
 # get_account_balance 모듈 임포트
 from get_account_balance import get_balance, get_ticker_price, get_market_from_ticker
+from get_compare_stock_data import load_sector_info, merge_csv_files
 
 load_dotenv()
 
@@ -78,8 +79,13 @@ async def buddy(ctx):
                 print(f"Error plotting {stock}: {e}")
         await asyncio.sleep(2)
 
+    print("Updating stock market CSV...")
     await loop.run_in_executor(None, update_stock_market_csv, ticker_path, config.STOCKS)
+    
+    print("Loading sector info...")
     sector_dict = await loop.run_in_executor(None, load_sector_info)
+    
+    print("Merging CSV files...")
     path = '.'
     await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
 
@@ -167,7 +173,6 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
-
 
 #  .\.venv\Scripts\activate
 # source .venv/bin/activate
