@@ -1,6 +1,8 @@
 # config.py
 import os
 from datetime import datetime
+from dotenv import load_dotenv
+load_dotenv()
 
 # Discord configuration
 DISCORD_APPLICATION_TOKEN = os.getenv('DISCORD_APPLICATION_TOKEN', 'your_token_here')
