@@ -31,7 +31,7 @@ def get_stock_info(ticker):
     }
 
 def update_stock_market_csv(file_path, tickers_to_update):
-    df = pd.read_csv(file_path, encoding='utf-8-sig')  # Specify encoding
+    df = pd.read_csv(ticker_path, encoding='utf-8-sig')  # Specify encoding
     for i, row in df.iterrows():
         ticker = row['Symbol']
         if ticker in tickers_to_update:
@@ -45,7 +45,7 @@ def update_stock_market_csv(file_path, tickers_to_update):
                 df.at[i, 'Stock'] = 'Unknown Stock'
                 df.at[i, 'Industry'] = 'Unknown Industry'
                 df.at[i, 'Beta'] = 0.0
-    df.to_csv(file_path, index=False, encoding='utf-8-sig')  # Specify encoding
+    df.to_csv(ticker_path, index=False, encoding='utf-8-sig')  # Specify encoding
 
 def load_tickers():
     ticker_dict = {}
@@ -156,12 +156,12 @@ def is_valid_stock(stock):  # Check if the stock is in the stock market CSV
         return False
 
 if __name__ == "__main__":
-    # 사용 예시 python get_ticker.py
+    # 사용 예시
+    ticker_path = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv')
 
-    info = get_stock_info('AAPL')
-    print(info)
-    market = get_ticker_market('086520', ticker_path)
-    print(market)
+    tickers_to_update = ['TCTZF']
+    update_stock_market_csv(ticker_path, tickers_to_update)
+    print("Stock information updated.")
     
 #  .\.venv\Scripts\activate
 #  python get_ticker.py
