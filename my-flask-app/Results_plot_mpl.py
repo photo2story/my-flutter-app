@@ -14,11 +14,11 @@ import requests
 import numpy as np
 import FinanceDataReader as fdr
 from datetime import datetime
-from get_ticker import get_ticker_name, get_ticker_market
+from get_ticker import get_ticker_name, get_ticker_market, is_valid_stock
 from tradingview_ta import TA_Handler, Interval, Exchange
 
 import os, sys
-from github_operations import save_csv_to_github, save_image_to_github, is_valid_stock, ticker_path # ticker_path=stock_market.csv 파일 경로
+from github_operations import save_csv_to_github, save_image_to_github, ticker_path # ticker_path=stock_market.csv 파일 경로
 NaN = np.nan
 
 def convert_file_path_for_saving(file_path):
