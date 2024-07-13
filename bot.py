@@ -21,8 +21,9 @@ from get_ticker import load_tickers, search_tickers_and_respond, get_ticker_name
 from estimate_stock import estimate_stock
 from Results_plot import plot_results_all
 from Results_plot_mpl import plot_results_mpl
-from github_operations import is_valid_stock, ticker_path
+from github_operations import ticker_path
 from backtest_send import backtest_and_send
+from get_ticker  import is_valid_stock
 
 # get_account_balance 모듈 임포트
 from get_account_balance import get_balance, get_ticker_price, get_market_from_ticker
