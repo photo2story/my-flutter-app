@@ -7,7 +7,7 @@ import os
 import requests
 import glob
 import asyncio  # 추가
-from get_ticker import get_ticker_name
+from get_ticker import get_ticker_name, is_valid_stock
 from Results_plot_mpl import plot_results_mpl
 
 
@@ -44,8 +44,6 @@ def plot_results(file_path, total_account_balance, total_rate, str_strategy, sto
     ax2.plot(stock_df['rate'], label='Daily Return')
     ax2.set_ylabel('Daily Return (%)')
     ax2.legend(loc='upper left')
-    # plt.title("\nTotal_account_balance: {:,.0f} won,".format(total_account_balance) +
-              # "Total_rate: {:,.0f} %".format(total_rate) +"\nStrategy: {} %".format(str_strategy))
 
     # 주식 이름 가져오기
     stock_name = get_ticker_name(stock)
