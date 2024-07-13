@@ -1,5 +1,3 @@
-### get_compare_stock_data.py
-
 import os
 import pandas as pd
 from collections import defaultdict
@@ -52,9 +50,4 @@ if __name__ == "__main__":
     sector = get_ticker_sector(ticker)
     print(f"The sector of {ticker} is {sector}")
     df = pd.read_csv(ticker_path, na_values=['', 'NaN'])
-<<<<<<< HEAD
     print(df[df['Symbol'] == 'NVDA'])
-=======
-    print(df[df['Symbol'] == 'NVDA'])
-
->>>>>>> 520aeafbdcd3ebc40263be73de689d801dcc5ffb
