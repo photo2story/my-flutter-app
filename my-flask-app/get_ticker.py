@@ -45,6 +45,8 @@ def update_stock_market_csv(file_path, tickers_to_update):
                 df.at[i, 'Stock'] = 'Unknown Stock'
                 df.at[i, 'Industry'] = 'Unknown Industry'
                 df.at[i, 'Beta'] = 0.0
+                
+    
     df.to_csv(ticker_path, index=False, encoding='utf-8-sig')  # Specify encoding
 
 def load_tickers():
