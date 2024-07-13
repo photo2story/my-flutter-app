@@ -1,3 +1,4 @@
+# Results_plot.py
 import matplotlib.dates as dates
 import matplotlib
 matplotlib.use('Agg')
@@ -93,16 +94,18 @@ def plot_results(file_path, total_account_balance, total_rate, str_strategy, sto
         print('Discord 메시지 전송 성공')
 
 
-def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy,invested_amount,min_stock_data_date):
+# Results_plot.py
+
+def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date):
     fig, ax2 = plt.subplots(figsize=(8, 6))
 
-    # 각 주식의 데이터프레임을 읽어옵니다.
     # 파일 경로 변환
     file_path1 = convert_file_path_for_reading(file_path1)
     file_path2 = convert_file_path_for_reading(file_path2)
+
+    # 각 주식의 데이터프레임을 읽어옵니다.
     df1 = pd.read_csv(file_path1, parse_dates=['Date'], index_col='Date')
     df2 = pd.read_csv(file_path2, parse_dates=['Date'], index_col='Date')
-    # print(df2)
 
     # 주식 데이터프레임의 최소 날짜를 찾아서 그 날짜로 범위를 맞춥니다.
     start_date = min_stock_data_date
@@ -113,12 +116,12 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     df2 = df2.loc[start_date:end_date]
 
     # 7일 이동 평균으로 리샘플링합니다.
-    df1['rate_7d_avg'] = df1['rate'].rolling('7D').mean()
-    df2['rate_20d_avg'] = df2['rate_vs'].rolling('20D').mean()
+    df1['rate_7d_avg'] = df1['rate'].rolling(window=7).mean()
+    df2['rate_20d_avg'] = df2['rate_vs'].rolling(window=20).mean()
 
     # 주식 1과 주식 2의 7일 이동 평균 데이터를 그래프에 추가
-    ax2.plot(df1.index, df1['rate_7d_avg'], label=f'{stock1} 7-Day Avg Return')
-    ax2.plot(df2.index, df2['rate_20d_avg'], label=f'{stock2} 20-Day Avg Return')
+    ax2.plot(df1.index, df1['rate_7d_avg'], label=f'{stock1} 7-Day Avg Return', color='purple')
+    ax2.plot(df2.index, df2['rate_20d_avg'], label=f'{stock2} 20-Day Avg Return', color='green')
 
     # 레이블, 제목, 범례 설정
     plt.ylabel('7-Day Average Daily Return (%)')
@@ -127,8 +130,8 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     stock1_name = get_ticker_name(stock1)
     stock2_name = get_ticker_name(stock2)
 
-    plt.title(f"{stock1} ({stock1_name}) vs {stock2} \n" +
-              f"\nTotal Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} %\n" +
+    plt.title(f"{stock1} ({stock1_name}) vs {stock2}\n"
+              f"Total Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} %\n"
               f"Invested Amount: {invested_amount:,.0f} $, Strategy: {str_strategy}",
               pad=10)  # 제목과 그래프 사이의 여백을 추가합니다.
 
@@ -137,19 +140,12 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     plt.xlabel('Year')
 
     # 그래프를 PNG 파일로 저장
-    if len(stock1) == 6 and stock1.isdigit():  # 한국 수식 6자리숫자
-        stock1_name = get_ticker_name(stock1)
-        if stock1_name is not None:
-            stock1 = stock1 + '_' + stock1_name
-            # print(stock1)
-    save_path = f'comparison_{stock1}_{stock2}.png'
-    
+    save_path = f'static/images/comparison_{stock1}_{stock2}.png'
+
     # 그래프 상단 여백 조정
     plt.subplots_adjust(top=0.8)  # 상단 여백을 추가합니다.
-    
-    fig.savefig(save_path)
 
-    
+    fig.savefig(save_path)
     plt.cla()
     plt.clf()
     plt.close(fig)
@@ -157,11 +153,11 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     # Discord로 이미지 전송
     DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
     message = {
-        'content': f"Stock: {stock1}\nInvested Amount: {invested_amount:,.0f} $, " +
-                   f"Total Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} %, " +
+        'content': f"Stock: {stock1}\nInvested Amount: {invested_amount:,.0f} $, "
+                   f"Total Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} %, "
                    f"Strategy: {str_strategy}"
     }
-    with open(f'comparison_{stock1}_{stock2}.png', 'rb') as image:
+    with open(save_path, 'rb') as image:
         response = requests.post(DISCORD_WEBHOOK_URL, json=message, files={'image': image})
 
     if response.status_code != 204:
