@@ -94,10 +94,8 @@ def analyze_with_gemini(ticker):
         3) 제공된 자료의 RSI, PPO 인덱스 지표를 분석해줘 (간단하게):
            RSI = {rsi}
            PPO = {ppo}
-        4) 최근 실적 및 전망(웹검색해서 간단하게):
-           최근 매출 = {latest_performance}
-        5) 애널리스트 의견(웹검색해서 간단하게):
-           추천의견 = {analyst_opinions}
+        4) 최근 실적 및 전망(웹검색해서 간단하게: 최근 매출,영업이익, 다음분기 전망 매출, 영업이익)
+        5) 애널리스트 의견(웹검색해서 간단하게: 최근 애널리스트 의견.)
         6) 레포트는 ["candidates"][0]["content"]["parts"][0]["text"]의 구조의 텍스트로 만들어줘
         7) 레포트는 한글로 만들어줘
         """
@@ -120,9 +118,9 @@ def analyze_with_gemini(ticker):
             file.write(report_text)
 
         # 리포트를 static/images 폴더로 이동 및 커밋
-        destination_folder = os.path.join('static', 'images')
-        os.makedirs(destination_folder, exist_ok=True)
-        shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
+        # destination_folder = os.path.join('static', 'images')
+        # os.makedirs(destination_folder, exist_ok=True)
+        # shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
         move_files_to_images_folder()
 
         return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord and saved as a text file.'
