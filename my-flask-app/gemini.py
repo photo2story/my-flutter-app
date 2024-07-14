@@ -6,10 +6,11 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import matplotlib.pyplot as plt
-from git_operations import move_files_to_images_folder
+
 # from googleapiclient.discovery import build
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from git_operations import move_files_to_images_folder
 # Load environment variables
 load_dotenv()
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
