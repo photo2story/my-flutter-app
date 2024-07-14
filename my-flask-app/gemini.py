@@ -1,5 +1,5 @@
 # gemini.py
-import os
+import os,sys
 import pandas as pd
 import requests
 from dotenv import load_dotenv
@@ -8,7 +8,8 @@ import shutil
 import matplotlib.pyplot as plt
 from git_operations import move_files_to_images_folder
 # from googleapiclient.discovery import build
-
+# 루트 디렉토리를 sys.path에 추가
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # Load environment variables
 load_dotenv()
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
@@ -109,10 +110,41 @@ def analyze_with_gemini(ticker):
         return error_message
 
 if __name__ == '__main__':
-    ticker = 'AAPL'  # Example ticker
-    report = analyze_with_gemini(ticker)
-    print(report)
+    # HTTP 서버 시작
+    server_thread = threading.Thread(target=run_server, daemon=True)
+    server_thread.start()
+    
+    # 봇 실행
+    asyncio.run(run_bot())
 
+### `gemini_test.py` 파일
+
+# 다음은 `STOCKS` 리스트에 있는 티커명을 10분 간격으로 하나씩 검토하는 테스트 코드입니다.
+
+# ```python
+import asyncio
+# from gemini import analyze_with_gemini, STOCKS
+STOCKS = [
+    'AAPL', 'MSFT', 'AMZN', 
+    'FB', 'GOOG', 'GOOGL', 
+    'BRK.B', 'JNJ', 'V', 'PG', 'NVDA', 'UNH', 'HD', 'MA', 
+    'PYPL', 'DIS', 'NFLX', 'XOM', 'VZ', 'PFE', 'T', 'KO', 'ABT', 'MRK', 'CSCO', 'ADBE', 'CMCSA', 'NKE', 
+    'INTC', 'PEP', 'TMO', 'CVX', 'ORCL', 'ABBV', 'AVGO', 'MCD', 'QCOM', 'MDT', 'BMY', 'AMGN', 'UPS', 'CRM', 
+    'MS', 'HON', 'C', 'GILD', 'DHR', 'BA', 'IBM', 'MMM', 'TSLA', 'TXN', 'SBUX', 'COST', 'AMD', 'TMUS', 
+    'CHTR', 'INTU', 'ADP', 'MU', 'MDLZ', 'ISRG', 'BKNG', 'ADI', 'ATVI', 'LRCX', 'AMAT', 'REGN', 'NXPI', 
+    'KDP', 'MAR', 'KLAC', 'WMT', 'JPM','SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'VFH',
+    'QQQ', 'TQQQ', 'SOXX', 
+    'SOXL', 'UPRO'
+]
+async def analyze_stocks():
+    for ticker in STOCKS:
+        print(f"Analyzing {ticker}")
+        result = analyze_with_gemini(ticker)
+        print(result)
+        await asyncio.sleep(600)  # 10분 대기
+
+if __name__ == "__main__":
+    asyncio.run(analyze_stocks())
 """
 source .venv/bin/activate
 python gemini.py    
