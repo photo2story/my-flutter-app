@@ -15,11 +15,11 @@ $(function() {
             success: function(data) {
                 const comparisonFile = data.find(file => file.name === `comparison_${stockTicker}_VOO.png`);
                 const resultFile = data.find(file => file.name === `result_mpl_${stockTicker}.png`);
-                const reportFile = data.find(file => file.name === `result_${stockTicker}.report`);
+                const reportFile = data.find(file => file.name === `report_${stockTicker}.txt`);
 
                 reviewList.empty();
 
-                if (comparisonFile && resultFile && reportFile) {
+                if (comparisonFile && resultFile) {
                     reviewList.append(`
                         <div class="review">
                             <h3>${stockTicker} vs VOO</h3>
@@ -28,10 +28,11 @@ $(function() {
                         </div>
                     `);
 
-                    // 리포트를 가져와서 표시
-                    $.get(reportFile.download_url, function(data) {
-                        reviewList.append(`<pre>${data}</pre>`);
-                    });
+                    if (reportFile) {
+                        $.get(reportFile.download_url, function(data) {
+                            reviewList.append(`<pre>${data}</pre>`);
+                        });
+                    }
                     alert(`Successfully fetched review for ${stockTicker}.`);
                 } else {
                     alert(`Unable to find images for the stock ticker ${stockTicker}.`);
