@@ -44,6 +44,16 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='', intents=intents)
 
+processed_message_ids = set()
+
+def check_duplicate_message():
+    async def predicate(ctx):
+        if ctx.message.id in processed_message_ids:
+            return False
+        processed_message_ids.add(ctx.message.id)
+        return True
+    return commands.check(predicate)
+
 bot_started = False
 
 @bot.event
@@ -67,9 +77,8 @@ async def send_msg():
     else:
         print(f"Failed to find channel with ID: {CHANNEL_ID}")
 
-processed_message_ids = set()
-
-@bot.command()
+@bot.command(name='buddy')
+@check_duplicate_message()
 async def buddy(ctx):
     loop = asyncio.get_running_loop()
 
@@ -96,7 +105,8 @@ async def buddy(ctx):
     await ctx.send("백테스팅 결과가 섹터별로 정리되었습니다.")
     move_files_to_images_folder()
 
-@bot.command()
+@bot.command(name='ticker')
+@check_duplicate_message()
 async def ticker(ctx, *, query: str = None):
     print(f'Command received: ticker with query: {query}')
     if query is None:
@@ -105,13 +115,9 @@ async def ticker(ctx, *, query: str = None):
 
     await search_tickers_and_respond(ctx, query)
 
-@bot.command()
+@bot.command(name='stock')
+@check_duplicate_message()
 async def stock(ctx, *args):
-    # 메시지 ID가 중복인지 확인
-    if ctx.message.id in processed_message_ids:
-        return
-    processed_message_ids.add(ctx.message.id)
-
     stock_name = ' '.join(args)
     await ctx.send(f'Arguments passed by command: {stock_name}')
     try:
@@ -137,7 +143,8 @@ async def stock(ctx, *args):
         await ctx.send(f'An error occurred: {e}')
         print(f'Error processing {info_stock}: {e}')
 
-@bot.command()
+@bot.command(name='show_all')
+@check_duplicate_message()
 async def show_all(ctx):
     try:
         await plot_results_all()
@@ -146,14 +153,14 @@ async def show_all(ctx):
         await ctx.send(f"An error occurred: {e}")
         print(f"Error: {e}")
 
-@bot.command()
+@bot.command(name='ping')
+@check_duplicate_message()
 async def ping(ctx):
-    if ctx.message.id not in processed_message_ids:
-        processed_message_ids.add(ctx.message.id)
-        await ctx.send(f'pong: {bot.user.name}')
-        print(f'Ping command received and responded with pong.')
+    await ctx.send(f'pong: {bot.user.name}')
+    print(f'Ping command received and responded with pong.')
 
-@bot.command()
+@bot.command(name='account')
+@check_duplicate_message()
 async def account(ctx, ticker: str):
     try:
         ticker = ticker.upper()  # 티커를 대문자로 변환
@@ -165,7 +172,8 @@ async def account(ctx, ticker: str):
         await ctx.send(f'An error occurred: {e}')
         print(f'Error processing account for {ticker}: {e}')
 
-@bot.command()
+@bot.command(name='gemini')
+@check_duplicate_message()
 async def gemini(ctx, ticker: str):
     try:
         ticker = ticker.upper()  # 티커를 대문자로 변환
@@ -192,6 +200,7 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
 
 #  .\.venv\Scripts\activate
 # source .venv/bin/activate
