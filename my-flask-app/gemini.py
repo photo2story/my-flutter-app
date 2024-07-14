@@ -51,7 +51,7 @@ def analyze_with_gemini(ticker):
 
         # Gemini API 호출을 위한 프롬프트 준비
         prompt_voo = f"""
-        1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘(간단하게 수익율차이: rate와 rate_vs값으로) {ticker}:\n{voo_data_str}
+        1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘(간단하게 맨마지막날의 수익율차이: rate와 rate_vs값으로) {ticker}:\n{voo_data_str}
         2) 제공된 자료의 최근 주가 변동(간단하게: 5일, 20일, 60일 이동평균 수치로)
         3) 제공된 자료의 RSI, PPO 인덱스 지표를 분석해줘 (간단하게: RSI 40 과매도)
         4) 최근 실적 및 전망(웹검색해서 간단하게: 최근 매출,영업이익, 다음분기 전망 매출, 영업이익)
