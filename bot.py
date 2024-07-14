@@ -107,6 +107,7 @@ async def ticker(ctx, *, query: str = None):
 
 @bot.command()
 async def stock(ctx, *args):
+    # 메시지 ID가 중복인지 확인
     if ctx.message.id in processed_message_ids:
         return
     processed_message_ids.add(ctx.message.id)
@@ -191,7 +192,6 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
-
 
 #  .\.venv\Scripts\activate
 # source .venv/bin/activate
