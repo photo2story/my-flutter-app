@@ -31,6 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _resultImageUrl = '';
   String _message = '';
   String _description = '';
+  String _reportText = '';
   List<String> _tickers = [];
   final TextEditingController _controller = TextEditingController();
 
@@ -67,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> fetchImages(String stockTicker) async {
+  Future<void> fetchImagesAndReport(String stockTicker) async {
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
@@ -78,6 +79,9 @@ class _MyHomePageState extends State<MyHomePage> {
         final resultFile = files.firstWhere(
             (file) => file['name'] == 'result_mpl_${stockTicker}.png',
             orElse: () => null);
+        final reportFile = files.firstWhere(
+            (file) => file['name'] == 'report_${stockTicker}.txt',
+            orElse: () => null);
 
         if (comparisonFile != null && resultFile != null) {
           setState(() {
@@ -85,17 +89,31 @@ class _MyHomePageState extends State<MyHomePage> {
             _resultImageUrl = resultFile['download_url'];
             _message = '';
           });
+          if (reportFile != null) {
+            final reportResponse = await http.get(Uri.parse(reportFile['download_url']));
+            if (reportResponse.statusCode == 200) {
+              setState(() {
+                _reportText = reportResponse.body;
+              });
+            } else {
+              setState(() {
+                _reportText = 'Failed to load report text';
+              });
+            }
+          }
         } else {
           setState(() {
             _comparisonImageUrl = '';
             _resultImageUrl = '';
-            _message = 'Unable to find images for the stock ticker $stockTicker';
+            _reportText = '';
+            _message = 'Unable to find images or report for the stock ticker $stockTicker';
           });
         }
       } else {
         setState(() {
           _comparisonImageUrl = '';
           _resultImageUrl = '';
+          _reportText = '';
           _message = 'GitHub API call failed: ${response.statusCode}';
         });
       }
@@ -103,6 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         _comparisonImageUrl = '';
         _resultImageUrl = '';
+        _reportText = '';
         _message = 'Error occurred: $e';
       });
     }
@@ -144,13 +163,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                   onSubmitted: (value) {
-                    fetchImages(_controller.text.toUpperCase());
+                    fetchImagesAndReport(_controller.text.toUpperCase());
                   },
                 ),
               ),
               ElevatedButton(
                 onPressed: () {
-                  fetchImages(_controller.text.toUpperCase());
+                  fetchImagesAndReport(_controller.text.toUpperCase());
                 },
                 child: Text('Search Review'),
               ),
@@ -168,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     padding: const EdgeInsets.all(4.0),
                     child: GestureDetector(
                       onTap: () {
-                        fetchImages(ticker);
+                        fetchImagesAndReport(ticker);
                       },
                       child: Text(
                         ticker,
@@ -203,6 +222,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     )
                   : Container(),
               SizedBox(height: 20),
+              _reportText.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        _reportText,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    )
+                  : Container(),
               _message.isNotEmpty
                   ? Text(
                       _message,
