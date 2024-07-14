@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 void main() {
   runApp(MyApp());
@@ -225,9 +226,8 @@ class _MyHomePageState extends State<MyHomePage> {
               _reportText.isNotEmpty
                   ? Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        _reportText,
-                        style: TextStyle(fontSize: 16),
+                      child: MarkdownBody(
+                        data: _reportText,
                       ),
                     )
                   : Container(),
@@ -267,7 +267,6 @@ class ImageScreen extends StatelessWidget {
     );
   }
 }
-
 
 // flutter devices
 
