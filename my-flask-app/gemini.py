@@ -63,7 +63,8 @@ def analyze_with_gemini(ticker):
         response_ticker = model.generate_content(prompt_voo)
 
         # 리포트를 텍스트로 저장
-        report_text = response_ticker.result["candidates"][0]["content"]["parts"][0]["text"]
+        report_text = response_ticker.text        
+        # report_text = response_ticker.result["candidates"][0]["content"]["parts"][0]["text"]
         print(report_text)
 
         # 디스코드 웹훅 메시지로 전송
