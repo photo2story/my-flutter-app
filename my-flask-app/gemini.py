@@ -56,19 +56,16 @@ def analyze_with_gemini(ticker):
         3) 제공된 자료의 RSI, PPO 인덱스 지표를 분석해줘 (간단하게: RSI 40 과매도)
         4) 최근 실적 및 전망(웹검색해서 간단하게: 최근 매출,영업이익, 다음분기 전망 매출, 영업이익)
         5) 애널리스트 의견(웹검색해서 간단하게: 매수, 강력매수..)
-        6) 레포트는 영어로 만들어줘
+        6) 레포트는 ["candidates"][0]["content"]["parts"][0]["text"]의 구조의 텍스트로 만들어줘
+        7) 레포트는 영어로 만들어줘
         """
 
         # Gemini API 호출
         response_ticker = model.generate_content(prompt_voo)
 
         # 리포트를 텍스트로 저장
-        try:
-            report_text = response_ticker.candidates[0].content.parts[0].text
-        except (KeyError, IndexError, AttributeError) as e:
-            print(f"Error extracting text from response: {e}")
-            report_text = "Error extracting text from Gemini API response."
-
+        report_text = response_ticker.text        
+        # report_text = response_ticker.result["candidates"][0]["content"]["parts"][0]["text"]
         print(report_text)
 
         # 디스코드 웹훅 메시지로 전송
@@ -98,6 +95,8 @@ if __name__ == '__main__':
     ticker = 'AAPL'  # Example ticker
     report = analyze_with_gemini(ticker)
     print(report)
+
+
 
 
 """

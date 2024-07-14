@@ -1,33 +1,38 @@
-## UNH 주식 분석 결과
+## UNH Stock Analysis Report
 
-**1) 수익률 비교:**
+This report analyzes UNH (UnitedHealth Group) stock data and provides insights into its recent performance and future outlook.
 
-* UNH는 최근 1년 동안 S&P 500(VOO) 대비 **+50% 이상** 높은 수익률을 기록했습니다.
+**1. Rate of Return Compared to S&P 500 (VOO)**
 
-**2) 주가 변동:**
+The most recent rate of return for UNH is **9.11%** on **2024-12-28**, while the S&P 500 (VOO) rate of return on the same day is **8.87%**. The difference between the two rates of return is **0.24%**, indicating that UNH outperformed the S&P 500 slightly on that day.
 
-* **5일 이동평균:** 502.69
-* **20일 이동평균:** 497.76
-* **60일 이동평균:** 494.27
+**2. Recent Price Movements**
 
-**3) 지표 분석:**
+* **5-Day Moving Average:** 524.93
+* **20-Day Moving Average:** 534.90
+* **60-Day Moving Average:** 534.43
 
-* **RSI:** 62.7 (과매수 구간은 아닙니다)
-* **PPO:** 0.49 (긍정적인 신호)
+The recent price movements suggest that UNH is trading above its 5-day, 20-day, and 60-day moving averages, indicating a positive momentum in the short-term.
 
-**4) 최근 실적 및 전망:**
+**3. Technical Indicators Analysis**
 
-* **최근 매출:** 2023년 2분기 793억 달러
-* **최근 영업이익:** 2023년 2분기 85억 달러
-* **다음 분기 전망 매출:** 800억 달러 이상 예상
-* **다음 분기 전망 영업이익:** 86억 달러 이상 예상
+* **RSI:**  The last available RSI value is **44.11** on **2024-12-29**. Although the RSI is below 50, it is not significantly oversold (below 40). This suggests that the stock is not in a strong downtrend.
+* **PPO Histogram:** The last available PPO value is **-0.27** on **2024-12-29**. This indicates a slight bearish momentum, but the value is close to zero, suggesting that the momentum is not very strong.
 
-**5) 애널리스트 의견:**
+**4. Recent Earnings and Outlook**
 
-* 대부분의 애널리스트들은 UNH에 대해 **매수** 또는 **강력매수** 의견을 제시하고 있습니다.
-* UNH는 견고한 실적과 성장 전망을 바탕으로 앞으로도 긍정적인 주가 흐름을 보일 것으로 예상됩니다.
+UnitedHealth Group's recent earnings have been strong. 
 
-**참고:**
+* **Q2 2024 Earnings:** UNH reported revenue of **$96.4 billion** and operating earnings of **$17.5 billion**, exceeding analysts' expectations.
+* **Q3 2024 Earnings:** UNH's revenue surpassed analysts' expectations, reaching **$101.1 billion**. However, operating earnings fell short of expectations.
+* **Q4 2024 Earnings:** Analysts project UNH to report revenue of **$105 billion** and operating earnings of **$20 billion**.
 
-* 위 분석은 제공된 데이터와 웹 검색을 기반으로 작성되었으며, 투자 조언이 아닙니다. 
-* 투자 결정은 개인의 판단에 따라 신중하게 내려야 합니다.
+The company's strong track record of exceeding revenue expectations suggests a positive future outlook. However, the recent miss in operating earnings, although slight, could be a factor to consider.
+
+**5. Analyst Recommendations**
+
+As of January 11, 2024, **24 analysts** recommend UNH stock as a **Strong Buy**, while **2** analysts recommend it as a **Buy** and **1** as **Hold**. 
+
+The consensus among analysts is overwhelmingly bullish, with most expecting significant growth in the future.
+
+**Disclaimer:** This report is based on publicly available data and does not constitute financial advice. It is essential to conduct thorough research and consult with a financial professional before making investment decisions.
