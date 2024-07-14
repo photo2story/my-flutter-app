@@ -8,6 +8,7 @@ import io
 from dotenv import load_dotenv
 from flask import Flask, render_template, send_from_directory, jsonify, request
 from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
+from flask_cors import CORS
 
 # Add my-flutter-app directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flutter-app')))
@@ -20,6 +21,8 @@ env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
 load_dotenv(dotenv_path=env_path)
 
 app = Flask(__name__)
+CORS(app)
+
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 app.config["DISCORD_CLIENT_ID"] = os.getenv("DISCORD_CLIENT_ID")
 app.config["DISCORD_CLIENT_SECRET"] = os.getenv("DISCORD_CLIENT_SECRET")
