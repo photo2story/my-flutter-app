@@ -6,10 +6,12 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 from github_operations import save_csv_to_github
 import shutil
+from discord import Webhook, RequestsWebhookAdapter
 
 # Load environment variables
 load_dotenv()
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
 
 # Configure the Gemini API
@@ -28,10 +30,19 @@ def download_csv(ticker):
         return False
 
 def analyze_with_gemini(ticker):
+    webhook = Webhook.from_url(DISCORD_WEBHOOK_URL, adapter=RequestsWebhookAdapter())
     try:
+        # 콘솔 및 Discord로 메시지 전송: 작업 시작
+        start_message = f"Gemini API를 사용하여 {ticker} 분석을 시작합니다."
+        print(start_message)
+        webhook.send(start_message)
+
         # Download the CSV files
         if not download_csv(ticker):
-            return f'Error: The file for {ticker} does not exist.'
+            error_message = f'Error: The file for {ticker} does not exist.'
+            print(error_message)
+            webhook.send(error_message)
+            return error_message
 
         # Load data from CSV files
         voo_file = f'result_VOO_{ticker}.csv'
@@ -54,32 +65,35 @@ def analyze_with_gemini(ticker):
         # Call the Gemini API
         response_voo = model.generate_content(prompt_voo)
 
-
         # Save the report to a file
         report_file = f'result_{ticker}.report'
         with open(report_file, 'w', encoding='utf-8') as file:
             file.write(response_voo.text)
             
         print(response_voo.text)
+        
         # Move report file to static/images
         destination_folder = os.path.join('static', 'images')
         os.makedirs(destination_folder, exist_ok=True)
         shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
 
-        # Save CSV to GitHub
-        save_csv_to_github(df_voo, f"result_VOO_{ticker}.csv", f"Updated CSV for {ticker}")
+        # 콘솔 및 Discord로 메시지 전송: 작업 완료
+        success_message = f"Gemini API 분석 완료: {ticker}. 리포트가 저장되었습니다."
+        print(success_message)
+        webhook.send(success_message)
         
         return f'Gemini Analysis for {ticker} (VOO) has been saved to {os.path.join(destination_folder, os.path.basename(report_file))}.'
 
     except Exception as e:
-        return f'An error occurred while analyzing {ticker} with Gemini API: {e}'
+        error_message = f"{ticker} 분석 중 오류 발생: {e}"
+        print(error_message)
+        webhook.send(error_message)
+        return error_message
 
 if __name__ == '__main__':
     ticker = 'AAPL'  # Example ticker
     report = analyze_with_gemini(ticker)
     print(report)
-
-
 
 
 """
