@@ -1,35 +1,36 @@
-## IONQ 주식 분석
+## IONQ Stock Analysis
 
-**1) 수익률 비교:**
+This report analyzes the performance of IONQ stock based on the provided data and information gathered from web searches.
 
-IONQ는 최근 1년 동안 S&P 500 (VOO) 대비 수익률이 훨씬 낮았습니다. 
+**1. Stock Performance vs. S&P 500**
 
-* IONQ: 약 -50%
-* S&P 500 (VOO): 약 +10%
+The provided data shows that IONQ's performance has been volatile and significantly lagging behind the S&P 500 (VOO) over the past year. 
 
-**2) 주가 변동:**
+* **Recent Performance:** IONQ's current rate is 9.11%, while the S&P 500's rate (rate_vs) is 17.51%. This represents a difference of **+93.9%** compared to the S&P 500, highlighting IONQ's underperformance.
+* **Specific Dates:**  IONQ has experienced substantial losses on certain days, such as a -14.17% decline on 2022-01-13 and a -32.14% drop on 2022-04-20.
 
-* 5일 이동평균: 10.68
-* 20일 이동평균: 11.69
-* 60일 이동평균: 12.96
+**2. Recent Price Movements**
 
-IONQ는 최근 5일, 20일, 60일 이동평균 모두 하락 추세를 보이고 있습니다.
+* **5-Day SMA:** 13.20 (This represents the average closing price over the past 5 days.)
+* **20-Day SMA:** 13.56 (This represents the average closing price over the past 20 days.)
+* **60-Day SMA:** 12.89 (This represents the average closing price over the past 60 days.)
 
-**3) 지표 분석:**
+**3. Technical Indicators**
 
-* RSI: 50.37 (현재는 과매도 구간이 아닙니다.)
-* PPO: -0.36 (현재는 매수 신호를 주는 상황은 아닙니다.)
+* **RSI:** The RSI (Relative Strength Index) is currently 49.2. This suggests that IONQ is neither overbought nor oversold.
+* **PPO:** The PPO (Percentage Price Oscillator) is currently -0.8. This indicates that IONQ's price is slightly below its recent average, potentially signaling weakness.
 
-**4) 최근 실적 및 전망:**
+**4. Recent Earnings and Outlook**
 
-IONQ는 2023년 2분기 실적 발표에서 매출액이 전년 동기 대비 15% 증가한 430만 달러를 기록했습니다. 하지만 영업손실은 3,200만 달러로 전년 동기 대비 확대되었습니다. 다음 분기 전망은 공개되지 않았습니다.
+* **Recent Earnings:** Web searches reveal IONQ's recent earnings are difficult to find, as the company is still in its early stages of development and has not yet achieved profitability. 
+* **Next Quarter Forecast:** It is difficult to find reliable forecasts for IONQ's next-quarter earnings due to the company's early stage and lack of profitability.
 
-**5) 애널리스트 의견:**
+**5. Analyst Opinions**
 
-현재 IONQ에 대한 애널리스트 평균 의견은 "매수"이며, 목표 주가는 15.50 달러입니다. 하지만 최근 실적 발표 이후 일부 애널리스트는 목표 주가를 하향 조정했습니다.
+* **Analyst Ratings:** Web searches reveal that IONQ is currently rated as "Hold" by analysts. Some analysts are optimistic about the company's long-term potential, but concerns remain regarding its lack of profitability and the competitiveness of the quantum computing market. 
 
-**종합 분석:**
+**Overall Analysis**
 
-IONQ는 최근 실적 부진과 시장 변동성으로 인해 주가가 하락하고 있습니다. 현재 주가는 5일, 20일, 60일 이동평균 모두 하락 추세를 보이며, 기술적 지표도 매수 신호를 주고 있지 않습니다. 
+Based on the available information, IONQ's stock performance has been underwhelming, trailing the S&P 500 by a significant margin. While technical indicators suggest neutrality, IONQ remains in the early stages of development with profitability remaining a concern. Analyst opinions are currently divided, with some recognizing long-term potential while others highlight the challenges of the quantum computing market. 
 
-다음 분기 전망과 실적이 중요하며, 애널리스트 의견은 긍정적이지만 최근 실적 발표 이후 목표 주가 하향 조정이 있었음을 감안해야 합니다. 
+**Disclaimer:** This report is based on publicly available information and should not be considered as financial advice. Investing in IONQ stock involves significant risk, and investors should conduct their own due diligence before making any investment decisions. 

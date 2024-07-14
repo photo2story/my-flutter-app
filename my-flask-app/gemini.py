@@ -78,7 +78,7 @@ def analyze_with_gemini(ticker):
         shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
 
         # GitHub에 파일 저장
-        save_file_to_github(f'static/images/{report_file}', report_file, f"Updated report for {ticker}")
+        save_csv_to_github(f'static/images/{report_file}', report_file, f"Updated report for {ticker}")
 
         # 디스코드 웹훅 메시지로 전송
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
