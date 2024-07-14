@@ -5,7 +5,7 @@ $(function() {
     const tickerListContainer = $('#ticker-list');
     const searchedTickersContainer = $('#searched-tickers');
 
-    function fetchImagesAndReport(stockTicker) {
+    function fetchImages(stockTicker) {
         const apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
 
         $.ajax({
@@ -15,11 +15,10 @@ $(function() {
             success: function(data) {
                 const comparisonFile = data.find(file => file.name === `comparison_${stockTicker}_VOO.png`);
                 const resultFile = data.find(file => file.name === `result_mpl_${stockTicker}.png`);
-                const reportFile = data.find(file => file.name === `result_${stockTicker}.report`);
 
                 reviewList.empty();
 
-                if (comparisonFile && resultFile && reportFile) {
+                if (comparisonFile && resultFile) {
                     reviewList.append(`
                         <div class="review">
                             <h3>${stockTicker} vs VOO</h3>
@@ -27,11 +26,6 @@ $(function() {
                             <img src="${resultFile.download_url}" alt="${stockTicker} Result" style="width: 100%; margin-top: 20px;">
                         </div>
                     `);
-
-                    // 리포트를 가져와서 표시
-                    $.get(reportFile.download_url, function(data) {
-                        reviewList.append(`<pre>${data}</pre>`);
-                    });
                     alert(`Successfully fetched review for ${stockTicker}.`);
                 } else {
                     alert(`Unable to find images for the stock ticker ${stockTicker}.`);
@@ -86,7 +80,7 @@ $(function() {
                 $('.ticker-item').on('click', function() {
                     const stockTicker = $(this).text();
                     stockInput.val(stockTicker);
-                    fetchImagesAndReport(stockTicker);
+                    fetchImages(stockTicker);
                 });
             },
             error: function() {
@@ -98,7 +92,7 @@ $(function() {
     searchReviewButton.click(function() {
         const stockTicker = stockInput.val().toUpperCase();
         if (stockTicker) {
-            fetchImagesAndReport(stockTicker);
+            fetchImages(stockTicker);
         }
     });
 
