@@ -5,7 +5,7 @@ $(function() {
     const tickerListContainer = $('#ticker-list');
     const searchedTickersContainer = $('#searched-tickers');
 
-    function fetchImages(stockTicker) {
+    function fetchImagesAndReport(stockTicker) {
         const apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
 
         $.ajax({
@@ -15,6 +15,7 @@ $(function() {
             success: function(data) {
                 const comparisonFile = data.find(file => file.name === `comparison_${stockTicker}_VOO.png`);
                 const resultFile = data.find(file => file.name === `result_mpl_${stockTicker}.png`);
+                const reportFile = data.find(file => file.name === `report_${stockTicker}.txt`);
 
                 reviewList.empty();
 
@@ -26,6 +27,12 @@ $(function() {
                             <img src="${resultFile.download_url}" alt="${stockTicker} Result" style="width: 100%; margin-top: 20px;">
                         </div>
                     `);
+
+                    if (reportFile) {
+                        $.get(reportFile.download_url, function(data) {
+                            reviewList.append(`<pre>${data}</pre>`);
+                        });
+                    }
                     alert(`Successfully fetched review for ${stockTicker}.`);
                 } else {
                     alert(`Unable to find images for the stock ticker ${stockTicker}.`);
@@ -69,7 +76,7 @@ $(function() {
                 const tickers = data
                     .filter(file => file.name.startsWith('comparison_') && file.name.endsWith('_VOO.png'))
                     .map(file => file.name.replace('comparison_', '').replace('_VOO.png', ''))
-                    .sort(); // 알파벳 순으로 정렬
+                    .sort();
 
                 tickerListContainer.empty();
 
@@ -80,7 +87,7 @@ $(function() {
                 $('.ticker-item').on('click', function() {
                     const stockTicker = $(this).text();
                     stockInput.val(stockTicker);
-                    fetchImages(stockTicker);
+                    fetchImagesAndReport(stockTicker);
                 });
             },
             error: function() {
@@ -92,17 +99,17 @@ $(function() {
     searchReviewButton.click(function() {
         const stockTicker = stockInput.val().toUpperCase();
         if (stockTicker) {
-            fetchImages(stockTicker);
+            fetchImagesAndReport(stockTicker);
         }
     });
 
     stockInput.on('keypress', function(e) {
-        if (e.which === 13) { // Enter key
+        if (e.which === 13) {
             searchReviewButton.click();
             return false;
         }
     });
 
-    loadTickerList(); // 페이지 로드 시 티커 목록 불러오기
-    displaySearchedTickers(); // 페이지 로드 시 검색된 티커 목록 불러오기
+    loadTickerList();
+    displaySearchedTickers();
 });
