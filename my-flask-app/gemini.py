@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import matplotlib.pyplot as plt
+import threading
 
 # from googleapiclient.discovery import build
 # 루트 디렉토리를 sys.path에 추가
