@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import matplotlib.pyplot as plt
+from git_operations import move_files_to_images_folder
 
 # Load environment variables
 load_dotenv()
@@ -83,7 +84,8 @@ def analyze_with_gemini(ticker):
         # 리포트를 static/images 폴더로 이동
         destination_folder = os.path.join('static', 'images')
         os.makedirs(destination_folder, exist_ok=True)
-        shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
+        # shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
+        move_files_to_images_folder()
 
         return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord and saved as a text file.'
 
