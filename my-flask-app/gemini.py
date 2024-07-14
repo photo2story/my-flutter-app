@@ -7,12 +7,12 @@ import google.generativeai as genai
 import shutil
 import matplotlib.pyplot as plt
 from git_operations import move_files_to_images_folder
-from googleapiclient.discovery import build
+# from googleapiclient.discovery import build
 
 # Load environment variables
 load_dotenv()
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
-GOOGLE_CSE_ID = os.getenv('GOOGLE_CSE_ID')
+# GOOGLE_CSE_ID = os.getenv('GOOGLE_CSE_ID')
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
 
@@ -30,25 +30,6 @@ def download_csv(ticker):
         return True
     else:
         return False
-
-def google_search(query, api_key, cse_id, **kwargs):
-    service = build("customsearch", "v1", developerKey=api_key)
-    res = service.cse().list(q=query, cx=cse_id, **kwargs).execute()
-    return res['items']
-
-def get_latest_performance(ticker):
-    query = f"{ticker} latest earnings"
-    results = google_search(query, GOOGLE_API_KEY, GOOGLE_CSE_ID, num=1)
-    if results:
-        return results[0]['snippet']
-    return "No recent performance data found."
-
-def get_analyst_opinions(ticker):
-    query = f"{ticker} analyst opinions"
-    results = google_search(query, GOOGLE_API_KEY, GOOGLE_CSE_ID, num=1)
-    if results:
-        return results[0]['snippet']
-    return "No analyst opinions found."
 
 def analyze_with_gemini(ticker):
     try:
@@ -76,10 +57,6 @@ def analyze_with_gemini(ticker):
         sma_60 = df_voo['sma60_ta'].iloc[-1]
         rsi = df_voo['rsi_ta'].iloc[-1]
         ppo = df_voo['ppo_histogram'].iloc[-1]
-
-        # 웹 검색 결과 가져오기
-        latest_performance = get_latest_performance(ticker)
-        analyst_opinions = get_analyst_opinions(ticker)
 
         # 프롬프트 준비
         prompt_voo = f"""
