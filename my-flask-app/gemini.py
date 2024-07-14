@@ -113,7 +113,6 @@ if __name__ == '__main__':
     report = analyze_with_gemini(ticker)
     print(report)
 
-
 """
 source .venv/bin/activate
 python gemini.py    
