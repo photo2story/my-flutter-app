@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import matplotlib.pyplot as plt
-from github_operations import save_file_to_github
+from github_operations import save_csv_to_github
 
 # Load environment variables
 load_dotenv()
