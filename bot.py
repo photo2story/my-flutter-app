@@ -107,6 +107,10 @@ async def ticker(ctx, *, query: str = None):
 
 @bot.command()
 async def stock(ctx, *args):
+    if ctx.message.id in processed_message_ids:
+        return
+    processed_message_ids.add(ctx.message.id)
+
     stock_name = ' '.join(args)
     await ctx.send(f'Arguments passed by command: {stock_name}')
     try:
