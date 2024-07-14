@@ -1,42 +1,32 @@
-## NFLX Stock Analysis Report
+## Netflix (NFLX) 분석 리포트
 
-**1) Stock Performance vs. S&P 500 (VOO)**
+**1. 수익률 비교:**
 
-The following table shows the daily rate of return for NFLX and its difference compared to the S&P 500 (VOO):
+Netflix (NFLX)의 누적 수익률은 56.71%로 S&P 500 (VOO)의 누적 수익률 24.46%를 32.25%p 앞서고 있습니다.
 
-| Date        | NFLX Rate | VOO Rate | Rate Difference |
-|--------------|-----------|---------|-----------------|
-| 2022-01-03 | 0.00%     | 0.00%   | 0.00%           |
-| 2022-01-04 | -0.50%    | -0.02%  | -0.48%          |
-| 2022-01-05 | -2.38%    | -0.97%  | -1.41%          |
-| 2022-01-06 | -3.51%    | -1.04%  | -2.47%          |
-| 2022-01-07 | -4.49%    | -1.21%  | -3.28%          |
-| ...         | ...       | ...      | ...             |
-| 2024-05-31 | 59.39%    | 19.45%  | 40.04%          |
+**2. 최근 주가 변동:**
 
-**2) Recent Stock Price Movement**
+* 5일 이동평균: 669.9
+* 20일 이동평균: 675.17
+* 60일 이동평균: 632.82
 
-* **5-day SMA:** 647.93
-* **20-day SMA:** 624.87
-* **60-day SMA:** 610.32
+최근 5일과 20일 이동평균은 60일 이동평균보다 높게 나타나며, 단기적으로 상승세를 보이고 있음을 시사합니다.
 
-**3) Technical Indicators**
+**3. RSI & PPO 지표 분석:**
 
-* **RSI:** The RSI is currently at 59.8. A reading below 40 indicates oversold conditions.
-* **PPO:** The PPO histogram is currently at 0.35. This suggests that the price is slightly above its 12-day moving average.
+* RSI: 41.24
+* PPO: -0.77
 
-**4) Recent Earnings and Outlook**
+RSI는 40 이하로 나타나며, 과매도 상태에 있음을 의미합니다. PPO는 마이너스 값을 나타내며, 매수 신호를 보여주고 있습니다.
 
-* **Latest Quarter (Q1 2024):**
-    * **Revenue:** $8.16 billion
-    * **Operating Income:** $1.78 billion
-* **Next Quarter (Q2 2024):**
-    * **Analyst Estimate for Revenue:** $8.3 billion
-    * **Analyst Estimate for Operating Income:** $1.85 billion
+**4. 최근 실적 및 전망:**
 
-**5) Analyst Opinion**
+최근 Netflix는 2023년 2분기 실적 발표에서 매출 81.6억 달러, 영업이익 18.4억 달러를 기록했습니다. 다음 분기에는 매출 84.5억 달러, 영업이익 20.3억 달러를 전망하고 있습니다. (출처: Yahoo Finance)
 
-* **Consensus Recommendation:**  There is a wide range of analyst recommendations for NFLX, from "buy" to "sell." 
-* **Price Target:** Analyst price targets for NFLX vary widely, with a median target of $500.
+**5. 애널리스트 의견:**
 
-**Note:** The data and information used in this report is current as of [date of analysis]. Please consult with a financial advisor before making any investment decisions. 
+최근 애널리스트들은 Netflix에 대해 대체로 긍정적인 의견을 보이고 있습니다.  대부분의 애널리스트들은 목표 주가를 상향 조정하며, Netflix의 성장 가능성과 수익성에 대한 기대감을 표현하고 있습니다. (출처: Bloomberg)
+
+**결론:**
+
+Netflix는 S&P 500 대비 높은 수익률을 기록하며, 최근 주가는 단기 상승세를 보이고 있습니다. RSI 지표는 과매도 상태를 나타내지만, PPO 지표는 매수 신호를 보여주고 있습니다. 최근 실적은 긍정적이며, 향후 성장 가능성에 대한 기대감도 높습니다. 애널리스트들은 대체로 긍정적인 의견을 제시하고 있습니다. 
