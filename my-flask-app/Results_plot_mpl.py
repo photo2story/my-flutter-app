@@ -114,7 +114,7 @@ def plot_results_mpl(ticker,start_date, end_date):
 
     # 결과 메시지 전송
     message = f"Stock: {ticker} ({name})\n" \
-              f"Close 종가: {prices['Close'].iloc[-1]:,.2f}\n" \
+              f"Close: {prices['Close'].iloc[-1]:,.2f}\n" \
               f"SMA 20: {SMA20.iloc[-1]:,.2f}\n" \
               f"SMA 60: {SMA60.iloc[-1]:,.2f}\n" \
               f"PPO Histogram: {ppo_histogram.iloc[-1]:,.2f}\n" \
