@@ -20,7 +20,7 @@ from git_operations import move_files_to_images_folder
 env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
 load_dotenv(dotenv_path=env_path)
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='')
 CORS(app)
 
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
@@ -35,11 +35,11 @@ DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_from_directory('', 'index.html')
 
 @app.route('/<path:path>')
 def static_proxy(path):
-    return send_from_directory(app.static_folder, path)
+    return send_from_directory('', path)
 
 @app.route('/generate_description', methods=['POST'])
 def generate_description():
