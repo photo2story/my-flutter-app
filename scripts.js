@@ -76,7 +76,7 @@ $(function() {
                 const tickers = data
                     .filter(file => file.name.startsWith('comparison_') && file.name.endsWith('_VOO.png'))
                     .map(file => file.name.replace('comparison_', '').replace('_VOO.png', ''))
-                    .sort();
+                    .sort(); // 알파벳 순으로 정렬
 
                 tickerListContainer.empty();
 
@@ -104,12 +104,12 @@ $(function() {
     });
 
     stockInput.on('keypress', function(e) {
-        if (e.which === 13) {
+        if (e.which === 13) { // Enter key
             searchReviewButton.click();
             return false;
         }
     });
 
-    loadTickerList();
-    displaySearchedTickers();
+    loadTickerList(); // 페이지 로드 시 티커 목록 불러오기
+    displaySearchedTickers(); // 페이지 로드 시 검색된 티커 목록 불러오기
 });

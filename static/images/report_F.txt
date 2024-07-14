@@ -1,0 +1,9 @@
+I can help you with analyzing the provided data and generating a report, but I need more information about the stock ticker symbol. Please provide the ticker symbol of the stock you want to analyze. Once you provide the ticker, I can:
+
+1. **Calculate the stock's rate of return and compare it to the S&P 500.**
+2. **Analyze the stock's recent price movements using the 5-day, 20-day, and 60-day moving averages.**
+3. **Interpret the RSI and PPO index indicators.**
+4. **Provide a summary of the company's recent financial performance and future outlook based on web searches.**
+5. **Summarize analyst opinions based on web searches.**
+
+I'll then generate a comprehensive report in English incorporating all the information. 

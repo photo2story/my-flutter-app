@@ -1,4 +1,5 @@
 # gemini.py
+# gemini.py
 import os
 import pandas as pd
 import requests
@@ -6,7 +7,6 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import matplotlib.pyplot as plt
-from github_operations import save_csv_to_github
 
 # Load environment variables
 load_dotenv()
@@ -19,12 +19,12 @@ genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 def download_csv(ticker):
-    voo_url = f"{GITHUB_RAW_BASE_URL}/result_VOO_{ticker}.csv"
-    response_voo = requests.get(voo_url)
+    ticker_vs_voo_url = f"{GITHUB_RAW_BASE_URL}/result_VOO_{ticker}.csv"
+    response_ticker = requests.get(ticker_vs_voo_url)
 
-    if response_voo.status_code == 200:
+    if response_ticker.status_code == 200:
         with open(f'result_VOO_{ticker}.csv', 'wb') as f:
-            f.write(response_voo.content)
+            f.write(response_ticker.content)
         return True
     else:
         return False
@@ -61,31 +61,28 @@ def analyze_with_gemini(ticker):
         """
 
         # Gemini API 호출
-        response_voo = model.generate_content(prompt_voo)
+        response_ticker = model.generate_content(prompt_voo)
 
         # 리포트를 텍스트로 저장
-        report_text = response_voo.text
+        report_text = response_ticker.text
         print(report_text)
-
-        # 리포트 파일 경로
-        report_file = f'report_{ticker}.txt'
-        with open(report_file, 'w', encoding='utf-8') as file:
-            file.write(report_text)
-
-        # 로컬 파일을 static/images로 이동
-        destination_folder = os.path.join('static', 'images')
-        os.makedirs(destination_folder, exist_ok=True)
-        shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
-
-        # GitHub에 파일 저장
-        save_csv_to_github(f'static/images/{report_file}', report_file, f"Updated report for {ticker}")
 
         # 디스코드 웹훅 메시지로 전송
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
         print(success_message)
         response = requests.post(DISCORD_WEBHOOK_URL, data={'content': success_message})
-        
-        return f'Gemini Analysis for {ticker} (VOO) has been saved to Discord and GitHub.'
+
+        # 리포트를 텍스트 파일로 저장
+        report_file = f'report_{ticker}.txt'
+        with open(report_file, 'w', encoding='utf-8') as file:
+            file.write(report_text)
+
+        # 리포트를 static/images 폴더로 이동
+        destination_folder = os.path.join('static', 'images')
+        os.makedirs(destination_folder, exist_ok=True)
+        shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
+
+        return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord and saved as a text file.'
 
     except Exception as e:
         error_message = f"{ticker} 분석 중 오류 발생: {e}"
@@ -97,6 +94,7 @@ if __name__ == '__main__':
     ticker = 'AAPL'  # Example ticker
     report = analyze_with_gemini(ticker)
     print(report)
+
 
 
 """
