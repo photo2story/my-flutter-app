@@ -5,6 +5,7 @@ import requests
 from dotenv import load_dotenv
 import google.generativeai as genai
 from github_operations import save_csv_to_github
+import shutil
 
 # Load environment variables
 load_dotenv()
