@@ -119,7 +119,7 @@ def analyze_with_gemini(ticker):
         with open(report_file, 'w', encoding='utf-8') as file:
             file.write(report_text)
 
-        # 리포트를 static/images 폴더로 이동
+        # 리포트를 static/images 폴더로 이동 및 커밋
         destination_folder = os.path.join('static', 'images')
         os.makedirs(destination_folder, exist_ok=True)
         shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
@@ -137,6 +137,7 @@ if __name__ == '__main__':
     ticker = 'AAPL'  # Example ticker
     report = analyze_with_gemini(ticker)
     print(report)
+
 
 """
 source .venv/bin/activate
