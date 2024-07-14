@@ -5,7 +5,7 @@ $(function() {
     const tickerListContainer = $('#ticker-list');
     const searchedTickersContainer = $('#searched-tickers');
 
-    function fetchImages(stockTicker, clearReviewList = false) {
+    function fetchImagesAndReport(stockTicker) {
         const apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
 
         $.ajax({
@@ -15,32 +15,32 @@ $(function() {
             success: function(data) {
                 const comparisonFile = data.find(file => file.name === `comparison_${stockTicker}_VOO.png`);
                 const resultFile = data.find(file => file.name === `result_mpl_${stockTicker}.png`);
+                const reportFile = data.find(file => file.name === `result_${stockTicker}.report`);
 
-                if (clearReviewList) {
-                    reviewList.empty();
-                }
+                reviewList.empty();
 
-                if (comparisonFile && resultFile) {
+                if (comparisonFile && resultFile && reportFile) {
                     reviewList.append(`
                         <div class="review">
                             <h3>${stockTicker} vs VOO</h3>
-                            <div class="chart-container">
-                                <img src="${comparisonFile.download_url}" alt="${stockTicker} vs VOO" class="responsive-img">
-                            </div>
-                            <div class="chart-container" style="margin-top: 20px;">
-                                <img src="${resultFile.download_url}" alt="${stockTicker} Result" class="responsive-img">
-                            </div>
+                            <img src="${comparisonFile.download_url}" alt="${stockTicker} vs VOO" style="width: 100%;">
+                            <img src="${resultFile.download_url}" alt="${stockTicker} Result" style="width: 100%; margin-top: 20px;">
                         </div>
                     `);
-                    console.log(`Successfully fetched review for ${stockTicker}.`);
+
+                    // 리포트를 가져와서 표시
+                    $.get(reportFile.download_url, function(data) {
+                        reviewList.append(`<pre>${data}</pre>`);
+                    });
+                    alert(`Successfully fetched review for ${stockTicker}.`);
                 } else {
-                    console.log(`Unable to find images for the stock ticker ${stockTicker}.`);
+                    alert(`Unable to find images for the stock ticker ${stockTicker}.`);
                     saveSearchedTicker(stockTicker);
                     displaySearchedTickers();
                 }
             },
             error: function() {
-                console.log('Error occurred while fetching images.');
+                alert('Error occurred while fetching images.');
             }
         });
     }
@@ -86,16 +86,11 @@ $(function() {
                 $('.ticker-item').on('click', function() {
                     const stockTicker = $(this).text();
                     stockInput.val(stockTicker);
-                    fetchImages(stockTicker, true); // 특정 주식을 클릭했을 때 리뷰 목록 초기화
-                });
-
-                // 모든 검토된 주식을 초기화면에 표시
-                tickers.forEach(ticker => {
-                    fetchImages(ticker, false); // 모든 티커에 대해 reviewList를 비우지 않음
+                    fetchImagesAndReport(stockTicker);
                 });
             },
             error: function() {
-                console.log('Error occurred while loading ticker list.');
+                alert('Error occurred while loading ticker list.');
             }
         });
     }
@@ -103,7 +98,7 @@ $(function() {
     searchReviewButton.click(function() {
         const stockTicker = stockInput.val().toUpperCase();
         if (stockTicker) {
-            fetchImages(stockTicker, true); // 검색 시 리뷰 목록 초기화
+            fetchImagesAndReport(stockTicker);
         }
     });
 

@@ -7,19 +7,28 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <meta name="DISCORD_WEBHOOK_URL" content="https://your-discord-webhook-url"> <!-- 환경 변수 추가 -->
     <style>
         body {
-            padding-top: 200px; /* 상단 고정 부분을 위한 패딩 */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
         }
-        .fixed-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: white;
-            z-index: 1000;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 10px;
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        label {
+            font-size: 14px;
+        }
+        input[type="text"] {
+            padding: 5px;
+            font-size: 14px;
+        }
+        button {
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
         }
         .ticker-list {
             margin-top: 20px;
@@ -33,32 +42,35 @@
             font-size: 12px; /* 글씨 크기 줄이기 */
             line-height: 1.0; /* 줄 간격 줄이기 */
         }
-        .review {
+        #reviewList {
             margin-top: 20px;
         }
-        .chart-container {
-            width: 100%;
-            overflow-x: auto; /* 화면을 넘어가는 그래프를 스크롤 가능하도록 설정 */
-        }
-        .responsive-img {
-            max-width: 100%;
-            height: auto;
+        #report {
+            margin-top: 20px;
+            white-space: pre-wrap; /* 줄바꿈과 공백을 유지 */
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ccc;
         }
     </style>
 </head>
 <body>
-    <div class="fixed-header">
-        <h1>Stock Comparison Review</h1>
-        <label for="stockName">Stock name:</label>
-        <input type="text" id="stockName" name="stockName">
-        <button id="searchReviewButton">Search Review</button>
-        <div id="ticker-list" class="ticker-list"></div>
-    </div>
+    <h1>Stock Comparison Review</h1>
+    <label for="stockName">Stock name:</label>
+    <input type="text" id="stockName" name="stockName">
+    <button id="searchReviewButton">Search Review</button>
+    <div id="ticker-list" class="ticker-list"></div>
     <div id="reviewList"></div>
     <div id="searched-tickers" class="ticker-list">
-        <h2>검토한 주식</h2>
+        <h2>Searched Stocks</h2>
     </div>
-    <!-- 정적 파일 경로를 동적으로 생성하여 JavaScript 파일 로드 -->
-    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    <div id="report"></div> <!-- 리포트를 표시할 영역 추가 -->
+    <script>
+        // This script will set the variables for the Dart code to read
+        window.env = {
+            DISCORD_WEBHOOK_URL: document.querySelector('meta[name="DISCORD_WEBHOOK_URL"]').content,
+        };
+    </script>
+    <script src="scripts.js"></script>
 </body>
 </html>
