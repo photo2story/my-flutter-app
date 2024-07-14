@@ -53,13 +53,14 @@ def analyze_with_gemini(ticker):
 
         # Call the Gemini API
         response_voo = model.generate_content(prompt_voo)
-        print(response_voo)
+
 
         # Save the report to a file
         report_file = f'result_{ticker}.report'
         with open(report_file, 'w', encoding='utf-8') as file:
             file.write(response_voo.text)
-
+            
+        print(response_voo.text)
         # Move report file to static/images
         destination_folder = os.path.join('static', 'images')
         os.makedirs(destination_folder, exist_ok=True)
