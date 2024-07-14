@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 
 void main() {
   runApp(MyApp());
@@ -33,18 +34,26 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> _tickers = [];
   final TextEditingController _controller = TextEditingController();
 
-  // 환경 변수 직접 포함
-  final String apiUrl = 'http://192.168.0.5:5000/api/get_reviewed_tickers';
-  final String descriptionApiUrl = 'http://192.168.0.5:5000/generate_description';
-  final String executeCommandApiUrl = 'http://192.168.0.5:5000/execute_stock_command';
+  final String apiUrl = 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchReviewedTickers();
+  }
 
   Future<void> fetchReviewedTickers() async {
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
-        final List<dynamic> tickers = json.decode(response.body);
+        final List<dynamic> files = json.decode(response.body);
+        final tickers = files
+            .where((file) => file['name'].startsWith('comparison_') && file['name'].endsWith('_VOO.png'))
+            .map<String>((file) => file['name'].replaceAll('comparison_', '').replaceAll('_VOO.png', ''))
+            .toList();
+
         setState(() {
-          _tickers = List<String>.from(tickers);
+          _tickers = tickers;
         });
       } else {
         setState(() {
@@ -60,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> fetchImages(String stockTicker) async {
     try {
-      final response = await http.get(Uri.parse('https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images'));
+      final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
         final List<dynamic> files = json.decode(response.body);
         final comparisonFile = files.firstWhere(
@@ -76,77 +85,25 @@ class _MyHomePageState extends State<MyHomePage> {
             _resultImageUrl = resultFile['download_url'];
             _message = '';
           });
-          await generateDescription(stockTicker); // 그래프 설명 생성
         } else {
           setState(() {
             _comparisonImageUrl = '';
             _resultImageUrl = '';
-            _message = '해당 주식 티커에 대한 이미지를 찾을 수 없습니다';
+            _message = 'Unable to find images for the stock ticker $stockTicker';
           });
         }
       } else {
         setState(() {
           _comparisonImageUrl = '';
           _resultImageUrl = '';
-          _message = 'GitHub API 호출 실패: ${response.statusCode}';
+          _message = 'GitHub API call failed: ${response.statusCode}';
         });
       }
     } catch (e) {
       setState(() {
         _comparisonImageUrl = '';
         _resultImageUrl = '';
-        _message = '오류 발생: $e';
-      });
-    }
-  }
-
-  Future<void> generateDescription(String stockTicker) async {
-    try {
-      final response = await http.post(
-        Uri.parse(descriptionApiUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'stock_ticker': stockTicker}),
-      );
-
-      if (response.statusCode == 200) {
-        final responseBody = json.decode(response.body);
-        final description = responseBody['description'];
-        setState(() {
-          _description = description;
-        });
-      } else {
-        setState(() {
-          _description = '설명 생성 실패: ${response.statusCode}';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _description = '오류 발생: $e';
-      });
-    }
-  }
-
-  Future<void> executeStockCommand(String stockTicker) async {
-    try {
-      final response = await http.post(
-        Uri.parse(executeCommandApiUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'stock_ticker': stockTicker}),
-      );
-
-      if (response.statusCode == 200) {
-        final responseBody = json.decode(response.body);
-        setState(() {
-          _message = responseBody['message'];
-        });
-      } else {
-        setState(() {
-          _message = '명령 실행 실패: ${response.statusCode}';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _message = '오류 발생: $e';
+        _message = 'Error occurred: $e';
       });
     }
   }
@@ -158,12 +115,6 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context) => ImageScreen(imageUrl: imageUrl),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchReviewedTickers();
   }
 
   @override
@@ -199,9 +150,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  executeStockCommand(_controller.text.toUpperCase());
+                  fetchImages(_controller.text.toUpperCase());
                 },
-                child: Text('Test Stock'),
+                child: Text('Search Review'),
               ),
               SizedBox(height: 20),
               Container(
@@ -258,13 +209,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       style: TextStyle(fontSize: 16, color: Colors.red),
                     )
                   : Container(),
-              SizedBox(height: 20),
-              _description.isNotEmpty
-                  ? Text(
-                      _description,
-                      style: TextStyle(fontSize: 16, color: Colors.green),
-                    )
-                  : Container(),
             ],
           ),
         ),
@@ -295,6 +239,7 @@ class ImageScreen extends StatelessWidget {
     );
   }
 }
+
 
 // flutter devices
 

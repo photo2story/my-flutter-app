@@ -5,14 +5,16 @@ import requests
 from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
+import matplotlib.pyplot as plt
+from github_operations import save_file_to_github
 
-# 환경 변수 로드
+# Load environment variables
 load_dotenv()
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
 
-# Gemini API 구성
+# Configure the Gemini API
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
@@ -61,16 +63,29 @@ def analyze_with_gemini(ticker):
         # Gemini API 호출
         response_voo = model.generate_content(prompt_voo)
 
-        # 레포트를 텍스트로 저장
+        # 리포트를 텍스트로 저장
         report_text = response_voo.text
         print(report_text)
+
+        # 리포트 파일 경로
+        report_file = f'report_{ticker}.txt'
+        with open(report_file, 'w', encoding='utf-8') as file:
+            file.write(report_text)
+
+        # 로컬 파일을 static/images로 이동
+        destination_folder = os.path.join('static', 'images')
+        os.makedirs(destination_folder, exist_ok=True)
+        shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
+
+        # GitHub에 파일 저장
+        save_file_to_github(f'static/images/{report_file}', report_file, f"Updated report for {ticker}")
 
         # 디스코드 웹훅 메시지로 전송
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
         print(success_message)
         response = requests.post(DISCORD_WEBHOOK_URL, data={'content': success_message})
         
-        return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord.'
+        return f'Gemini Analysis for {ticker} (VOO) has been saved to Discord and GitHub.'
 
     except Exception as e:
         error_message = f"{ticker} 분석 중 오류 발생: {e}"
@@ -82,8 +97,6 @@ if __name__ == '__main__':
     ticker = 'AAPL'  # Example ticker
     report = analyze_with_gemini(ticker)
     print(report)
-
-
 
 
 """
