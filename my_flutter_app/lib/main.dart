@@ -70,63 +70,68 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> fetchImagesAndReport(String stockTicker) async {
-    try {
-      final response = await http.get(Uri.parse(apiUrl));
-      if (response.statusCode == 200) {
-        final List<dynamic> files = json.decode(response.body);
-        final comparisonFile = files.firstWhere(
-            (file) => file['name'] == 'comparison_${stockTicker}_VOO.png',
-            orElse: () => null);
-        final resultFile = files.firstWhere(
-            (file) => file['name'] == 'result_mpl_${stockTicker}.png',
-            orElse: () => null);
-        final reportFile = files.firstWhere(
-            (file) => file['name'] == 'report_${stockTicker}.txt',
-            orElse: () => null);
+      try {
+        final response = await http.get(Uri.parse(apiUrl));
+        if (response.statusCode == 200) {
+          final List<dynamic> files = json.decode(response.body);
+          final comparisonFile = files.firstWhere(
+              (file) => file['name'] == 'comparison_${stockTicker}_VOO.png',
+              orElse: () => null);
+          final resultFile = files.firstWhere(
+              (file) => file['name'] == 'result_mpl_${stockTicker}.png',
+              orElse: () => null);
+          final reportFile = files.firstWhere(
+              (file) => file['name'] == 'report_${stockTicker}.txt',
+              orElse: () => null);
 
-        if (comparisonFile != null && resultFile != null) {
-          setState(() {
-            _comparisonImageUrl = comparisonFile['download_url'];
-            _resultImageUrl = resultFile['download_url'];
-            _message = '';
-          });
-          if (reportFile != null) {
-            final reportResponse = await http.get(Uri.parse(reportFile['download_url']));
-            if (reportResponse.statusCode == 200) {
-              setState(() {
-                _reportText = reportResponse.body;
-              });
+          if (comparisonFile != null && resultFile != null) {
+            setState(() {
+              _comparisonImageUrl = comparisonFile['download_url'];
+              _resultImageUrl = resultFile['download_url'];
+              _message = '';
+            });
+            if (reportFile != null) {
+              final reportResponse = await http.get(Uri.parse(reportFile['download_url']));
+              if (reportResponse.statusCode == 200) {
+                setState(() {
+                  _reportText = reportResponse.body;
+                });
+              } else {
+                setState(() {
+                  _reportText = 'Failed to load report text';
+                });
+              }
             } else {
               setState(() {
-                _reportText = 'Failed to load report text';
+                _reportText = ''; // Clear the report text if no report is found
               });
             }
+          } else {
+            setState(() {
+              _comparisonImageUrl = '';
+              _resultImageUrl = '';
+              _reportText = ''; // Clear the report text if no images or report are found
+              _message = 'Unable to find images or report for the stock ticker $stockTicker';
+            });
           }
         } else {
           setState(() {
             _comparisonImageUrl = '';
             _resultImageUrl = '';
-            _reportText = '';
-            _message = 'Unable to find images or report for the stock ticker $stockTicker';
+            _reportText = ''; // Clear the report text on API call failure
+            _message = 'GitHub API call failed: ${response.statusCode}';
           });
         }
-      } else {
+      } catch (e) {
         setState(() {
           _comparisonImageUrl = '';
           _resultImageUrl = '';
-          _reportText = '';
-          _message = 'GitHub API call failed: ${response.statusCode}';
+          _reportText = ''; // Clear the report text on exception
+          _message = 'Error occurred: $e';
         });
       }
-    } catch (e) {
-      setState(() {
-        _comparisonImageUrl = '';
-        _resultImageUrl = '';
-        _reportText = '';
-        _message = 'Error occurred: $e';
-      });
     }
-  }
+
 
   void _openImage(BuildContext context, String imageUrl) {
     Navigator.push(
