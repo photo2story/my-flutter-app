@@ -4,8 +4,6 @@ import pandas as pd
 import requests
 from dotenv import load_dotenv
 import google.generativeai as genai
-import shutil
-import matplotlib.pyplot as plt
 from git_operations import move_files_to_images_folder
 
 # Load environment variables
@@ -47,17 +45,31 @@ def analyze_with_gemini(ticker):
         voo_file = f'result_VOO_{ticker}.csv'
         df_voo = pd.read_csv(voo_file)
 
-        # CSV 데이터를 문자열로 변환
-        voo_data_str = df_voo.to_csv(index=False)
+        # 누적수익률 추출
+        final_rate = df_voo['rate'].iloc[-1]
+        final_rate_vs = df_voo['rate_vs'].iloc[-1]
+        sma_5 = df_voo['sma05_ta'].iloc[-1]
+        sma_20 = df_voo['sma20_ta'].iloc[-1]
+        sma_60 = df_voo['sma60_ta'].iloc[-1]
+        rsi = df_voo['rsi_ta'].iloc[-1]
+        ppo = df_voo['ppo_histogram'].iloc[-1]
 
         # Gemini API 호출을 위한 프롬프트 준비
         prompt_voo = f"""
-        1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘_
-           (간단하게 자료 맨마지막날의 수익율차이)_
-            대상주식의 rate필드(누적수익률) 값과 기초지수인 S&P 500의 rate_vs 필드(VOO누적수익률)값으로 비교{ticker}:\n{voo_data_str}
+        1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘
+           (간단하게 자료 맨마지막날의 누적수익율차이)
+            리뷰할 주식티커명 = {ticker}
+            리뷰주식의 누적수익률 = {final_rate}
+            기준이 되는 비교주식(S&P 500, VOO)의 누적수익율 = {final_rate_vs}
+            {ticker}:\n{df_voo.to_csv(index=False)}
         2) 제공된 자료의 최근 주가 변동(간단하게: 5일, 20일, 60일 이동평균 수치로)
-        3) 제공된 자료의 RSI, PPO 인덱스 지표를 분석해줘 (간단하게: RSI 40 과매도)
-        4) 최근 실적 및 전망(웹검색해서 간단하게: 최근 매출,영업이익, 다음분기 전망 매출, 영업이익)
+           5일 이동평균 = {sma_5}
+           20일 이동평균 = {sma_20}
+           60일 이동평균 = {sma_60}
+        3) 제공된 자료의 RSI, PPO 인덱스 지표를 분석해줘 (간단하게)
+           RSI = {rsi}
+           PPO = {ppo}
+        4) 최근 실적 및 전망(웹검색해서 간단하게: 최근 매출, 영업이익, 다음분기 전망 매출, 영업이익)
         5) 애널리스트 의견(웹검색해서 간단하게: 추천의견..)
         6) 레포트는 ["candidates"][0]["content"]["parts"][0]["text"]의 구조의 텍스트로 만들어줘
         7) 레포트는 한글로 만들어줘
@@ -68,7 +80,6 @@ def analyze_with_gemini(ticker):
 
         # 리포트를 텍스트로 저장
         report_text = response_ticker.text        
-        # report_text = response_ticker.result["candidates"][0]["content"]["parts"][0]["text"]
         print(report_text)
 
         # 디스코드 웹훅 메시지로 전송
@@ -82,9 +93,9 @@ def analyze_with_gemini(ticker):
             file.write(report_text)
 
         # 리포트를 static/images 폴더로 이동
-        # destination_folder = os.path.join('static', 'images')
-        # os.makedirs(destination_folder, exist_ok=True)
-        # shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
+        destination_folder = os.path.join('static', 'images')
+        os.makedirs(destination_folder, exist_ok=True)
+        shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
         move_files_to_images_folder()
 
         return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord and saved as a text file.'
@@ -99,8 +110,6 @@ if __name__ == '__main__':
     ticker = 'AAPL'  # Example ticker
     report = analyze_with_gemini(ticker)
     print(report)
-
-
 
 
 """
