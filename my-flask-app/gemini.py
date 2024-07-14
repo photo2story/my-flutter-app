@@ -82,8 +82,8 @@ def analyze_with_gemini(ticker):
             file.write(report_text)
 
         # 리포트를 static/images 폴더로 이동
-        destination_folder = os.path.join('static', 'images')
-        os.makedirs(destination_folder, exist_ok=True)
+        # destination_folder = os.path.join('static', 'images')
+        # os.makedirs(destination_folder, exist_ok=True)
         # shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
         move_files_to_images_folder()
 
