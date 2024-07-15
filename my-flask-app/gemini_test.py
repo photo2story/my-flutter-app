@@ -1,4 +1,6 @@
 import asyncio
+import time
+import sys
 from gemini import analyze_with_gemini
 
 STOCKS = [
@@ -14,14 +16,24 @@ STOCKS = [
     'SOXL', 'UPRO'
 ]
 
+def print_progress_bar(seconds):
+    total_ticks = 30
+    interval = seconds / total_ticks
+    for i in range(total_ticks + 1):
+        bar = '[' + '>' * i + ' ' * (total_ticks - i) + ']'
+        sys.stdout.write(f'\rWaiting {seconds} seconds: {bar}')
+        sys.stdout.flush()
+        time.sleep(interval)
+    print()
+
 async def analyze_stocks():
     for ticker in STOCKS:
         print(f"Analyzing {ticker}")
         result = analyze_with_gemini(ticker)
         print(result)
-        await asyncio.sleep(300)  # 5분 대기
+        print_progress_bar(100)  # 100초 대기
 
 if __name__ == "__main__":
     asyncio.run(analyze_stocks())
-    
+
 # python gemini_test.py    
