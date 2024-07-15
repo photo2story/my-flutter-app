@@ -31,9 +31,9 @@ async def analyze_stocks():
         print(f"Analyzing {ticker}")
         result = analyze_with_gemini(ticker)
         print(result)
-        print_progress_bar(100)  # 100초 대기
+        print_progress_bar(20)  # 20초 대기
 
 if __name__ == "__main__":
     asyncio.run(analyze_stocks())
 
-# python gemini_test.py    
+# python gemini_test.py  
