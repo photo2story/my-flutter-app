@@ -13,17 +13,18 @@ import config  # config.py 임포트
 os.environ['SSL_CERT_FILE'] = certifi.where()
 
 # Add my-flask-app directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flask-app')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flutter-app')))
 
 # 사용자 정의 모듈 임포트
 from git_operations import move_files_to_images_folder
+from gemini import analyze_with_gemini
 from get_ticker import load_tickers, search_tickers_and_respond, get_ticker_name, update_stock_market_csv, get_ticker_from_korean_name
 from estimate_stock import estimate_stock
 from Results_plot import plot_results_all
 from Results_plot_mpl import plot_results_mpl
 from github_operations import ticker_path
 from backtest_send import backtest_and_send
-from get_ticker  import is_valid_stock
+from get_ticker import is_valid_stock
 
 # get_account_balance 모듈 임포트
 from get_account_balance import get_balance, get_ticker_price, get_market_from_ticker
@@ -43,16 +44,6 @@ H_ACCOUNT = os.getenv('H_ACCOUNT')
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='', intents=intents)
-
-processed_message_ids = set()
-
-def check_duplicate_message():
-    async def predicate(ctx):
-        if ctx.message.id in processed_message_ids:
-            return False
-        processed_message_ids.add(ctx.message.id)
-        return True
-    return commands.check(predicate)
 
 bot_started = False
 
@@ -77,33 +68,58 @@ async def send_msg():
     else:
         print(f"Failed to find channel with ID: {CHANNEL_ID}")
 
+processed_message_ids = set()
+
+def check_duplicate_message():
+    async def predicate(ctx):
+        if ctx.message.id in processed_message_ids:
+            return False
+        processed_message_ids.add(ctx.message.id)
+        return True
+    return commands.check(predicate)
+
 @bot.command(name='buddy')
 @check_duplicate_message()
 async def buddy(ctx):
     loop = asyncio.get_running_loop()
 
-    for stock in config.STOCKS:
-        await backtest_and_send(ctx, stock, 'modified_monthly', bot)
-        if is_valid_stock(stock):
-            try:
-                plot_results_mpl(stock, config.START_DATE, config.END_DATE)
-            except KeyError as e:
-                await ctx.send(f"An error occurred while plotting {stock}: {e}")
-                print(f"Error plotting {stock}: {e}")
-        await asyncio.sleep(2)
+    async def analyze_tickers():
+        for stock in config.STOCKS:
+            await ctx.send(f'Running backtest_and_send for {stock}')
+            await backtest_and_send(ctx, stock, 'modified_monthly', bot)
+            if is_valid_stock(stock):
+                try:
+                    plot_results_mpl(stock, config.START_DATE, config.END_DATE)
+                except KeyError as e:
+                    await ctx.send(f"An error occurred while plotting {stock}: {e}")
+                    print(f"Error plotting {stock}: {e}")
+            await asyncio.sleep(2)
 
-    print("Updating stock market CSV...")
-    await loop.run_in_executor(None, update_stock_market_csv, ticker_path, config.STOCKS)
-    
-    print("Loading sector info...")
-    sector_dict = await loop.run_in_executor(None, load_sector_info)
-    
-    print("Merging CSV files...")
-    path = '.'
-    await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
+        print("Updating stock market CSV...")
+        await loop.run_in_executor(None, update_stock_market_csv, ticker_path, config.STOCKS)
+        
+        print("Loading sector info...")
+        sector_dict = await loop.run_in_executor(None, load_sector_info)
+        
+        print("Merging CSV files...")
+        path = '.'
+        await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
 
-    await ctx.send("백테스팅 결과가 섹터별로 정리되었습니다.")
-    move_files_to_images_folder()
+        await ctx.send("백테스팅 결과가 섹터별로 정리되었습니다.")
+        move_files_to_images_folder()
+
+    async def analyze_with_gemini_tickers():
+        for stock in config.STOCKS:
+            await ctx.send(f'Running gemini analysis for {stock}')
+            report = analyze_with_gemini(stock)
+            await ctx.send(report)
+            await asyncio.sleep(600)  # 10분 대기
+
+    # 기존 작업을 실행
+    asyncio.create_task(analyze_tickers())
+    
+    # 10분 간격으로 gemini 분석을 실행
+    asyncio.create_task(analyze_with_gemini_tickers())
 
 @bot.command(name='ticker')
 @check_duplicate_message()
