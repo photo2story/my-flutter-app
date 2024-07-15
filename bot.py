@@ -96,6 +96,12 @@ async def buddy(ctx):
     await ctx.send("백테스팅 결과가 섹터별로 정리되었습니다.")
     move_files_to_images_folder()
 
+    for stock in config.STOCKS:
+        result = analyze_with_gemini(stock)
+        await ctx.send(result)
+        await asyncio.sleep(10)
+    move_files_to_images_folder()
+
 @bot.command()
 async def ticker(ctx, *, query: str = None):
     print(f'Command received: ticker with query: {query}')
@@ -187,7 +193,6 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
-
 
 
 #  .\.venv\Scripts\activate
