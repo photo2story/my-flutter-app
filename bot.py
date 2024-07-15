@@ -13,11 +13,10 @@ import config  # config.py 임포트
 os.environ['SSL_CERT_FILE'] = certifi.where()
 
 # Add my-flask-app directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flutter-app')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flask-app')))
 
 # 사용자 정의 모듈 임포트
 from git_operations import move_files_to_images_folder
-from gemini import analyze_with_gemini
 from get_ticker import load_tickers, search_tickers_and_respond, get_ticker_name, update_stock_market_csv, get_ticker_from_korean_name
 from estimate_stock import estimate_stock
 from Results_plot import plot_results_all
@@ -70,59 +69,34 @@ async def send_msg():
 
 processed_message_ids = set()
 
-def check_duplicate_message():
-    async def predicate(ctx):
-        if ctx.message.id in processed_message_ids:
-            return False
-        processed_message_ids.add(ctx.message.id)
-        return True
-    return commands.check(predicate)
-
-@bot.command(name='buddy')
-@check_duplicate_message()
+@bot.command()
 async def buddy(ctx):
     loop = asyncio.get_running_loop()
 
-    async def analyze_tickers():
-        for stock in config.STOCKS:
-            await ctx.send(f'Running backtest_and_send for {stock}')
-            await backtest_and_send(ctx, stock, 'modified_monthly', bot)
-            if is_valid_stock(stock):
-                try:
-                    plot_results_mpl(stock, config.START_DATE, config.END_DATE)
-                except KeyError as e:
-                    await ctx.send(f"An error occurred while plotting {stock}: {e}")
-                    print(f"Error plotting {stock}: {e}")
-            await asyncio.sleep(2)
+    for stock in config.STOCKS:
+        await backtest_and_send(ctx, stock, 'modified_monthly', bot)
+        if is_valid_stock(stock):
+            try:
+                plot_results_mpl(stock, config.START_DATE, config.END_DATE)
+            except KeyError as e:
+                await ctx.send(f"An error occurred while plotting {stock}: {e}")
+                print(f"Error plotting {stock}: {e}")
+        await asyncio.sleep(2)
 
-        print("Updating stock market CSV...")
-        await loop.run_in_executor(None, update_stock_market_csv, ticker_path, config.STOCKS)
-        
-        print("Loading sector info...")
-        sector_dict = await loop.run_in_executor(None, load_sector_info)
-        
-        print("Merging CSV files...")
-        path = '.'
-        await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
-
-        await ctx.send("백테스팅 결과가 섹터별로 정리되었습니다.")
-        move_files_to_images_folder()
-
-    async def analyze_with_gemini_tickers():
-        for stock in config.STOCKS:
-            await ctx.send(f'Running gemini analysis for {stock}')
-            report = analyze_with_gemini(stock)
-            await ctx.send(report)
-            await asyncio.sleep(600)  # 10분 대기
-
-    # 기존 작업을 실행
-    asyncio.create_task(analyze_tickers())
+    print("Updating stock market CSV...")
+    await loop.run_in_executor(None, update_stock_market_csv, ticker_path, config.STOCKS)
     
-    # 10분 간격으로 gemini 분석을 실행
-    asyncio.create_task(analyze_with_gemini_tickers())
+    print("Loading sector info...")
+    sector_dict = await loop.run_in_executor(None, load_sector_info)
+    
+    print("Merging CSV files...")
+    path = '.'
+    await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
 
-@bot.command(name='ticker')
-@check_duplicate_message()
+    await ctx.send("백테스팅 결과가 섹터별로 정리되었습니다.")
+    move_files_to_images_folder()
+
+@bot.command()
 async def ticker(ctx, *, query: str = None):
     print(f'Command received: ticker with query: {query}')
     if query is None:
@@ -131,8 +105,7 @@ async def ticker(ctx, *, query: str = None):
 
     await search_tickers_and_respond(ctx, query)
 
-@bot.command(name='stock')
-@check_duplicate_message()
+@bot.command()
 async def stock(ctx, *args):
     stock_name = ' '.join(args)
     await ctx.send(f'Arguments passed by command: {stock_name}')
@@ -159,8 +132,7 @@ async def stock(ctx, *args):
         await ctx.send(f'An error occurred: {e}')
         print(f'Error processing {info_stock}: {e}')
 
-@bot.command(name='show_all')
-@check_duplicate_message()
+@bot.command()
 async def show_all(ctx):
     try:
         await plot_results_all()
@@ -169,14 +141,14 @@ async def show_all(ctx):
         await ctx.send(f"An error occurred: {e}")
         print(f"Error: {e}")
 
-@bot.command(name='ping')
-@check_duplicate_message()
+@bot.command()
 async def ping(ctx):
-    await ctx.send(f'pong: {bot.user.name}')
-    print(f'Ping command received and responded with pong.')
+    if ctx.message.id not in processed_message_ids:
+        processed_message_ids.add(ctx.message.id)
+        await ctx.send(f'pong: {bot.user.name}')
+        print(f'Ping command received and responded with pong.')
 
-@bot.command(name='account')
-@check_duplicate_message()
+@bot.command()
 async def account(ctx, ticker: str):
     try:
         ticker = ticker.upper()  # 티커를 대문자로 변환
@@ -188,8 +160,7 @@ async def account(ctx, ticker: str):
         await ctx.send(f'An error occurred: {e}')
         print(f'Error processing account for {ticker}: {e}')
 
-@bot.command(name='gemini')
-@check_duplicate_message()
+@bot.command()
 async def gemini(ctx, ticker: str):
     try:
         ticker = ticker.upper()  # 티커를 대문자로 변환
@@ -216,6 +187,7 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
 
 
 #  .\.venv\Scripts\activate
