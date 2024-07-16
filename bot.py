@@ -88,7 +88,7 @@ async def stock(ctx, query: str):
             except KeyError as e:
                 await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
                 print(f"Error plotting {stock_name}: {e}")
-        await asyncio.sleep(2)
+        await asyncio.sleep(10)
 
         # Gemini 분석
         result = analyze_with_gemini(stock_name)
