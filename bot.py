@@ -85,6 +85,12 @@ async def buddy(ctx):
                     await ctx.send(f"An error occurred while plotting {stock}: {e}")
                     print(f"Error plotting {stock}: {e}")
             await asyncio.sleep(2)
+            
+            move_files_to_images_folder()
+
+            result = analyze_with_gemini(stock)
+            await ctx.send(result)
+            await asyncio.sleep(10)
 
         print("Updating stock market CSV...")
         await loop.run_in_executor(None, update_stock_market_csv, ticker_path, [s['ticker'] if isinstance(s, dict) else s for s in stocks])
@@ -97,14 +103,6 @@ async def buddy(ctx):
         await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
 
         await ctx.send(f"백테스팅 결과가 섹터별로 정리되었습니다.")
-
-        for stock_data in stocks:
-            stock = stock_data['ticker'] if isinstance(stock_data, dict) else stock_data
-            result = analyze_with_gemini(stock)
-            await ctx.send(result)
-            await asyncio.sleep(10)
-
-    move_files_to_images_folder()
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
@@ -197,6 +195,7 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
 
 
 
