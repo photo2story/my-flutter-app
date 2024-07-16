@@ -20,18 +20,25 @@ CSV_URL = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my
 GITHUB_API_URL = os.getenv('GITHUB_API_URL', 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images')
 
 # Stocks list
-STOCKS = [
-    'AAPL', 'MSFT', 'AMZN', 
-    'FB', 'GOOG', 'GOOGL', 
-    'BRK.B', 'JNJ', 'V', 'PG', 'NVDA', 'UNH', 'HD', 'MA', 
-    'PYPL', 'DIS', 'NFLX', 'XOM', 'VZ', 'PFE', 'T', 'KO', 'ABT', 'MRK', 'CSCO', 'ADBE', 'CMCSA', 'NKE', 
-    'INTC', 'PEP', 'TMO', 'CVX', 'ORCL', 'ABBV', 'AVGO', 'MCD', 'QCOM', 'MDT', 'BMY', 'AMGN', 'UPS', 'CRM', 
-    'MS', 'HON', 'C', 'GILD', 'DHR', 'BA', 'IBM', 'MMM', 'TSLA', 'TXN', 'SBUX', 'COST', 'AMD', 'TMUS', 
-    'CHTR', 'INTU', 'ADP', 'MU', 'MDLZ', 'ISRG', 'BKNG', 'ADI', 'ATVI', 'LRCX', 'AMAT', 'REGN', 'NXPI', 
-    'KDP', 'MAR', 'KLAC', 'WMT', 'JPM','SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'VFH',
-    'QQQ', 'TQQQ', 'SOXX', 
-    'SOXL', 'UPRO'
-]
+STOCKS = {
+    'Technology': [
+        'AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA', 'ADBE', 'CSCO', 'INTC', 'ORCL', 
+        'AVGO', 'QCOM', 'IBM', 'AMD', 'ATVI', 'LRCX', 'AMAT', 'NXPI', 'KLAC', 'INTU', 
+        'ADP', 'MU'
+    ],
+    'Financials': ['BRK.B', 'V', 'MA', 'PYPL', 'JPM', 'MS', 'C', 'VFH'],
+    'Consumer Cyclical': ['TSLA', 'HD', 'DIS', 'NFLX', 'SBUX','PEP', 'KO', 'NKE'],
+    'Healthcare': ['LLY','JNJ', 'UNH', 'PFE', 'AMGN'],
+    'Communication Services': ['META', 'VZ', 'T', 'TMUS', 'CHTR'],
+    'Industrials': ['GE', 'CAT', 'BA', 'UPS', 'MMM', 'TXN'],
+    'Consumer Defensive': ['WMT', 'PG', 'COST'],
+    'Energy': ['XOM', 'CVX', 'COP','NEP', 'FSLR'],
+    'Basic Materials': ['LIN', 'SCCO', 'SHW', 'ALB'],
+    'Real Estate': ['AMT', 'PLD', 'EQIX'], 
+    'Utilities': ['NEE', 'DUK', 'SO'],
+    'ETFs': ['SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO']
+}
+
 
 # Stock market CSV path
 STOCK_MARKET_CSV_PATH = os.getenv('STOCK_MARKET_CSV_PATH', 'path/to/stock_market.csv')
