@@ -73,33 +73,37 @@ processed_message_ids = set()
 async def buddy(ctx):
     loop = asyncio.get_running_loop()
 
-    for stock in config.STOCKS:
-        await backtest_and_send(ctx, stock, 'modified_monthly', bot)
-        if is_valid_stock(stock):
-            try:
-                plot_results_mpl(stock, config.START_DATE, config.END_DATE)
-            except KeyError as e:
-                await ctx.send(f"An error occurred while plotting {stock}: {e}")
-                print(f"Error plotting {stock}: {e}")
-        await asyncio.sleep(2)
+    for sector, stocks in config.STOCKS.items():
+        await ctx.send(f'Processing sector: {sector}')
+        for stock_data in stocks:
+            stock = stock_data['ticker'] if isinstance(stock_data, dict) else stock_data
+            await backtest_and_send(ctx, stock, 'modified_monthly', bot)
+            if is_valid_stock(stock):
+                try:
+                    plot_results_mpl(stock, config.START_DATE, config.END_DATE)
+                except KeyError as e:
+                    await ctx.send(f"An error occurred while plotting {stock}: {e}")
+                    print(f"Error plotting {stock}: {e}")
+            await asyncio.sleep(2)
 
-    print("Updating stock market CSV...")
-    await loop.run_in_executor(None, update_stock_market_csv, ticker_path, config.STOCKS)
-    
-    print("Loading sector info...")
-    sector_dict = await loop.run_in_executor(None, load_sector_info)
-    
-    print("Merging CSV files...")
-    path = '.'
-    await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
+        print("Updating stock market CSV...")
+        await loop.run_in_executor(None, update_stock_market_csv, ticker_path, [s['ticker'] if isinstance(s, dict) else s for s in stocks])
+        
+        print("Loading sector info...")
+        sector_dict = await loop.run_in_executor(None, load_sector_info)
+        
+        print("Merging CSV files...")
+        path = '.'
+        await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
 
-    await ctx.send("백테스팅 결과가 섹터별로 정리되었습니다.")
-    move_files_to_images_folder()
+        await ctx.send(f"백테스팅 결과가 섹터별로 정리되었습니다.")
 
-    for stock in config.STOCKS:
-        result = analyze_with_gemini(stock)
-        await ctx.send(result)
-        await asyncio.sleep(10)
+        for stock_data in stocks:
+            stock = stock_data['ticker'] if isinstance(stock_data, dict) else stock_data
+            result = analyze_with_gemini(stock)
+            await ctx.send(result)
+            await asyncio.sleep(10)
+
     move_files_to_images_folder()
 
 @bot.command()
@@ -193,6 +197,7 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
 
 
 #  .\.venv\Scripts\activate
