@@ -1,25 +1,23 @@
 # gemini.py
-import os,sys
+import os, sys
 import pandas as pd
 import requests
 from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
-import matplotlib.pyplot as plt
 import threading
 
-# from googleapiclient.discovery import build
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from git_operations import move_files_to_images_folder
-# Load environment variables
+
+# 환경 변수 로드
 load_dotenv()
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
-# GOOGLE_CSE_ID = os.getenv('GOOGLE_CSE_ID')
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
 
-# Configure the Gemini API
+# Gemini API 구성
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
@@ -33,6 +31,10 @@ def download_csv(ticker):
         return True
     else:
         return False
+
+def create_google_search_link(stock):
+    base_url = "https://www.google.com/search?q=인베스팅+"
+    return f"{base_url}{stock}"
 
 def analyze_with_gemini(ticker):
     try:
@@ -63,9 +65,8 @@ def analyze_with_gemini(ticker):
 
         # 프롬프트 준비
         prompt_voo = f"""
-        
         1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
-           리뷰할 주식티커명 = {ticker} 
+           리뷰할 주식티커명 = {ticker}
            회사이름과 회사 개요(1줄로)
            리뷰주식의 누적수익률 = {final_rate}
            기준이 되는 비교주식(S&P 500, VOO)의 누적수익율 = {final_rate_vs}
@@ -86,7 +87,9 @@ def analyze_with_gemini(ticker):
         response_ticker = model.generate_content(prompt_voo)
 
         # 리포트를 텍스트로 저장
-        report_text = response_ticker.text        
+        report_text = response_ticker.text
+        google_search_link = create_google_search_link(ticker)
+        report_text += f"\nGoogle Search Link: {google_search_link}"
         print(report_text)
 
         # 디스코드 웹훅 메시지로 전송
@@ -100,9 +103,6 @@ def analyze_with_gemini(ticker):
             file.write(report_text)
 
         # 리포트를 static/images 폴더로 이동 및 커밋
-        # destination_folder = os.path.join('static', 'images')
-        # os.makedirs(destination_folder, exist_ok=True)
-        # shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
         move_files_to_images_folder()
 
         return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord and saved as a text file.'
@@ -121,34 +121,8 @@ if __name__ == '__main__':
     # 봇 실행
     asyncio.run(run_bot())
 
-### `gemini_test.py` 파일
 
-# 다음은 `STOCKS` 리스트에 있는 티커명을 10분 간격으로 하나씩 검토하는 테스트 코드입니다.
 
-# ```python
-import asyncio
-# from gemini import analyze_with_gemini, STOCKS
-STOCKS = [
-    'AAPL', 'MSFT', 'AMZN', 
-    'FB', 'GOOG', 'GOOGL', 
-    'BRK.B', 'JNJ', 'V', 'PG', 'NVDA', 'UNH', 'HD', 'MA', 
-    'PYPL', 'DIS', 'NFLX', 'XOM', 'VZ', 'PFE', 'T', 'KO', 'ABT', 'MRK', 'CSCO', 'ADBE', 'CMCSA', 'NKE', 
-    'INTC', 'PEP', 'TMO', 'CVX', 'ORCL', 'ABBV', 'AVGO', 'MCD', 'QCOM', 'MDT', 'BMY', 'AMGN', 'UPS', 'CRM', 
-    'MS', 'HON', 'C', 'GILD', 'DHR', 'BA', 'IBM', 'MMM', 'TSLA', 'TXN', 'SBUX', 'COST', 'AMD', 'TMUS', 
-    'CHTR', 'INTU', 'ADP', 'MU', 'MDLZ', 'ISRG', 'BKNG', 'ADI', 'ATVI', 'LRCX', 'AMAT', 'REGN', 'NXPI', 
-    'KDP', 'MAR', 'KLAC', 'WMT', 'JPM','SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'VFH',
-    'QQQ', 'TQQQ', 'SOXX', 
-    'SOXL', 'UPRO'
-]
-async def analyze_stocks():
-    for ticker in STOCKS:
-        print(f"Analyzing {ticker}")
-        result = analyze_with_gemini(ticker)
-        print(result)
-        await asyncio.sleep(300)  # 10분 대기
-
-if __name__ == "__main__":
-    asyncio.run(analyze_stocks())
 """
 source .venv/bin/activate
 python gemini.py    

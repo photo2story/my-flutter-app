@@ -1,6 +1,5 @@
 # bot.py
 import os
-import os
 import sys
 import asyncio
 from dotenv import load_dotenv
@@ -17,7 +16,7 @@ os.environ['SSL_CERT_FILE'] = certifi.where()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flask-app')))
 
 # 사용자 정의 모듈 임포트
-from git_operations import move_files_to_images_folder, fetch_csv_data
+from git_operations import move_files_to_images_folder
 from get_ticker import load_tickers, search_tickers_and_respond, get_ticker_name, update_stock_market_csv, get_ticker_from_korean_name
 from estimate_stock import estimate_stock
 from Results_plot import plot_results_all
@@ -25,13 +24,11 @@ from Results_plot_mpl import plot_results_mpl
 from github_operations import ticker_path
 from backtest_send import backtest_and_send
 from get_ticker import is_valid_stock
+from gemini import analyze_with_gemini
 
 # get_account_balance 모듈 임포트
 from get_account_balance import get_balance, get_ticker_price, get_market_from_ticker
 from get_compare_stock_data import load_sector_info, merge_csv_files
-
-# gemini 모듈 임포트
-from gemini import analyze_with_gemini
 
 load_dotenv()
 
@@ -72,43 +69,37 @@ processed_message_ids = set()
 
 @bot.command()
 async def buddy(ctx):
-    loop = asyncio.get_running_loop()
-
     for sector, stocks in config.STOCKS.items():
         await ctx.send(f'Processing sector: {sector}')
-        for stock_data in stocks:
-            stock = stock_data['ticker'] if isinstance(stock_data, dict) else stock_data
-            
-            # 백테스팅 및 결과 플로팅
-            await backtest_and_send(ctx, stock, 'modified_monthly', bot)
-            if is_valid_stock(stock):
-                try:
-                    plot_results_mpl(stock, config.START_DATE, config.END_DATE)
-                except KeyError as e:
-                    await ctx.send(f"An error occurred while plotting {stock}: {e}")
-                    print(f"Error plotting {stock}: {e}")
-            await asyncio.sleep(2)
+        for stock in stocks:
+            await ctx.invoke(bot.get_command("stock"), query=stock)
+            await asyncio.sleep(10)  # 각 호출 간에 10초 대기
 
-            # 파일 이동
-            move_files_to_images_folder()
-            
-            # Gemini 분석
-            result = analyze_with_gemini(stock)
-            await ctx.send(result)
-            await asyncio.sleep(10)
+@bot.command()
+async def stock(ctx, query: str):
+    stock_name = query.upper()
+    await ctx.send(f'Processing stock: {stock_name}')
+    try:
+        # 백테스팅 및 결과 플로팅
+        await backtest_and_send(ctx, stock_name, 'modified_monthly', bot)
+        if is_valid_stock(stock_name):
+            try:
+                plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
+            except KeyError as e:
+                await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
+                print(f"Error plotting {stock_name}: {e}")
+        await asyncio.sleep(2)
 
-    print("Updating stock market CSV...")
-    await loop.run_in_executor(None, update_stock_market_csv, ticker_path, [s['ticker'] if isinstance(s, dict) else s for s in stocks])
-    
-    print("Loading sector info...")
-    sector_dict = await loop.run_in_executor(None, load_sector_info)
-    
-    print("Merging CSV files...")
-    path = '.'
-    await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
+        # 파일 이동
+        move_files_to_images_folder()
 
-    await ctx.send(f"백테스팅 결과가 섹터별로 정리되었습니다.")
-    move_files_to_images_folder()
+        # Gemini 분석
+        result = analyze_with_gemini(stock_name)
+        await ctx.send(result)
+        
+    except Exception as e:
+        await ctx.send(f'An error occurred while processing {stock_name}: {e}')
+        print(f'Error processing {stock_name}: {e}')
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
@@ -118,33 +109,6 @@ async def ticker(ctx, *, query: str = None):
         return
 
     await search_tickers_and_respond(ctx, query)
-
-@bot.command()
-async def stock(ctx, *args):
-    stock_name = ' '.join(args)
-    await ctx.send(f'Arguments passed by command: {stock_name}')
-    try:
-        info_stock = str(stock_name).upper()
-        if info_stock.startswith('K '):
-            korean_stock_name = info_stock[2:].upper()
-            korean_stock_code = get_ticker_from_korean_name(korean_stock_name)
-            if korean_stock_code is None:
-                await ctx.send(f'Cannot find the stock {korean_stock_name}.')
-                return
-            else:
-                info_stock = korean_stock_code
-
-        await ctx.send(f'Running backtest_and_send for {info_stock}')
-        await backtest_and_send(ctx, info_stock, option_strategy='1', bot=bot)
-        
-        await ctx.send(f'Plotting results for {info_stock}')
-        plot_results_mpl(info_stock, config.START_DATE, config.END_DATE)
-        move_files_to_images_folder()
-        await ctx.send(f'Successfully processed {info_stock}')
-        
-    except Exception as e:
-        await ctx.send(f'An error occurred: {e}')
-        print(f'Error processing {info_stock}: {e}')
 
 @bot.command()
 async def show_all(ctx):
@@ -201,6 +165,7 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
 
 
 
