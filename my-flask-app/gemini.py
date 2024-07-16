@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import threading
+from bs4 import BeautifulSoup
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -32,9 +33,19 @@ def download_csv(ticker):
     else:
         return False
 
-def create_google_search_link(stock):
-    base_url = "https://www.google.com/search?q=인베스팅+"
-    return f"{base_url}{stock}"
+def get_first_google_search_link(stock):
+    query = f"인베스팅 {stock}"
+    url = f"https://www.google.com/search?q={query}"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+        first_link = soup.find('a')['href']
+        return first_link
+    return "No link found"
 
 def analyze_with_gemini(ticker):
     try:
@@ -88,7 +99,7 @@ def analyze_with_gemini(ticker):
 
         # 리포트를 텍스트로 저장
         report_text = response_ticker.text
-        google_search_link = create_google_search_link(ticker)
+        google_search_link = get_first_google_search_link(ticker)
         report_text += f"\nGoogle Search Link: {google_search_link}"
         print(report_text)
 
@@ -120,6 +131,7 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
 
 
 
