@@ -30,7 +30,7 @@ STOCKS = {
     'Consumer Defensive': ['WMT', 'PG'],
     'Energy': ['XOM', 'FSLR'],
     'Basic Materials': ['LIN','ALB'],
-    'Real Estate': ['AMT',], 
+    'Real Estate': ['AMT'], 
     'Utilities': ['NEE', 'DUK']
     # 'ETFs': ['SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO']
 }

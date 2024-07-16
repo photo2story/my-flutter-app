@@ -78,6 +78,8 @@ async def buddy(ctx):
         await ctx.send(f'Processing sector: {sector}')
         for stock_data in stocks:
             stock = stock_data['ticker'] if isinstance(stock_data, dict) else stock_data
+            
+            # 백테스팅 및 결과 플로팅
             await backtest_and_send(ctx, stock, 'modified_monthly', bot)
             if is_valid_stock(stock):
                 try:
@@ -86,24 +88,27 @@ async def buddy(ctx):
                     await ctx.send(f"An error occurred while plotting {stock}: {e}")
                     print(f"Error plotting {stock}: {e}")
             await asyncio.sleep(2)
-            
-            move_files_to_images_folder()
 
+            # 파일 이동
+            move_files_to_images_folder()
+            
+            # Gemini 분석
             result = analyze_with_gemini(stock)
             await ctx.send(result)
             await asyncio.sleep(10)
 
-        print("Updating stock market CSV...")
-        await loop.run_in_executor(None, update_stock_market_csv, ticker_path, [s['ticker'] if isinstance(s, dict) else s for s in stocks])
-        
-        print("Loading sector info...")
-        sector_dict = await loop.run_in_executor(None, load_sector_info)
-        
-        print("Merging CSV files...")
-        path = '.'
-        await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
+    print("Updating stock market CSV...")
+    await loop.run_in_executor(None, update_stock_market_csv, ticker_path, [s['ticker'] if isinstance(s, dict) else s for s in stocks])
+    
+    print("Loading sector info...")
+    sector_dict = await loop.run_in_executor(None, load_sector_info)
+    
+    print("Merging CSV files...")
+    path = '.'
+    await loop.run_in_executor(None, merge_csv_files, path, sector_dict)
 
-        await ctx.send(f"백테스팅 결과가 섹터별로 정리되었습니다.")
+    await ctx.send(f"백테스팅 결과가 섹터별로 정리되었습니다.")
+    move_files_to_images_folder()
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
