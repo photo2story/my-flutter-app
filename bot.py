@@ -90,12 +90,12 @@ async def stock(ctx, query: str):
                 print(f"Error plotting {stock_name}: {e}")
         await asyncio.sleep(2)
 
-        # 파일 이동
-        move_files_to_images_folder()
-
         # Gemini 분석
         result = analyze_with_gemini(stock_name)
         await ctx.send(result)
+        
+        # 파일 이동
+        move_files_to_images_folder()
         
     except Exception as e:
         await ctx.send(f'An error occurred while processing {stock_name}: {e}')
@@ -165,6 +165,7 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
 
 
 
