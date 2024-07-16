@@ -209,4 +209,5 @@ if __name__ == '__main__':
 git fetch origin
 git checkout main
 git reset --hard origin/main
+nix-shell
 """
