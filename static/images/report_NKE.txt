@@ -1,32 +1,32 @@
-## NKE Stock Analysis Report
+## NKE 주식 분석 리포트
 
-**1. Performance vs S&P 500**
+**1. 수익률 비교:**
 
-The data provided shows that on the last day, **NKE's rate was -13.29%, while S&P 500 (VOO) rate was 9.11%.** This indicates that NKE underperformed the S&P 500 by **22.40%** on that specific day.
+NKE의 누적 수익률은 -38.78%로 S&P 500 (VOO)의 24.05% 대비 **62.83%p** 낮습니다.
 
-**2. Recent Price Trend**
+**2. 최근 주가 변동:**
 
-Here's the recent price trend based on the provided data:
+* 5일 이동평균: 72.97
+* 20일 이동평균: 84.7
+* 60일 이동평균: 90.52
 
-* **5-day SMA:** 107.82
-* **20-day SMA:** 108.80
-* **60-day SMA:** 108.07
+NKE의 주가는 최근 5일, 20일, 60일 이동평균 모두 하락세를 보이고 있습니다.
 
-This suggests that NKE's stock price has been relatively stable over the past 60 days, with a slight upward trend in the last 20 days.
+**3. 기술적 지표 분석:**
 
-**3. Technical Indicators Analysis**
+* RSI: 22.66
+* PPO: -1.68
 
-* **RSI (Relative Strength Index):** The RSI indicator is not provided in the data, but the statement suggests it is below 40, indicating **oversold conditions**. This could potentially signal a rebound in price. 
-* **PPO (Percentage Price Oscillator):** The data shows that the PPO histogram is negative. While the exact value isn't specified, a negative PPO histogram generally suggests **potential bearish momentum**.
+RSI는 30 이하로 과매도 영역에 진입했으며, PPO는 음수 값으로 매수 신호를 보여주고 있습니다.
 
-**4. Recent Performance and Outlook**
+**4. 최근 실적 및 전망:**
 
-According to a recent web search, Nike's (NKE) **Q4 2023 revenue was $12.82 billion**, slightly higher than the previous year. **Operating income was $1.48 billion**, a significant decrease compared to the previous year.
+(최근 뉴스 검색을 통해 NKE의 최근 실적 및 전망 정보를 추가해주세요.)
 
-Analysts predict that **Nike's revenue in Q1 2024 will be $13.14 billion**, with **operating income reaching $1.59 billion**.  These figures suggest a modest improvement in performance compared to the previous quarter, though still lower than the previous year.
+**5. 애널리스트 의견:**
 
-**5. Analyst Opinions**
+(최근 뉴스 검색을 통해 NKE에 대한 애널리스트 의견 정보를 추가해주세요.)
 
-A recent web search indicates that **analysts are generally optimistic about Nike's future.** While specific recommendations vary, many analysts view NKE as a **"buy" or "strong buy".**
+**6. 결론:**
 
-**Disclaimer:** This report is for informational purposes only and is not intended to be considered investment advice. Please consult with a qualified financial advisor before making any investment decisions.
+NKE는 최근 수익률이 S&P 500에 비해 크게 저조하며, 주가는 하락세를 보이고 있습니다. 기술적 지표는 과매도 상태를 나타내고 있으며, PPO는 매수 신호를 보여주고 있습니다. 하지만 최근 실적 및 전망, 애널리스트 의견 등을 종합적으로 고려하여 투자 결정을 내려야 합니다. 
