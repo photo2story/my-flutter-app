@@ -76,6 +76,7 @@ def analyze_with_gemini(ticker):
 
         # 프롬프트 준비
         prompt_voo = f"""
+        
         1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
            리뷰할 주식티커명 = {ticker}
            회사이름과 회사 개요(1줄로)
