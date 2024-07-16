@@ -1,5 +1,6 @@
 # gemini.py
-import os, sys
+import os
+import sys
 import pandas as pd
 import requests
 from dotenv import load_dotenv
@@ -43,8 +44,12 @@ def get_first_google_search_link(stock):
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
-        first_link = soup.find('a')['href']
-        return first_link
+        first_link_tag = soup.find('a', href=True)
+        if first_link_tag:
+            first_link = first_link_tag['href']
+            if first_link.startswith('/url?q='):
+                first_link = first_link.split('&')[0].replace('/url?q=', '')
+            return first_link
     return "No link found"
 
 def analyze_with_gemini(ticker):
@@ -76,7 +81,6 @@ def analyze_with_gemini(ticker):
 
         # 프롬프트 준비
         prompt_voo = f"""
-        
         1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
            리뷰할 주식티커명 = {ticker}
            회사이름과 회사 개요(1줄로)
