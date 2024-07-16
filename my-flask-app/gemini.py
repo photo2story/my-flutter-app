@@ -105,7 +105,7 @@ def analyze_with_gemini(ticker):
         # 리포트를 텍스트로 저장
         report_text = response_ticker.text
         google_search_link = get_first_google_search_link(ticker)
-        report_text += f"\nGoogle Search Link: {google_search_link}"
+        report_text += f"\nGoogle Search Link: [여기를 클릭하세요]({google_search_link})"
         print(report_text)
 
         # 디스코드 웹훅 메시지로 전송
@@ -136,6 +136,7 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
 
 
 
