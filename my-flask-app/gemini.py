@@ -35,7 +35,7 @@ def download_csv(ticker):
         return False
 
 def get_first_google_search_link(stock):
-    query = f"인베스팅 {stock}"
+    query = f"인베스팅.com {stock}"
     url = f"https://www.google.com/search?q={query}"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
