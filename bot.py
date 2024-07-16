@@ -1,5 +1,6 @@
 # bot.py
 import os
+import os
 import sys
 import asyncio
 from dotenv import load_dotenv
@@ -16,7 +17,7 @@ os.environ['SSL_CERT_FILE'] = certifi.where()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flask-app')))
 
 # 사용자 정의 모듈 임포트
-from git_operations import move_files_to_images_folder
+from git_operations import move_files_to_images_folder, fetch_csv_data
 from get_ticker import load_tickers, search_tickers_and_respond, get_ticker_name, update_stock_market_csv, get_ticker_from_korean_name
 from estimate_stock import estimate_stock
 from Results_plot import plot_results_all
