@@ -44,12 +44,11 @@ def get_first_google_search_link(stock):
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
-        first_link_tag = soup.find('a', href=True)
-        if first_link_tag:
-            first_link = first_link_tag['href']
-            if first_link.startswith('/url?q='):
-                first_link = first_link.split('&')[0].replace('/url?q=', '')
-            return first_link
+        for link in soup.find_all('a'):
+            href = link.get('href')
+            if href and '/url?q=' in href:
+                actual_link = href.split('/url?q=')[1].split('&')[0]
+                return actual_link
     return "No link found"
 
 def analyze_with_gemini(ticker):
