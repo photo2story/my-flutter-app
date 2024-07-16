@@ -21,18 +21,18 @@ GITHUB_API_URL = os.getenv('GITHUB_API_URL', 'https://api.github.com/repos/photo
 
 # Stocks list
 STOCKS = {
-    'Technology': ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA', 'TSM', 'ASML', 'AVGO', 'QCOM', 'AMD', 'LRCX'], 
-    'Financials': ['BRK.B', 'V', 'MA', 'PYPL', 'JPM', 'MS', 'C', 'VFH'],
-    'Consumer Cyclical': ['TSLA', 'HD', 'DIS', 'NFLX', 'SBUX','PEP', 'KO', 'NKE'],
-    'Healthcare': ['LLY','JNJ', 'UNH', 'PFE', 'AMGN'],
-    'Communication Services': ['META', 'VZ', 'T', 'TMUS', 'CHTR'],
-    'Industrials': ['GE', 'CAT', 'BA', 'UPS', 'MMM', 'TXN'],
-    'Consumer Defensive': ['WMT', 'PG', 'COST'],
-    'Energy': ['XOM', 'CVX', 'COP','NEP', 'FSLR'],
-    'Basic Materials': ['LIN', 'SCCO', 'SHW', 'ALB'],
-    'Real Estate': ['AMT', 'PLD', 'EQIX'], 
-    'Utilities': ['NEE', 'DUK', 'SO'],
-    'ETFs': ['SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO']
+    'Technology': ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA'], 
+    'Financials': ['BRKa', 'SQ'],
+    'Consumer Cyclical': ['TSLA', 'NFLX'],
+    'Healthcare': ['LLY','UNH'],
+    'Communication Services': ['META', 'VZ'],
+    'Industrials': ['GE','UPS'],
+    'Consumer Defensive': ['WMT', 'PG'],
+    'Energy': ['XOM', 'FSLR'],
+    'Basic Materials': ['LIN','ALB'],
+    'Real Estate': ['AMT',], 
+    'Utilities': ['NEE', 'DUK']
+    # 'ETFs': ['SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO']
 }
 
 
