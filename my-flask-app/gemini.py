@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import threading
-from bs4 import BeautifulSoup
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -18,10 +17,19 @@ load_dotenv()
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
+CSV_PATH = os.getenv('CSV_PATH', 'static/images/stock_market.csv')
 
 # Gemini API 구성
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
+
+# CSV 파일에서 티커명과 회사 이름을 매핑하는 딕셔너리 생성
+def create_ticker_to_name_dict(csv_path):
+    df = pd.read_csv(csv_path)
+    ticker_to_name = dict(zip(df['Symbol'], df['Name']))
+    return ticker_to_name
+
+ticker_to_name = create_ticker_to_name_dict(CSV_PATH)
 
 def download_csv(ticker):
     ticker_vs_voo_url = f"{GITHUB_RAW_BASE_URL}/result_VOO_{ticker}.csv"
@@ -34,22 +42,12 @@ def download_csv(ticker):
     else:
         return False
 
-def get_first_google_search_link(stock):
-    query = f"인베스팅.com {stock}"
-    url = f"https://www.google.com/search?q={query}"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    }
-
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
-        for link in soup.find_all('a'):
-            href = link.get('href')
-            if href and '/url?q=' in href:
-                actual_link = href.split('/url?q=')[1].split('&')[0]
-                return actual_link
-    return "No link found"
+def get_google_search_links(company_name):
+    query1 = f"인베스팅.com {company_name}"
+    query2 = f"investing.com consensus-estimates {company_name}"
+    link1 = f"https://www.google.com/search?q={query1}"
+    link2 = f"https://www.google.com/search?q={query2}"
+    return link1, link2
 
 def analyze_with_gemini(ticker):
     try:
@@ -80,6 +78,7 @@ def analyze_with_gemini(ticker):
 
         # 프롬프트 준비
         prompt_voo = f"""
+        
         1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
            리뷰할 주식티커명 = {ticker}
            회사이름과 회사 개요(1줄로)
@@ -103,8 +102,10 @@ def analyze_with_gemini(ticker):
 
         # 리포트를 텍스트로 저장
         report_text = response_ticker.text
-        google_search_link = get_first_google_search_link(ticker)
-        report_text += f"\nGoogle Search Link: [여기를 클릭하세요]({google_search_link})"
+        company_name = ticker_to_name.get(ticker, ticker)  # 티커명에서 회사 이름을 찾고, 없으면 티커명을 사용
+        link1, link2 = get_google_search_links(company_name)
+        report_text += f"\nGoogle Search Link 1: [여기를 클릭하세요]({link1})"
+        report_text += f"\nGoogle Search Link 2: [여기를 클릭하세요]({link2})"
         print(report_text)
 
         # 디스코드 웹훅 메시지로 전송
@@ -135,9 +136,6 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
-
-
-
 
 
 """
