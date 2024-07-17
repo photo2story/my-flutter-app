@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import threading
+from urllib.parse import quote_plus
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -43,8 +44,8 @@ def download_csv(ticker):
         return False
 
 def get_google_search_links(company_name):
-    query1 = f"인베스팅.com {company_name}"
-    query2 = f"investing.com consensus-estimates {company_name}"
+    query1 = quote_plus(f"인베스팅.com {company_name}")
+    query2 = quote_plus(f"investing.com consensus-estimates {company_name}")
     link1 = f"https://www.google.com/search?q={query1}"
     link2 = f"https://www.google.com/search?q={query2}"
     return link1, link2
@@ -78,7 +79,6 @@ def analyze_with_gemini(ticker):
 
         # 프롬프트 준비
         prompt_voo = f"""
-        
         1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
            리뷰할 주식티커명 = {ticker}
            회사이름과 회사 개요(1줄로)
@@ -136,6 +136,7 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
 
 
 """
