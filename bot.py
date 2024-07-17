@@ -88,6 +88,8 @@ async def stock(ctx, query: str):
             except KeyError as e:
                 await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
                 print(f"Error plotting {stock_name}: {e}")
+                    # 파일 이동
+            move_files_to_images_folder()    
         await asyncio.sleep(10)
 
         # Gemini 분석
@@ -95,7 +97,7 @@ async def stock(ctx, query: str):
         await ctx.send(result)
         
         # 파일 이동
-        move_files_to_images_folder()
+        # move_files_to_images_folder()
         
     except Exception as e:
         await ctx.send(f'An error occurred while processing {stock_name}: {e}')

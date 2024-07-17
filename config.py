@@ -22,7 +22,7 @@ GITHUB_API_URL = os.getenv('GITHUB_API_URL', 'https://api.github.com/repos/photo
 # Stocks list
 STOCKS = {
     'Technology': ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA'], 
-    'Financials': ['BRKa', 'SQ'],
+    'Financials': ['BAC', 'SQ'],
     'Consumer Cyclical': ['TSLA', 'NFLX'],
     'Healthcare': ['LLY','UNH'],
     'Communication Services': ['META', 'VZ'],
