@@ -8,6 +8,8 @@ import google.generativeai as genai
 import shutil
 import threading
 from urllib.parse import quote_plus
+from bs4 import BeautifulSoup
+import asyncio
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -50,6 +52,33 @@ def get_google_search_links(company_name):
     link2 = f"https://www.google.com/search?q={query2}"
     return link1, link2
 
+# 웹 스크래핑 함수 추가
+def scrape_web(company_name):
+    search_url = f"https://www.google.com/search?q={quote_plus(company_name + ' 최근 실적')}"
+    response = requests.get(search_url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    results = soup.find_all('div', class_='BNeawe s3v9rd AP7Wnd')
+    
+    performance = "최근 실적 정보를 찾을 수 없습니다."
+    opinions = "애널리스트 의견을 찾을 수 없습니다."
+    
+    for result in results:
+        if "실적" in result.text:
+            performance = result.text
+            break
+    
+    search_url = f"https://www.google.com/search?q={quote_plus(company_name + ' 애널리스트 의견')}"
+    response = requests.get(search_url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    results = soup.find_all('div', class_='BNeawe s3v9rd AP7Wnd')
+    
+    for result in results:
+        if "애널리스트" in result.text:
+            opinions = result.text
+            break
+    
+    return performance, opinions
+
 def analyze_with_gemini(ticker):
     try:
         # 시작 메시지 전송
@@ -77,6 +106,10 @@ def analyze_with_gemini(ticker):
         rsi = df_voo['rsi_ta'].iloc[-1]
         ppo = df_voo['ppo_histogram'].iloc[-1]
 
+        # 웹 스크래핑
+        company_name = ticker_to_name.get(ticker, ticker)
+        performance, opinions = scrape_web(company_name)
+
         # 프롬프트 준비
         prompt_voo = f"""
         1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
@@ -91,8 +124,10 @@ def analyze_with_gemini(ticker):
         3) 제공된 자료의 RSI, PPO 인덱스 지표를 분석해줘 (간단하게):
            RSI = {rsi}
            PPO = {ppo}
-        4) 최근 실적 및 전망(웹검색, 간단하게: 올해 실적, 전망)
-        5) 애널리스트 의견(웹검색,간단하게: 올해 애널리스트 의견 buy? sell?)
+        4) 최근 실적 및 전망(웹검색, 간단하게: 올해 실적, 전망):
+           {performance}
+        5) 애널리스트 의견(웹검색,간단하게: 올해 애널리스트 의견 buy? sell?):
+           {opinions}
         6) 레포트는 ["candidates"][0]["content"]["parts"][0]["text"]의 구조의 텍스트로 만들어줘
         7) 레포트는 한글로 만들어줘
         """
@@ -102,7 +137,6 @@ def analyze_with_gemini(ticker):
 
         # 리포트를 텍스트로 저장
         report_text = response_ticker.text
-        company_name = ticker_to_name.get(ticker, ticker)  # 티커명에서 회사 이름을 찾고, 없으면 티커명을 사용
         link1, link2 = get_google_search_links(company_name)
         report_text += f"\nGoogle Search Link 1: [여기를 클릭하세요]({link1})"
         report_text += f"\nGoogle Search Link 2: [여기를 클릭하세요]({link2})"
@@ -136,7 +170,6 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
-
 
 
 """
