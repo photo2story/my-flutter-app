@@ -52,7 +52,6 @@ def get_google_search_links(company_name):
     link2 = f"https://www.google.com/search?q={query2}"
     return link1, link2
 
-# 웹 스크래핑 함수 수정
 def scrape_web(company_name):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
@@ -70,13 +69,19 @@ def scrape_web(company_name):
     opinions = "애널리스트 의견을 찾을 수 없습니다."
     
     # 구글 검색 결과에서 첫 번째 텍스트 추출
-    performance_result = performance_soup.find('div', class_='BNeawe s3v9rd AP7Wnd')
+    performance_result = performance_soup.find_all('div', class_='BNeawe s3v9rd AP7Wnd')
     if performance_result:
-        performance = performance_result.text
+        for result in performance_result:
+            if "실적" in result.text:
+                performance = result.text
+                break
     
-    opinions_result = opinions_soup.find('div', class_='BNeawe s3v9rd AP7Wnd')
+    opinions_result = opinions_soup.find_all('div', class_='BNeawe s3v9rd AP7Wnd')
     if opinions_result:
-        opinions = opinions_result.text
+        for result in opinions_result:
+            if "의견" in result.text:
+                opinions = result.text
+                break
     
     return performance, opinions
 
@@ -140,6 +145,7 @@ def analyze_with_gemini(ticker):
 
         # 리포트를 텍스트로 저장
         report_text = response_ticker.text
+        company_name = ticker_to_name.get(ticker, ticker)
         link1, link2 = get_google_search_links(company_name)
         report_text += f"\nGoogle Search Link 1: [여기를 클릭하세요]({link1})"
         report_text += f"\nGoogle Search Link 2: [여기를 클릭하세요]({link2})"
@@ -173,6 +179,7 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
 
 """
 source .venv/bin/activate
