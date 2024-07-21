@@ -46,36 +46,37 @@ def download_csv(ticker):
         return False
 
 def get_google_search_links(company_name):
-    query1 = quote_plus(f"인베스팅.com {company_name}")
-    query2 = quote_plus(f"investing.com consensus-estimates {company_name}")
+    query1 = quote_plus(f"investing.com {company_name} 최근 발표 실적")
+    query2 = quote_plus(f"investing.com {company_name} 최근 의견 예상치")
     link1 = f"https://www.google.com/search?q={query1}"
     link2 = f"https://www.google.com/search?q={query2}"
     return link1, link2
 
-# 웹 스크래핑 함수 추가
+# 웹 스크래핑 함수 수정
 def scrape_web(company_name):
-    search_url = f"https://www.google.com/search?q={quote_plus(company_name + ' 최근 실적')}"
-    response = requests.get(search_url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    results = soup.find_all('div', class_='BNeawe s3v9rd AP7Wnd')
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+    performance_url = f"https://www.google.com/search?q={quote_plus(company_name + ' 최근 발표 실적')}"
+    opinions_url = f"https://www.google.com/search?q={quote_plus(company_name + ' 최근 의견 예상치')}"
+    
+    performance_response = requests.get(performance_url, headers=headers)
+    opinions_response = requests.get(opinions_url, headers=headers)
+    
+    performance_soup = BeautifulSoup(performance_response.text, 'html.parser')
+    opinions_soup = BeautifulSoup(opinions_response.text, 'html.parser')
     
     performance = "최근 실적 정보를 찾을 수 없습니다."
     opinions = "애널리스트 의견을 찾을 수 없습니다."
     
-    for result in results:
-        if "실적" in result.text:
-            performance = result.text
-            break
+    # 구글 검색 결과에서 첫 번째 텍스트 추출
+    performance_result = performance_soup.find('div', class_='BNeawe s3v9rd AP7Wnd')
+    if performance_result:
+        performance = performance_result.text
     
-    search_url = f"https://www.google.com/search?q={quote_plus(company_name + ' 애널리스트 의견')}"
-    response = requests.get(search_url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    results = soup.find_all('div', class_='BNeawe s3v9rd AP7Wnd')
-    
-    for result in results:
-        if "애널리스트" in result.text:
-            opinions = result.text
-            break
+    opinions_result = opinions_soup.find('div', class_='BNeawe s3v9rd AP7Wnd')
+    if opinions_result:
+        opinions = opinions_result.text
     
     return performance, opinions
 
@@ -124,9 +125,11 @@ def analyze_with_gemini(ticker):
         3) 제공된 자료의 RSI, PPO 인덱스 지표를 분석해줘 (간단하게):
            RSI = {rsi}
            PPO = {ppo}
-        4) 최근 실적 및 전망(웹검색, 간단하게: 올해 실적, 전망):
+        4) 최근 실적 및 전망:
+
            {performance}
-        5) 애널리스트 의견(웹검색,간단하게: 올해 애널리스트 의견 buy? sell?):
+        5) 애널리스트 의견:
+
            {opinions}
         6) 레포트는 ["candidates"][0]["content"]["parts"][0]["text"]의 구조의 텍스트로 만들어줘
         7) 레포트는 한글로 만들어줘
@@ -170,7 +173,6 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
-
 
 """
 source .venv/bin/activate
