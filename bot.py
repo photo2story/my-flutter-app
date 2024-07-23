@@ -1,4 +1,5 @@
 # bot.py
+# bot.py
 import os
 import sys
 import asyncio
@@ -24,8 +25,7 @@ from Results_plot_mpl import plot_results_mpl
 from github_operations import ticker_path
 from backtest_send import backtest_and_send
 from get_ticker import is_valid_stock
-from gemini import analyze_with_gemini
-from gpt import analyze_with_gpt4o  # 여기서 gemini.py 대신 gpt.py를 사용
+from gpt import analyze_with_gpt  # 이 부분을 수정
 
 # get_account_balance 모듈 임포트
 from get_account_balance import get_balance, get_ticker_price, get_market_from_ticker
@@ -47,135 +47,6 @@ bot_started = False
 
 @bot.event
 async def on_ready():
-    global bot_started
-    if not bot_started:
-        print(f'Logged in as {bot.user.name}')
-        channel = bot.get_channel(CHANNEL_ID)
-        if channel:
-            await channel.send(f'Bot has successfully logged in as {bot.user.name}')
-        else:
-            print(f'Failed to get channel with ID {CHANNEL_ID}')
-        bot_started = True
-
-@tasks.loop(minutes=5)
-async def send_msg():
-    channel = bot.get_channel(CHANNEL_ID)
-    if channel:
-        await channel.send('Hello')
-        print(f'Message sent to channel {CHANNEL_ID}')
-    else:
-        print(f"Failed to find channel with ID: {CHANNEL_ID}")
-
-processed_message_ids = set()
-
-@bot.command()
-async def buddy(ctx):
-    for sector, stocks in config.STOCKS.items():
-        await ctx.send(f'Processing sector: {sector}')
-        for stock in stocks:
-            await ctx.invoke(bot.get_command("stock"), query=stock)
-            await asyncio.sleep(10)  # 각 호출 간에 10초 대기
-
-@bot.command()
-async def stock(ctx, query: str):
-    stock_name = query.upper()
-    await ctx.send(f'Processing stock: {stock_name}')
-    try:
-        # 백테스팅 및 결과 플로팅
-        await backtest_and_send(ctx, stock_name, 'modified_monthly', bot)
-        if is_valid_stock(stock_name):
-            try:
-                plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
-            except KeyError as e:
-                await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
-                print(f"Error plotting {stock_name}: {e}")
-                    # 파일 이동
-            move_files_to_images_folder()    
-        await asyncio.sleep(10)
-
-        # Gemini 분석
-        # result = analyze_with_gemini(stock_name)
-        # await ctx.send(result)
-
-        # GPT-4o mini 분석
-        result = analyze_with_gpt4o(stock_name)
-        await ctx.send(result)
-        
-        # 파일 이동
-        # move_files_to_images_folder()
-        
-    except Exception as e:
-        await ctx.send(f'An error occurred while processing {stock_name}: {e}')
-        print(f'Error processing {stock_name}: {e}')
-
-@bot.command()
-async def ticker(ctx, *, query: str = None):
-    print(f'Command received: ticker with query: {query}')
-    if query is None:
-        await ctx.send("Please enter ticker stock name or ticker.")
-        return
-
-    await search_tickers_and_respond(ctx, query)
-
-@bot.command()
-async def show_all(ctx):
-    try:
-        await plot_results_all()
-        await ctx.send("All results have been successfully displayed.")
-    except Exception as e:
-        await ctx.send(f"An error occurred: {e}")
-        print(f"Error: {e}")
-
-@bot.command()
-async def ping(ctx):
-    if ctx.message.id not in processed_message_ids:
-        processed_message_ids.add(ctx.message.id)
-        await ctx.send(f'pong: {bot.user.name}')
-        print(f'Ping command received and responded with pong.')
-
-@bot.command()
-async def account(ctx, ticker: str):
-    try:
-        ticker = ticker.upper()  # 티커를 대문자로 변환
-        exchange = get_market_from_ticker(ticker)
-        last_price = get_ticker_price(H_APIKEY, H_SECRET, H_ACCOUNT, exchange, ticker)
-        await ctx.send(f'The exchange for {ticker} is {exchange}')
-        await ctx.send(f'Last price of {ticker} is {last_price}')
-    except Exception as e:
-        await ctx.send(f'An error occurred: {e}')
-        print(f'Error processing account for {ticker}: {e}')
-
-@bot.command()
-async def gemini(ctx, ticker: str):
-    try:
-        ticker = ticker.upper()  # 티커를 대문자로 변환
-        report = analyze_with_gemini(ticker)
-        await ctx.send(report)
-    except Exception as e:
-        await ctx.send(f'An error occurred while analyzing {ticker} with Gemini API: {e}')
-        print(f'Error processing Gemini analysis for {ticker}: {e}')
-
-async def run_bot():
-    await bot.start(TOKEN)
-
-def run_server():
-    port = int(os.environ.get('PORT', 8080))
-    server_address = ('', port)
-    httpd = HTTPServer(server_address, SimpleHTTPRequestHandler)
-    print(f'Starting server on port {port}')
-    httpd.serve_forever()
-
-if __name__ == '__main__':
-    # HTTP 서버 시작
-    server_thread = threading.Thread(target=run_server, daemon=True)
-    server_thread.start()
-    
-    # 봇 실행
-    asyncio.run(run_bot())
-
-
-
-
 
 
 #  .\.venv\Scripts\activate

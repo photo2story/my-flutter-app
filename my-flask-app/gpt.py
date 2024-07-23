@@ -4,13 +4,9 @@ import sys
 import pandas as pd
 import requests
 from dotenv import load_dotenv
-from openai import OpenAI
-
-client = OpenAI(api_key=OPENAI_API_KEY)
+import openai
 import shutil
 import threading
-import asyncio
-from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -23,7 +19,8 @@ DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
 CSV_PATH = os.getenv('CSV_PATH', 'static/images/stock_market.csv')
 
-# OpenAI API 설정
+# OpenAI API 구성
+client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
 # CSV 파일에서 티커명과 회사 이름을 매핑하는 딕셔너리 생성
 def create_ticker_to_name_dict(csv_path):
@@ -51,7 +48,7 @@ def get_google_search_links(company_name):
     link2 = f"https://www.google.com/search?q={query2}"
     return link1, link2
 
-def analyze_with_gpt4o(ticker):
+def analyze_with_gpt(ticker):
     try:
         # 시작 메시지 전송
         start_message = f"GPT-4o mini를 사용하여 {ticker} 분석을 시작합니다."
@@ -80,6 +77,7 @@ def analyze_with_gpt4o(ticker):
 
         # 프롬프트 준비
         prompt_voo = f"""
+        
         1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
            리뷰할 주식티커명 = {ticker}
            회사이름과 회사 개요(1줄로)
@@ -98,15 +96,17 @@ def analyze_with_gpt4o(ticker):
         7) 레포트는 한글로 만들어줘
         """
 
-        # GPT-4o mini 호출
-        response = client.chat.completions.create(model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a financial analyst."},
-            {"role": "user", "content": prompt_voo}
-        ])
+        # OpenAI API 호출
+        response_ticker = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt_voo}
+            ]
+        )
 
         # 리포트를 텍스트로 저장
-        report_text = response.choices[0].message.content
+        report_text = response_ticker.choices[0].message.content
         company_name = ticker_to_name.get(ticker, ticker)  # 티커명에서 회사 이름을 찾고, 없으면 티커명을 사용
         link1, link2 = get_google_search_links(company_name)
         report_text += f"\nGoogle Search Link 1: [여기를 클릭하세요]({link1})"
@@ -134,24 +134,9 @@ def analyze_with_gpt4o(ticker):
         response = requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
         return error_message
 
-def run_server():
-    port = int(os.environ.get('PORT', 8080))
-    server_address = ('', port)
-    httpd = HTTPServer(server_address, SimpleHTTPRequestHandler)
-    print(f'Starting server on port {port}')
-    httpd.serve_forever()
-
-async def run_bot():
-    # 봇 실행 코드를 여기에 추가합니다.
+if __name__ == '__main__':
     pass
 
-if __name__ == '__main__':
-    # HTTP 서버 시작
-    server_thread = threading.Thread(target=run_server, daemon=True)
-    server_thread.start()
-
-    # 봇 실행
-    asyncio.run(run_bot())
 
 """
 source .venv/bin/activate
