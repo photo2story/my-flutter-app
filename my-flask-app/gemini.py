@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import threading
-from urllib.parse import quote_plus
 from bs4 import BeautifulSoup
 import asyncio
 
@@ -19,6 +18,7 @@ from git_operations import move_files_to_images_folder
 load_dotenv()
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
+FMP_API_KEY = os.getenv('FMP_API_KEY')
 GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
 CSV_PATH = os.getenv('CSV_PATH', 'static/images/stock_market.csv')
 
@@ -45,45 +45,33 @@ def download_csv(ticker):
     else:
         return False
 
-def get_google_search_links(company_name):
-    query1 = quote_plus(f"investing.com {company_name} 최근 발표 실적")
-    query2 = quote_plus(f"investing.com {company_name} 최근 의견 예상치")
-    link1 = f"https://www.google.com/search?q={query1}"
-    link2 = f"https://www.google.com/search?q={query2}"
-    return link1, link2
+def get_earnings_data(ticker):
+    url = f'https://financialmodelingprep.com/api/v3/earnings-surprises/{ticker}?apikey={FMP_API_KEY}'
+    
+    response = requests.get(url)
+    
+    if response.status_code != 200:
+        raise Exception(f"API 요청 실패: {response.status_code}")
+    
+    try:
+        data = response.json()
+        return data
+    except ValueError as e:
+        print('Error parsing JSON:', e)
+        return None
 
-def scrape_web(company_name):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    }
-    performance_url = f"https://www.google.com/search?q={quote_plus(company_name + ' 최근 발표 실적')}"
-    opinions_url = f"https://www.google.com/search?q={quote_plus(company_name + ' 최근 의견 예상치')}"
+def get_recent_earnings(ticker, num_entries=4):
+    earnings_data = get_earnings_data(ticker)
     
-    performance_response = requests.get(performance_url, headers=headers)
-    opinions_response = requests.get(opinions_url, headers=headers)
-    
-    performance_soup = BeautifulSoup(performance_response.text, 'html.parser')
-    opinions_soup = BeautifulSoup(opinions_response.text, 'html.parser')
-    
-    performance = "최근 실적 정보를 찾을 수 없습니다."
-    opinions = "애널리스트 의견을 찾을 수 없습니다."
-    
-    # 구글 검색 결과에서 첫 번째 텍스트 추출
-    performance_result = performance_soup.find_all('div', class_='BNeawe s3v9rd AP7Wnd')
-    if performance_result:
-        for result in performance_result:
-            if "실적" in result.text:
-                performance = result.text
-                break
-    
-    opinions_result = opinions_soup.find_all('div', class_='BNeawe s3v9rd AP7Wnd')
-    if opinions_result:
-        for result in opinions_result:
-            if "의견" in result.text:
-                opinions = result.text
-                break
-    
-    return performance, opinions
+    if earnings_data:
+        df = pd.DataFrame(earnings_data)
+        
+        # 최근 num_entries개의 데이터만 선택
+        df = df.head(num_entries)
+        
+        return df
+    else:
+        return pd.DataFrame()
 
 def analyze_with_gemini(ticker):
     try:
@@ -112,9 +100,12 @@ def analyze_with_gemini(ticker):
         rsi = df_voo['rsi_ta'].iloc[-1]
         ppo = df_voo['ppo_histogram'].iloc[-1]
 
-        # 웹 스크래핑
-        company_name = ticker_to_name.get(ticker, ticker)
-        performance, opinions = scrape_web(company_name)
+        # 어닝 데이터 가져오기
+        recent_earnings = get_recent_earnings(ticker)
+        earnings_text = ""
+        if not recent_earnings.empty:
+            for index, row in recent_earnings.iterrows():
+                earnings_text += f"\n날짜: {row['date']}, 실제 수익: {row['actualEarningResult']}, 예상 수익: {row['estimatedEarning']}"
 
         # 프롬프트 준비
         prompt_voo = f"""
@@ -132,12 +123,9 @@ def analyze_with_gemini(ticker):
            PPO = {ppo}
         4) 최근 실적 및 전망:
 
-           {performance}
-        5) 애널리스트 의견:
-
-           {opinions}
-        6) 레포트는 ["candidates"][0]["content"]["parts"][0]["text"]의 구조의 텍스트로 만들어줘
-        7) 레포트는 한글로 만들어줘
+           {earnings_text}
+        5) 레포트는 ["candidates"][0]["content"]["parts"][0]["text"]의 구조의 텍스트로 만들어줘
+        6) 레포트는 한글로 만들어줘
         """
 
         # Gemini API 호출
@@ -145,16 +133,12 @@ def analyze_with_gemini(ticker):
 
         # 리포트를 텍스트로 저장
         report_text = response_ticker.text
-        company_name = ticker_to_name.get(ticker, ticker)
-        link1, link2 = get_google_search_links(company_name)
-        report_text += f"\nGoogle Search Link 1: [여기를 클릭하세요]({link1})"
-        report_text += f"\nGoogle Search Link 2: [여기를 클릭하세요]({link2})"
         print(report_text)
 
         # 디스코드 웹훅 메시지로 전송
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
         print(success_message)
-        response = requests.post(DISCORD_WEBHOOK_URL, data={'content': success_message})
+        response = requests.post(DISCORD_WEBHOOK_URL, json={'content': success_message})
 
         # 리포트를 텍스트 파일로 저장
         report_file = f'report_{ticker}.txt'
@@ -173,12 +157,9 @@ def analyze_with_gemini(ticker):
         return error_message
 
 if __name__ == '__main__':
-    # HTTP 서버 시작
-    server_thread = threading.Thread(target=run_server, daemon=True)
-    server_thread.start()
-    
-    # 봇 실행
-    asyncio.run(run_bot())
+    # 분석할 티커 설정
+    ticker = 'TSLA'
+    analyze_with_gemini(ticker)
 
 
 """
