@@ -4,7 +4,9 @@ import sys
 import pandas as pd
 import requests
 from dotenv import load_dotenv
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=OPENAI_API_KEY)
 import shutil
 import threading
 import asyncio
@@ -22,7 +24,6 @@ GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-
 CSV_PATH = os.getenv('CSV_PATH', 'static/images/stock_market.csv')
 
 # OpenAI API 설정
-openai.api_key = OPENAI_API_KEY
 
 # CSV 파일에서 티커명과 회사 이름을 매핑하는 딕셔너리 생성
 def create_ticker_to_name_dict(csv_path):
@@ -98,13 +99,11 @@ def analyze_with_gpt4o(ticker):
         """
 
         # GPT-4o mini 호출
-        response = openai.ChatCompletion.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are a financial analyst."},
-                {"role": "user", "content": prompt_voo}
-            ]
-        )
+        response = client.chat.completions.create(model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a financial analyst."},
+            {"role": "user", "content": prompt_voo}
+        ])
 
         # 리포트를 텍스트로 저장
         report_text = response.choices[0].message.content
@@ -150,7 +149,7 @@ if __name__ == '__main__':
     # HTTP 서버 시작
     server_thread = threading.Thread(target=run_server, daemon=True)
     server_thread.start()
-    
+
     # 봇 실행
     asyncio.run(run_bot())
 
