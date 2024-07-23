@@ -24,7 +24,7 @@ from Results_plot_mpl import plot_results_mpl
 from github_operations import ticker_path
 from backtest_send import backtest_and_send
 from get_ticker import is_valid_stock
-from gemini import analyze_with_gemini
+from gpt import analyze_with_gpt4o  # 여기서 gemini.py 대신 gpt.py를 사용
 
 # get_account_balance 모듈 임포트
 from get_account_balance import get_balance, get_ticker_price, get_market_from_ticker
@@ -92,8 +92,8 @@ async def stock(ctx, query: str):
             move_files_to_images_folder()    
         await asyncio.sleep(10)
 
-        # Gemini 분석
-        result = analyze_with_gemini(stock_name)
+        # GPT-4o mini 분석
+        result = analyze_with_gpt4o(stock_name)
         await ctx.send(result)
         
         # 파일 이동
@@ -141,14 +141,14 @@ async def account(ctx, ticker: str):
         print(f'Error processing account for {ticker}: {e}')
 
 @bot.command()
-async def gemini(ctx, ticker: str):
+async def gpt(ctx, ticker: str):
     try:
         ticker = ticker.upper()  # 티커를 대문자로 변환
-        report = analyze_with_gemini(ticker)
+        report = analyze_with_gpt4o(ticker)
         await ctx.send(report)
     except Exception as e:
-        await ctx.send(f'An error occurred while analyzing {ticker} with Gemini API: {e}')
-        print(f'Error processing Gemini analysis for {ticker}: {e}')
+        await ctx.send(f'An error occurred while analyzing {ticker} with GPT-4o mini: {e}')
+        print(f'Error processing GPT-4o analysis for {ticker}: {e}')
 
 async def run_bot():
     await bot.start(TOKEN)
@@ -167,10 +167,6 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
-
-
-
-
 
 
 #  .\.venv\Scripts\activate
