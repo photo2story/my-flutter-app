@@ -14,7 +14,7 @@ import config  # config.py 임포트
 os.environ['SSL_CERT_FILE'] = certifi.where()
 
 # Add my-flask-app directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flutter-app')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flask-app')))
 
 # 사용자 정의 모듈 임포트
 from git_operations import move_files_to_images_folder
