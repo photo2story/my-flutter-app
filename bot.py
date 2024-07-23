@@ -1,5 +1,4 @@
 # bot.py
-# bot.py
 import os
 import sys
 import asyncio
@@ -173,7 +172,6 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
-
 
 
 #  .\.venv\Scripts\activate
