@@ -24,6 +24,7 @@ from Results_plot_mpl import plot_results_mpl
 from github_operations import ticker_path
 from backtest_send import backtest_and_send
 from get_ticker import is_valid_stock
+from gemini import analyze_with_gemini
 from gpt import analyze_with_gpt
 
 # get_account_balance 모듈 임포트
@@ -72,16 +73,13 @@ async def buddy(ctx):
     for sector, stocks in config.STOCKS.items():
         await ctx.send(f'Processing sector: {sector}')
         for stock in stocks:
-            await process_stock(ctx, stock)
+            await ctx.invoke(bot.get_command("stock"), query=stock)
             await asyncio.sleep(10)  # 각 호출 간에 10초 대기
 
 @bot.command()
 async def stock(ctx, query: str):
     stock_name = query.upper()
     await ctx.send(f'Processing stock: {stock_name}')
-    await process_stock(ctx, stock_name)
-
-async def process_stock(ctx, stock_name: str):
     try:
         # 백테스팅 및 결과 플로팅
         await backtest_and_send(ctx, stock_name, 'modified_monthly', bot)
@@ -91,19 +89,21 @@ async def process_stock(ctx, stock_name: str):
             except KeyError as e:
                 await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
                 print(f"Error plotting {stock_name}: {e}")
-
-            # 파일 이동
-            move_files_to_images_folder()
-
+                    # 파일 이동
+            move_files_to_images_folder()    
         await asyncio.sleep(10)
 
+        # Gemini 분석
+        # result = analyze_with_gemini(stock_name)
+        # await ctx.send(result)
+        
         # GPT 분석
         result = analyze_with_gpt(stock_name)
         await ctx.send(result)
-
+        
         # 파일 이동
-        move_files_to_images_folder()
-
+        # move_files_to_images_folder()
+        
     except Exception as e:
         await ctx.send(f'An error occurred while processing {stock_name}: {e}')
         print(f'Error processing {stock_name}: {e}')
@@ -149,11 +149,12 @@ async def account(ctx, ticker: str):
 async def gemini(ctx, ticker: str):
     try:
         ticker = ticker.upper()  # 티커를 대문자로 변환
+        # report = analyze_with_gemini(ticker)
         report = analyze_with_gpt(ticker)  # 이 부분을 수정
         await ctx.send(report)
     except Exception as e:
-        await ctx.send(f'An error occurred while analyzing {ticker} with GPT API: {e}')
-        print(f'Error processing GPT analysis for {ticker}: {e}')
+        await ctx.send(f'An error occurred while analyzing {ticker} with Gemini API: {e}')
+        print(f'Error processing Gemini analysis for {ticker}: {e}')
 
 async def run_bot():
     await bot.start(TOKEN)
@@ -172,6 +173,10 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
+
+
+
 
 
 #  .\.venv\Scripts\activate
