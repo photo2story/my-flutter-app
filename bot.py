@@ -94,12 +94,12 @@ async def stock(ctx, query: str):
         await asyncio.sleep(10)
 
         # Gemini 분석
-        # result = analyze_with_gemini(stock_name)
-        # await ctx.send(result)
+        result = analyze_with_gemini(stock_name)
+        await ctx.send(result)
         
         # GPT 분석
-        result = analyze_with_gpt(stock_name)
-        await ctx.send(result)
+        # result = analyze_with_gpt(stock_name)
+        # await ctx.send(result)
         
         # 파일 이동
         # move_files_to_images_folder()

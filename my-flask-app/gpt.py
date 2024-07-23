@@ -20,7 +20,7 @@ openai.api_key = OPENAI_API_KEY
 # CSV 파일에서 티커명과 회사 이름, 개요를 매핑하는 딕셔너리 생성
 def create_ticker_to_info_dict(csv_path):
     df = pd.read_csv(csv_path)
-    ticker_to_info = dict(zip(df['Symbol'], zip(df['Name'], df['Overview'])))
+    ticker_to_info = dict(zip(df['Symbol'], zip(df['Name'])))
     return ticker_to_info
 
 ticker_to_info = create_ticker_to_info_dict(CSV_PATH)
