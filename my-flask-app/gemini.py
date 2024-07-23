@@ -73,9 +73,9 @@ def get_recent_earnings(ticker, num_entries=4):
         return pd.DataFrame()
 
 def format_earnings_text(recent_earnings):
-    earnings_text = "| 날짜 | 실제 수익 | 예상 수익 |\n|---|---|---|\n"
+    earnings_text = "| 날짜 : 실제 수익 / 예상 수익 |\n"
     for index, row in recent_earnings.iterrows():
-        earnings_text += f"| {row['date']} | {row['actualEarningResult']} | {row['estimatedEarning']} |\n"
+        earnings_text += f"| {row['date']} : {row['actualEarningResult']} / {row['estimatedEarning']} |\n"
     return earnings_text
 
 def analyze_with_gemini(ticker):
