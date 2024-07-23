@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import threading
-from bs4 import BeautifulSoup
 import asyncio
 
 # 루트 디렉토리를 sys.path에 추가
@@ -73,6 +72,12 @@ def get_recent_earnings(ticker, num_entries=4):
     else:
         return pd.DataFrame()
 
+def format_earnings_text(recent_earnings):
+    earnings_text = "| 날짜 | 실제 수익 | 예상 수익 |\n|---|---|---|\n"
+    for index, row in recent_earnings.iterrows():
+        earnings_text += f"| {row['date']} | {row['actualEarningResult']} | {row['estimatedEarning']} |\n"
+    return earnings_text
+
 def analyze_with_gemini(ticker):
     try:
         # 시작 메시지 전송
@@ -102,10 +107,7 @@ def analyze_with_gemini(ticker):
 
         # 어닝 데이터 가져오기
         recent_earnings = get_recent_earnings(ticker)
-        earnings_text = ""
-        if not recent_earnings.empty:
-            for index, row in recent_earnings.iterrows():
-                earnings_text += f"\n날짜: {row['date']}, 실제 수익: {row['actualEarningResult']}, 예상 수익: {row['estimatedEarning']}"
+        earnings_text = format_earnings_text(recent_earnings)
 
         # 프롬프트 준비
         prompt_voo = f"""
@@ -121,11 +123,11 @@ def analyze_with_gemini(ticker):
         3) 제공된 자료의 RSI, PPO 인덱스 지표를 분석해줘 (간단하게):
            RSI = {rsi}
            PPO = {ppo}
-        4) 최근 실적 및 전망:
-
+        4) 최근 실적 및 전망: 제공된 자료의 실적을 분석해줘(간단하게)
            {earnings_text}
-        5) 레포트는 ["candidates"][0]["content"]["parts"][0]["text"]의 구조의 텍스트로 만들어줘
-        6) 레포트는 한글로 만들어줘
+        5) 종합적으로 분석해줘(1~4번까지의 요약)
+        6) 레포트는 ["candidates"][0]["content"]["parts"][0]["text"]의 구조의 텍스트로 만들어줘
+        7) 레포트는 한글로 만들어줘
         """
 
         # Gemini API 호출
@@ -160,6 +162,7 @@ if __name__ == '__main__':
     # 분석할 티커 설정
     ticker = 'TSLA'
     analyze_with_gemini(ticker)
+
 
 
 """
