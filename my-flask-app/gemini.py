@@ -80,29 +80,35 @@ def analyze_with_gemini(ticker):
 
         # 어닝 데이터 가져오기
         recent_earnings = get_recent_eps_and_revenue(ticker)
-        if recent_earnings is None:
-            raise Exception("No recent earnings data found.")
+        if not recent_earnings:
+            raise ValueError("No recent earnings data found.")
+
+        # earnings_text 변수 생성
         earnings_text = format_earnings_text(recent_earnings)
 
         # 프롬프트 준비
         prompt_voo = f"""
-        1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
-           리뷰할 주식티커명 = {ticker}
-           회사이름과 회사 개요(1줄로)
-           리뷰주식의 누적수익률 = {final_rate}
-           기준이 되는 비교주식(S&P 500, VOO)의 누적수익율 = {final_rate_vs}
-        2) 제공된 자료의 최근 주가 변동(간단하게: 5일, 20일, 60일 이동평균 수치로):
-           5일이동평균 = {sma_5}
-           20일이동평균 = {sma_20}
-           60일이동평균 = {sma_60}
-        3) 제공된 자료의 RSI, PPO 인덱스 지표를 분석해줘 (간단하게):
-           RSI = {rsi}
-           PPO = {ppo}
-        4) 최근 실적 및 전망: 제공된 자료의 실적을 분석해줘(간단하게)
-           실적/기대치 = {earnings_text}
-        5) 종합적으로 분석해줘(1~4번까지의 요약)
-        6) 레포트는 ["candidates"][0]["content"]["parts"][0]["text"]의 구조의 텍스트로 만들어줘
-        7) 레포트는 한글로 만들어줘
+        1) Provide a simple comparison between the given stock (ticker) and the S&P 500 (VOO) 
+           in terms of cumulative returns up to the most recent date:
+
+            Stock Ticker: {ticker}
+            Company name and a brief description
+            Cumulative return of the stock: {final_rate}
+            Cumulative return of the benchmark (S&P 500, VOO): {final_rate_vs}
+        2) Briefly describe the recent stock price trends using the 5-day, 20-day, and 60-day moving averages:
+
+            5-day Moving Average: {sma_5}
+            20-day Moving Average: {sma_20}
+            60-day Moving Average: {sma_60}
+        3) Briefly analyze the technical indicators, including RSI and PPO:
+
+            RSI: {rsi}
+            PPO: {ppo}
+        4) Briefly analyze the recent earnings and outlook. 
+            Provide the last 4 quarters' results in the following format: {earnings_text}. 
+            For the most recent quarter, include a comparison between actual results and estimates.
+
+        5) Provide a comprehensive summary analysis (summarizing points 1 to 4).
         """
 
         # Gemini API 호출
@@ -133,9 +139,10 @@ def analyze_with_gemini(ticker):
         response = requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
         return error_message
 
+
 if __name__ == '__main__':
     # 분석할 티커 설정
-    ticker = 'AAPL'
+    ticker = 'TSLA'
     analyze_with_gemini(ticker)
 
 
