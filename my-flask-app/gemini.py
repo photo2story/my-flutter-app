@@ -6,12 +6,11 @@ import requests
 from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
-import threading
-import asyncio
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from git_operations import move_files_to_images_folder
+from get_earning import get_recent_eps_and_revenue  # 새롭게 추가된 모듈 import
 
 # 환경 변수 로드
 load_dotenv()
@@ -44,38 +43,12 @@ def download_csv(ticker):
     else:
         return False
 
-def get_earnings_data(ticker):
-    url = f'https://financialmodelingprep.com/api/v3/earnings-surprises/{ticker}?apikey={FMP_API_KEY}'
-    
-    response = requests.get(url)
-    
-    if response.status_code != 200:
-        raise Exception(f"API 요청 실패: {response.status_code}")
-    
-    try:
-        data = response.json()
-        return data
-    except ValueError as e:
-        print('Error parsing JSON:', e)
-        return None
-
-def get_recent_earnings(ticker, num_entries=4):
-    earnings_data = get_earnings_data(ticker)
-    
-    if earnings_data:
-        df = pd.DataFrame(earnings_data)
-        
-        # 최근 num_entries개의 데이터만 선택
-        df = df.head(num_entries)
-        
-        return df
-    else:
-        return pd.DataFrame()
-
-def format_earnings_text(recent_earnings):
-    earnings_text = "| 날짜 : 실제 수익 / 예상 수익 |\n"
-    for index, row in recent_earnings.iterrows():
-        earnings_text += f"| {row['date']} : {row['actualEarningResult']} / {row['estimatedEarning']} |\n"
+def format_earnings_text(earnings_data):
+    if not earnings_data:
+        return "No earnings data available."
+    earnings_text = "| 날짜 : EPS / Revenue |\n"
+    for end, filed, eps_val, revenue_val in earnings_data:
+        earnings_text += f"| {end} (Filed: {filed}): EPS {eps_val}, Revenue {revenue_val:.2f} B$ |\n"
     return earnings_text
 
 def analyze_with_gemini(ticker):
@@ -106,7 +79,9 @@ def analyze_with_gemini(ticker):
         ppo = df_voo['ppo_histogram'].iloc[-1]
 
         # 어닝 데이터 가져오기
-        recent_earnings = get_recent_earnings(ticker)
+        recent_earnings = get_recent_eps_and_revenue(ticker)
+        if recent_earnings is None:
+            raise Exception("No recent earnings data found.")
         earnings_text = format_earnings_text(recent_earnings)
 
         # 프롬프트 준비
