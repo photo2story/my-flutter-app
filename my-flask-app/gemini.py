@@ -1,5 +1,4 @@
 # gemini.py
-# gemini.py
 import os
 import sys
 import pandas as pd
@@ -7,8 +6,6 @@ import requests
 from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
-import threading
-import asyncio
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -82,14 +79,10 @@ def analyze_with_gemini(ticker):
         ppo = df_voo['ppo_histogram'].iloc[-1]
 
         # 어닝 데이터 가져오기
-        # 어닝 데이터 가져오기
         recent_earnings = get_recent_eps_and_revenue(ticker)
-        if not recent_earnings:
-            raise ValueError("No recent earnings data found.")
-
-        # earnings_text 변수 생성
+        if recent_earnings is None:
+            raise Exception("No recent earnings data found.")
         earnings_text = format_earnings_text(recent_earnings)
-
 
         # 프롬프트 준비
         prompt_voo = f"""
@@ -105,9 +98,8 @@ def analyze_with_gemini(ticker):
         3) 제공된 자료의 RSI, PPO 인덱스 지표를 분석해줘 (간단하게):
            RSI = {rsi}
            PPO = {ppo}
-        4) 최근 실적 및 전망: 제공된 자료의 실적을 분석해줘(간단하게).
-           다음과 같은 형식으로 최근 4분기 실적을 표시: {earnings_text}
-           가장 최근 실적은 예상치도 함께 포함해서 검토해줘
+        4) 최근 실적 및 전망: 제공된 자료의 실적을 분석해줘(간단하게)
+           실적/기대치 = {earnings_text}
         5) 종합적으로 분석해줘(1~4번까지의 요약)
         6) 레포트는 ["candidates"][0]["content"]["parts"][0]["text"]의 구조의 텍스트로 만들어줘
         7) 레포트는 한글로 만들어줘
@@ -117,13 +109,13 @@ def analyze_with_gemini(ticker):
         response_ticker = model.generate_content(prompt_voo)
 
         # 리포트를 텍스트로 저장
-        report_text = response_ticker.text        
+        report_text = response_ticker.text
         print(report_text)
 
         # 디스코드 웹훅 메시지로 전송
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
         print(success_message)
-        response = requests.post(DISCORD_WEBHOOK_URL, data={'content': success_message})
+        response = requests.post(DISCORD_WEBHOOK_URL, json={'content': success_message})
 
         # 리포트를 텍스트 파일로 저장
         report_file = f'report_{ticker}.txt'
@@ -131,9 +123,6 @@ def analyze_with_gemini(ticker):
             file.write(report_text)
 
         # 리포트를 static/images 폴더로 이동 및 커밋
-        # destination_folder = os.path.join('static', 'images')
-        # os.makedirs(destination_folder, exist_ok=True)
-        # shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
         move_files_to_images_folder()
 
         return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord and saved as a text file.'
@@ -145,9 +134,11 @@ def analyze_with_gemini(ticker):
         return error_message
 
 if __name__ == '__main__':
-    ticker = 'AAPL'  # Example ticker
-    report = analyze_with_gemini(ticker)
-    print(report)
+    # 분석할 티커 설정
+    ticker = 'AAPL'
+    analyze_with_gemini(ticker)
+
+
 
 """
 source .venv/bin/activate
