@@ -1,24 +1,39 @@
 # gemini.py
+# gemini.py
 import os
+import sys
 import pandas as pd
 import requests
 from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
-import matplotlib.pyplot as plt
-from git_operations import move_files_to_images_folder
-# from googleapiclient.discovery import build
+import threading
+import asyncio
 
-# Load environment variables
+# 루트 디렉토리를 sys.path에 추가
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from git_operations import move_files_to_images_folder
+from get_earning import get_recent_eps_and_revenue  # 새롭게 추가된 모듈 import
+
+# 환경 변수 로드
 load_dotenv()
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
-# GOOGLE_CSE_ID = os.getenv('GOOGLE_CSE_ID')
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
+FMP_API_KEY = os.getenv('FMP_API_KEY')
 GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
+CSV_PATH = os.getenv('CSV_PATH', 'static/images/stock_market.csv')
 
-# Configure the Gemini API
+# Gemini API 구성
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
+
+# CSV 파일에서 티커명과 회사 이름을 매핑하는 딕셔너리 생성
+def create_ticker_to_name_dict(csv_path):
+    df = pd.read_csv(csv_path)
+    ticker_to_name = dict(zip(df['Symbol'], df['Name']))
+    return ticker_to_name
+
+ticker_to_name = create_ticker_to_name_dict(CSV_PATH)
 
 def download_csv(ticker):
     ticker_vs_voo_url = f"{GITHUB_RAW_BASE_URL}/result_VOO_{ticker}.csv"
@@ -30,6 +45,14 @@ def download_csv(ticker):
         return True
     else:
         return False
+
+def format_earnings_text(earnings_data):
+    if not earnings_data:
+        return "No earnings data available."
+    earnings_text = "| 날짜 : EPS / Revenue |\n"
+    for end, filed, eps_val, revenue_val in earnings_data:
+        earnings_text += f"| {end} (Filed: {filed}): EPS {eps_val}, Revenue {revenue_val:.2f} B$ |\n"
+    return earnings_text
 
 def analyze_with_gemini(ticker):
     try:
@@ -58,36 +81,51 @@ def analyze_with_gemini(ticker):
         rsi = df_voo['rsi_ta'].iloc[-1]
         ppo = df_voo['ppo_histogram'].iloc[-1]
 
+        # 어닝 데이터 가져오기
+        recent_earnings = get_recent_eps_and_revenue(ticker)
+        if not recent_earnings:
+            raise ValueError("No recent earnings data found.")
+
+        # earnings_text 변수 생성
+        earnings_text = format_earnings_text(recent_earnings)
+
         # 프롬프트 준비
         prompt_voo = f"""
-        1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
-           리뷰할 주식티커명 = {ticker}
-           리뷰주식의 누적수익률 = {final_rate}
-           기준이 되는 비교주식(S&P 500, VOO)의 누적수익율 = {final_rate_vs}
-        2) 제공된 자료의 최근 주가 변동(간단하게: 5일, 20일, 60일 이동평균 수치로):
-           5일이동평균 = {sma_5}
-           20일이동평균 = {sma_20}
-           60일이동평균 = {sma_60}
-        3) 제공된 자료의 RSI, PPO 인덱스 지표를 분석해줘 (간단하게):
-           RSI = {rsi}
-           PPO = {ppo}
-        4) 최근 실적 및 전망(웹검색해서 간단하게: 최근 매출,영업이익, 다음분기 전망 매출, 영업이익)
-        5) 애널리스트 의견(웹검색해서 간단하게: 최근 애널리스트 의견.)
-        6) 레포트는 ["candidates"][0]["content"]["parts"][0]["text"]의 구조의 텍스트로 만들어줘
-        7) 레포트는 한글로 만들어줘
+        1) Provide a simple comparison between the given stock (ticker) and the S&P 500 (VOO) 
+           in terms of cumulative returns up to the most recent date:
+
+            Stock Ticker: {ticker}
+            Company name and a brief description
+            Cumulative return of the stock: {final_rate}
+            Cumulative return of the benchmark (S&P 500, VOO): {final_rate_vs}
+        2) Briefly describe the recent stock price trends using the 5-day, 20-day, and 60-day moving averages:
+
+            5-day Moving Average: {sma_5}
+            20-day Moving Average: {sma_20}
+            60-day Moving Average: {sma_60}
+        3) Briefly analyze the technical indicators, including RSI and PPO:
+
+            RSI: {rsi}
+            PPO: {ppo}
+        4) Briefly analyze the recent earnings and outlook. 
+            Provide the last 4 quarters' results in the following format: {earnings_text}. 
+            For the most recent quarter, include a comparison between actual results and estimates.
+
+        5) Provide a comprehensive summary analysis (summarizing points 1 to 4).
         """
 
+        # Gemini API 호출
         # Gemini API 호출
         response_ticker = model.generate_content(prompt_voo)
 
         # 리포트를 텍스트로 저장
-        report_text = response_ticker.text        
+        report_text = response_ticker.text
         print(report_text)
 
         # 디스코드 웹훅 메시지로 전송
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
         print(success_message)
-        response = requests.post(DISCORD_WEBHOOK_URL, data={'content': success_message})
+        response = requests.post(DISCORD_WEBHOOK_URL, json={'content': success_message})
 
         # 리포트를 텍스트 파일로 저장
         report_file = f'report_{ticker}.txt'
@@ -95,9 +133,6 @@ def analyze_with_gemini(ticker):
             file.write(report_text)
 
         # 리포트를 static/images 폴더로 이동 및 커밋
-        # destination_folder = os.path.join('static', 'images')
-        # os.makedirs(destination_folder, exist_ok=True)
-        # shutil.move(report_file, os.path.join(destination_folder, os.path.basename(report_file)))
         move_files_to_images_folder()
 
         return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord and saved as a text file.'
@@ -108,10 +143,13 @@ def analyze_with_gemini(ticker):
         response = requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
         return error_message
 
+
 if __name__ == '__main__':
-    ticker = 'AAPL'  # Example ticker
-    report = analyze_with_gemini(ticker)
-    print(report)
+    # 분석할 티커 설정
+    ticker = 'TSLA'
+    analyze_with_gemini(ticker)
+
+
 
 """
 source .venv/bin/activate
