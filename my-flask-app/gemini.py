@@ -160,7 +160,7 @@ def analyze_with_gemini(ticker):
 
 if __name__ == '__main__':
     # 분석할 티커 설정
-    ticker = 'TSLA'
+    ticker = 'AAPL'
     analyze_with_gemini(ticker)
 
 
