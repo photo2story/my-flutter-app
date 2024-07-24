@@ -1,34 +1,39 @@
-## TSLA Stock Analysis:
+## 테슬라(TSLA) 주식 분석 보고서
 
-**1. Stock Performance Comparison:**
+**1. 수익률 비교 분석**
 
-* **TSLA** has had a **cumulative return of -15.87%** compared to the **S&P 500 (VOO) which has returned 21.86%** over the same period. This indicates that TSLA has significantly underperformed the market.
+테슬라(TSLA)는 최근 1년 동안 **-15.36%**의 수익률을 기록하며 S&P 500 지수(VOO)의 **21.78%** 수익률에 크게 못 미쳤습니다. 두 지수 간의 누적 수익률 차이는 **37.14%**입니다.
 
-**2. Recent Stock Price Trends:**
+**2. 최근 주가 변동 분석**
 
-* **5-day Moving Average (241.1):** Suggests a slightly upward trend in the short term.
-* **20-day Moving Average (238.08):** Indicates a moderately positive trend over the last month.
-* **60-day Moving Average (198.48):**  Shows a significant upward trend over the last two months. 
+* **5일 이동평균**: 241.42
+* **20일 이동평균**: 238.16
+* **60일 이동평균**: 198.5
 
-**3. Technical Indicators:**
+최근 5일 동안 테슬라 주가는 20일 이동평균보다 소폭 높은 수준에서 움직이고 있습니다. 60일 이동평균과 비교하면 상당히 높은 수준입니다.
 
-* **RSI (46.13):**  Indicates a neutral to slightly bullish sentiment. The stock is not considered overbought or oversold.
-* **PPO (-1.89):** Suggests a potential bearish divergence. While the price is moving up, the momentum indicator is trending downwards.
+**3. 기술적 지표 분석**
 
-**4. Recent Earnings and Outlook:**
+* **RSI**: 46.79
+* **PPO**: -1.84
 
-| Date: EPS / Revenue |
-|---|---|
-| 2024-06-30 (Filed: 2024-07-24): EPS 0.46, Revenue 25500000000.00 B$ |
-| 2024-03-31 (Filed: 2024-04-24): EPS 0.37, Revenue 21301000000.00 B$ |
-| 2023-09-30 (Filed: 2023-10-23): EPS 0.58, Revenue 23350000000.00 B$ |
-| 2023-06-30 (Filed: 2023-07-24): EPS 0.85, Revenue 24927000000.00 B$ |
+RSI는 50보다 낮아 약세 신호를 보이고 있으며, PPO는 음수 값을 나타내며 매도 신호를 보여줍니다.
 
-**For the most recent quarter (2024-06-30):**
+**4. 최근 실적 및 전망 분석**
 
-* **EPS beat estimates by a small margin.**  While the actual EPS was 0.46, analysts were expecting 0.44.
-* **Revenue fell short of estimates.** The actual revenue was 25500000000.00 B$, while analysts had projected 25700000000.00 B$.
+테슬라의 최근 분기 실적은 긍정적입니다. 매출은 지속적으로 증가하고 있으며, EPS 역시 꾸준히 성장하고 있습니다. 다만, 시장 기대치를 충족하지 못하는 경우가 종종 발생하고 있습니다.
 
-**5. Comprehensive Summary Analysis:**
+| 날짜 | EPS | 매출 |
+|---|---|---|
+| 2024-06-30 (Filed: 2024-07-24) | 0.46 | 255억 달러 |
+| 2024-03-31 (Filed: 2024-04-24) | 0.37 | 213억 달러 |
+| 2023-09-30 (Filed: 2023-10-23) | 0.58 | 233억 달러 |
+| 2023-06-30 (Filed: 2023-07-24) | 0.85 | 249억 달러 |
 
-TSLA's stock performance has significantly lagged behind the broader market. While the stock has recently shown a positive trend in its price action, with the 5-day, 20-day, and 60-day moving averages all indicating upward momentum, the recent earnings report and the PPO indicator suggest a potential bearish divergence. Despite beating EPS estimates, the revenue fell short, highlighting challenges in the company's growth trajectory. Overall, investors should monitor the stock closely for further developments and potential shifts in market sentiment. 
+**5. 종합 분석**
+
+테슬라는 최근 주가가 급등하면서 S&P 500 지수 대비 상당한 수익률 차이를 보이고 있습니다. 하지만 기술적 지표는 약세 신호를 보이고 있으며, 최근 실적은 시장 기대치를 충족하지 못하는 경우가 종종 발생하고 있습니다. 따라서 단기적으로는 주가 조정 가능성이 존재합니다.
+
+**6. 결론**
+
+테슬라 주식은 단기적으로 주가 조정 가능성이 높습니다. 투자 결정을 내리기 전에 추가적인 분석과 심층적인 조사가 필요합니다. 
