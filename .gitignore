@@ -249,6 +249,7 @@ app/**/flutter_export_environment.sh
 *.csv
 !stock_market.csv
 !result_VOO*.csv
+!20*.csv
 
 # Chrome Device Default 제외
 my_flutter_app/.dart_tool/chrome-device/Default/
