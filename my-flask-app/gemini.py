@@ -1,4 +1,5 @@
 # gemini.py
+# gemini.py
 import os
 import sys
 import pandas as pd
@@ -6,6 +7,8 @@ import requests
 from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
+import threading
+import asyncio
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -111,6 +114,7 @@ def analyze_with_gemini(ticker):
         5) Provide a comprehensive summary analysis (summarizing points 1 to 4).
         """
 
+        # Gemini API 호출
         # Gemini API 호출
         response_ticker = model.generate_content(prompt_voo)
 
