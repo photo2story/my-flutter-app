@@ -1,36 +1,39 @@
-## IONQ Stock Analysis
+## IONQ 주식 분석 보고서
 
-This report analyzes the performance of IONQ stock based on the provided data and information gathered from web searches.
+**1. 수익률 비교 분석**
 
-**1. Stock Performance vs. S&P 500**
+IONQ 주식은 2023년 11월 8일 이후로 **-18.05%**의 누적 수익률을 기록했습니다. 반면, S&P 500 지수 (VOO)는 같은 기간 동안 **23.35%**의 누적 수익률을 기록했습니다. 즉, IONQ 주식은 S&P 500 지수 대비 **41.4%** 낮은 수익률을 보이고 있습니다. 
 
-The provided data shows that IONQ's performance has been volatile and significantly lagging behind the S&P 500 (VOO) over the past year. 
+**2. 최근 주가 변동 분석**
 
-* **Recent Performance:** IONQ's current rate is 9.11%, while the S&P 500's rate (rate_vs) is 17.51%. This represents a difference of **+93.9%** compared to the S&P 500, highlighting IONQ's underperformance.
-* **Specific Dates:**  IONQ has experienced substantial losses on certain days, such as a -14.17% decline on 2022-01-13 and a -32.14% drop on 2022-04-20.
+IONQ 주식은 최근 5일 동안 **8.12**의 이동평균 가격을 기록했습니다. 20일 이동평균 가격은 **7.75**이며, 60일 이동평균 가격은 **8.11**입니다. 이는 최근 5일 동안 주가가 소폭 상승했지만, 장기적으로는 횡보하는 모습을 보여주고 있음을 의미합니다.
 
-**2. Recent Price Movements**
+**3. RSI, PPO 지표 분석**
 
-* **5-Day SMA:** 13.20 (This represents the average closing price over the past 5 days.)
-* **20-Day SMA:** 13.56 (This represents the average closing price over the past 20 days.)
-* **60-Day SMA:** 12.89 (This represents the average closing price over the past 60 days.)
+IONQ 주식의 RSI는 **54.26**으로, 과매수 또는 과매도 영역에 진입하지 않았습니다. PPO는 **0.59**로, 상승 추세를 유지하고 있음을 시사합니다.
 
-**3. Technical Indicators**
+**4. 최근 실적 및 전망 분석**
 
-* **RSI:** The RSI (Relative Strength Index) is currently 49.2. This suggests that IONQ is neither overbought nor oversold.
-* **PPO:** The PPO (Percentage Price Oscillator) is currently -0.8. This indicates that IONQ's price is slightly below its recent average, potentially signaling weakness.
+IONQ는 최근 4분기 연속으로 예상치를 하회하는 실적을 기록했습니다. 특히, 2024년 5월 8일 발표된 1분기 실적은 예상치를 크게 하회하며 시장의 우려를 자극했습니다. 
 
-**4. Recent Earnings and Outlook**
+**5. 종합 분석**
 
-* **Recent Earnings:** Web searches reveal IONQ's recent earnings are difficult to find, as the company is still in its early stages of development and has not yet achieved profitability. 
-* **Next Quarter Forecast:** It is difficult to find reliable forecasts for IONQ's next-quarter earnings due to the company's early stage and lack of profitability.
+IONQ 주식은 S&P 500 지수 대비 저조한 수익률을 기록하고 있으며, 최근 실적 부진으로 인해 투자 심리가 위축되어 있습니다. 다만, 최근 주가는 5일 이동평균에서 소폭 상승했으며, RSI와 PPO 지표는 긍정적인 신호를 보여주고 있습니다. 향후 실적 개선 여부와 시장의 반응을 주의 깊게 살펴볼 필요가 있습니다.
 
-**5. Analyst Opinions**
+**6. 레포트 구조**
 
-* **Analyst Ratings:** Web searches reveal that IONQ is currently rated as "Hold" by analysts. Some analysts are optimistic about the company's long-term potential, but concerns remain regarding its lack of profitability and the competitiveness of the quantum computing market. 
-
-**Overall Analysis**
-
-Based on the available information, IONQ's stock performance has been underwhelming, trailing the S&P 500 by a significant margin. While technical indicators suggest neutrality, IONQ remains in the early stages of development with profitability remaining a concern. Analyst opinions are currently divided, with some recognizing long-term potential while others highlight the challenges of the quantum computing market. 
-
-**Disclaimer:** This report is based on publicly available information and should not be considered as financial advice. Investing in IONQ stock involves significant risk, and investors should conduct their own due diligence before making any investment decisions. 
+```json
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "## IONQ 주식 분석 보고서\n\n**1. 수익률 비교 분석**\n\nIONQ 주식은 2023년 11월 8일 이후로 **-18.05%**의 누적 수익률을 기록했습니다. 반면, S&P 500 지수 (VOO)는 같은 기간 동안 **23.35%**의 누적 수익률을 기록했습니다. 즉, IONQ 주식은 S&P 500 지수 대비 **41.4%** 낮은 수익률을 보이고 있습니다. \n\n**2. 최근 주가 변동 분석**\n\nIONQ 주식은 최근 5일 동안 **8.12**의 이동평균 가격을 기록했습니다. 20일 이동평균 가격은 **7.75**이며, 60일 이동평균 가격은 **8.11**입니다. 이는 최근 5일 동안 주가가 소폭 상승했지만, 장기적으로는 횡보하는 모습을 보여주고 있음을 의미합니다.\n\n**3. RSI, PPO 지표 분석**\n\nIONQ 주식의 RSI는 **54.26**으로, 과매수 또는 과매도 영역에 진입하지 않았습니다. PPO는 **0.59**로, 상승 추세를 유지하고 있음을 시사합니다.\n\n**4. 최근 실적 및 전망 분석**\n\nIONQ는 최근 4분기 연속으로 예상치를 하회하는 실적을 기록했습니다. 특히, 2024년 5월 8일 발표된 1분기 실적은 예상치를 크게 하회하며 시장의 우려를 자극했습니다. \n\n**5. 종합 분석**\n\nIONQ 주식은 S&P 500 지수 대비 저조한 수익률을 기록하고 있으며, 최근 실적 부진으로 인해 투자 심리가 위축되어 있습니다. 다만, 최근 주가는 5일 이동평균에서 소폭 상승했으며, RSI와 PPO 지표는 긍정적인 신호를 보여주고 있습니다. 향후 실적 개선 여부와 시장의 반응을 주의 깊게 살펴볼 필요가 있습니다."
+          }
+        ]
+      }
+    }
+  ]
+}
+```
