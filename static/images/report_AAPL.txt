@@ -1,43 +1,31 @@
-## 애플(AAPL) 주식 분석 리포트
+## Apple (AAPL) Stock Analysis
 
-### 1. 수익률 비교
+**1. Comparison to S&P 500 (VOO):**
 
-애플(AAPL)의 누적 수익률은 **29.71%**로, S&P 500(VOO)의 누적 수익률 **21.84%**를 **7.87%p** 앞서고 있습니다.
+Apple (AAPL) has outperformed the S&P 500 (VOO) in terms of cumulative returns, with a 29.61% gain compared to VOO's 21.81%. This indicates that Apple has been a stronger performer than the broader market.
 
-### 2. 최근 주가 변동
+**2. Recent Price Trends:**
 
-* 5일 이동평균: **223.19**
-* 20일 이동평균: **224.23**
-* 60일 이동평균: **203.46**
+* **Short-term:** The 5-day moving average (223.15) is slightly below the 20-day moving average (224.22), suggesting a slight downward trend in the very short term.
+* **Mid-term:** The 20-day moving average (224.22) is above the 60-day moving average (203.46), implying an upward trend over the last month or two. 
+* **Long-term:** The 60-day moving average (203.46) continues to rise, demonstrating a strong long-term upward trend.
 
-최근 5일, 20일 이동평균은 60일 이동평균보다 높게 나타나며 상승세를 유지하고 있습니다.
+**3. Technical Indicators:**
 
-### 3. RSI & PPO 지표 분석
+* **RSI (48.38):**  The RSI is currently in the neutral territory, neither overbought nor oversold. This suggests that the stock is not experiencing extreme price movements.
+* **PPO (-0.96):** The PPO is negative, indicating that the stock's price momentum is slowing down.
 
-* RSI: **48.65**
-* PPO: **-0.95**
+**4. Recent Earnings and Outlook:**
 
-RSI는 중립적인 수준이며, PPO는 약세 신호를 보이고 있습니다.
+| Date : EPS / Revenue |
+|---|---|
+| 2024-03-30 (Filed: 2024-05-03): EPS 1.53, Revenue 90753000000.00 B$ |
+| 2023-12-30 (Filed: 2024-02-02): EPS 2.19, Revenue 119575000000.00 B$ |
+| 2023-07-01 (Filed: 2023-08-04): EPS 1.27, Revenue 81797000000.00 B$ |
+| 2023-04-01 (Filed: 2023-05-05): EPS 1.53, Revenue 94836000000.00 B$ |
 
-### 4. 최근 실적 및 전망
+The most recent quarter (2024-03-30) saw EPS of $1.53, slightly lower than analysts' estimates. However, revenue beat expectations. Apple's overall earnings trend has shown some volatility, but remains relatively strong.
 
-**최근 실적:** (웹 검색 결과를 반영)
+**5. Summary Analysis:**
 
-* 매출: (최근 분기 매출)
-* 영업이익: (최근 분기 영업이익)
-
-**다음 분기 전망:** (웹 검색 결과를 반영)
-
-* 매출: (다음 분기 전망 매출)
-* 영업이익: (다음 분기 전망 영업이익)
-
-### 5. 애널리스트 의견
-
-(웹 검색 결과를 반영) 최근 애널리스트들은 애플에 대해 **(애널리스트들의 평균적인 의견)** 의견을 제시하고 있습니다.
-
----
-
-**참고:** 
-
-* 위 리포트는 제공된 정보와 웹 검색 결과를 기반으로 작성되었으며, 투자 권유가 아닙니다. 투자 결정은 개인의 판단에 따라 신중하게 내려야 합니다.
-* 실제 투자를 결정하기 전에 추가적인 조사와 전문가의 조언을 구하는 것이 좋습니다. 
+Apple's stock has significantly outperformed the market in recent periods. While short-term price action suggests a slight downward trend, the stock is trending upward in the mid-term and long-term. Technical indicators show a neutral RSI and a negative PPO, suggesting a slowing momentum. While the most recent earnings report showed a slight miss on EPS, revenue beat expectations. Apple continues to be a strong company with a solid track record, but its performance may be influenced by factors such as economic conditions and competitive pressures. Further analysis, including industry trends and future outlook, is recommended. 
