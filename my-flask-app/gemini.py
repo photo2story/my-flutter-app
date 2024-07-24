@@ -82,9 +82,14 @@ def analyze_with_gemini(ticker):
         ppo = df_voo['ppo_histogram'].iloc[-1]
 
         # 어닝 데이터 가져오기
+        # 어닝 데이터 가져오기
         recent_earnings = get_recent_eps_and_revenue(ticker)
         if not recent_earnings:
             raise ValueError("No recent earnings data found.")
+
+        # earnings_text 변수 생성
+        earnings_text = format_earnings_text(recent_earnings)
+
 
         # 프롬프트 준비
         prompt_voo = f"""
