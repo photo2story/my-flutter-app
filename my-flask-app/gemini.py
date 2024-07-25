@@ -108,23 +108,31 @@ async def analyze_with_gemini(ticker):
         """
 
         # Gemini API 호출
+        print(f"Sending prompt to Gemini API for {ticker}")
         response_ticker = model.generate_content(prompt_voo)
+        
+        print(f"Raw response from Gemini API: {response_ticker}")  # 전체 응답 로깅
 
         # 리포트 내용 확인
-        report_text = response_ticker.text
-        print(f"Generated report for {ticker}: {report_text}")
+        # 응답 처리
+        if response_ticker and response_ticker.parts:
+            report_text = response_ticker.text
+            print(f"Generated report for {ticker}: {report_text}")
 
-        # Discord로 리포트 전송 전에 빈 메시지인지 확인
-        if report_text and report_text.strip():  # None 체크와 공백만 있는지 확인
-            # 메시지 길이 제한 확인 (Discord 메시지 길이 제한: 2000자)
-            if len(report_text) > 1900:  # 여유를 두고 1900자로 제한
-                chunks = [report_text[i:i+1900] for i in range(0, len(report_text), 1900)]
-                for chunk in chunks:
-                    requests.post(DISCORD_WEBHOOK_URL, data={'content': chunk})
+            if report_text and report_text.strip():
+                # 메시지 길이 제한 확인 (Discord 메시지 길이 제한: 2000자)
+                if len(report_text) > 1900:  # 여유를 두고 1900자로 제한
+                    chunks = [report_text[i:i+1900] for i in range(0, len(report_text), 1900)]
+                    for chunk in chunks:
+                        requests.post(DISCORD_WEBHOOK_URL, data={'content': chunk})
+                else:
+                    requests.post(DISCORD_WEBHOOK_URL, data={'content': report_text})
             else:
-                requests.post(DISCORD_WEBHOOK_URL, data={'content': report_text})
+                error_message = f"Analysis result for {ticker} is empty after processing."
+                print(error_message)
+                requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
         else:
-            error_message = f"Analysis result for {ticker} could not be generated. Generated content is empty."
+            error_message = f"No valid response received from Gemini API for {ticker}."
             print(error_message)
             requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
 
@@ -132,7 +140,7 @@ async def analyze_with_gemini(ticker):
         await move_files_to_images_folder()
 
     except Exception as e:
-        error_message = f"Error occurred while analyzing {ticker}: {str(e)}"
+        error_message = f"Error occurred while analyzing {ticker}: {str(e)}\n{traceback.format_exc()}"
         print(error_message)
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
 
