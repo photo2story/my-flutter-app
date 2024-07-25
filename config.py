@@ -27,11 +27,11 @@ STOCKS = {
     'Healthcare': ['LLY','UNH'],
     'Communication Services': ['META', 'VZ'],
     'Industrials': ['GE','UPS'],
-    'Consumer Defensive': ['WMT', 'PG'],
-    'Energy': ['XOM', 'FSLR'],
+    'Consumer Defensive': ['WMT', 'SBUX'],
+    'Energy': ['XOM'],
     'Basic Materials': ['LIN','ALB'],
-    'Real Estate': ['AMT'], 
-    'Utilities': ['NEE', 'DUK']
+    'Real Estate': ['DHI', 'ADSK'], 
+    'Utilities': ['DHI', 'ADSK']
     # 'ETFs': ['SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO']
 }
 

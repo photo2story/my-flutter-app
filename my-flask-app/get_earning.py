@@ -62,7 +62,7 @@ def get_recent_eps_and_revenue(ticker):
     eps_facts = filter_quarterly_data(eps_facts)
     revenue_facts = filter_quarterly_data(revenue_facts)
     
-    # 최신 데이터 4개 추출 및 매칭
+    # 최신 데이터 5개 추출 및 매칭
     eps_facts = sorted(eps_facts, key=lambda x: x['end'], reverse=True)
     revenue_facts = sorted(revenue_facts, key=lambda x: x['end'], reverse=True)
 
@@ -72,7 +72,7 @@ def get_recent_eps_and_revenue(ticker):
             if eps['end'] == rev['end']:
                 quarterly_results.append((eps['end'], eps['filed'], eps['val'], rev['val']))
                 break
-        if len(quarterly_results) == 4:
+        if len(quarterly_results) == 5:
             break
 
     return quarterly_results
