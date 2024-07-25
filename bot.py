@@ -149,13 +149,13 @@ async def account(ctx, ticker: str):
 @bot.command()
 async def gemini(ctx, ticker: str):
     try:
-        ticker = ticker.upper()  # 티커명을 대문자로 변환
+        ticker = ticker.upper()  # 티커를 대문자로 변환
         report = analyze_with_gpt(ticker)  # GPT 분석 사용
 
         # 리포트 내용을 로그에 출력 (디버깅용)
         print(f"Generated report for {ticker}: {report}")
 
-        if report:  # 빈 문자열인지 확인
+        if report and len(report.strip()) > 0:  # 빈 문자열인지 확인
             await ctx.send(report)
         else:
             await ctx.send(f"No report generated for {ticker}.")
@@ -163,7 +163,6 @@ async def gemini(ctx, ticker: str):
         error_message = f'An error occurred while analyzing {ticker} with GPT API: {e}'
         await ctx.send(error_message)
         print(error_message)
-
 
 
 async def run_bot():
