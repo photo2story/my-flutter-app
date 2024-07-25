@@ -74,4 +74,4 @@ if __name__ == "__main__":
     main()
 
 
-# python get_earning.py    
+# python get_earning_fmp.py    
