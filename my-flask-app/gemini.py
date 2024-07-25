@@ -115,10 +115,13 @@ async def analyze_with_gemini(ticker):
         print(f"Generated report for {ticker}: {report_text}")
 
         # Discord로 리포트 전송 전에 빈 메시지인지 확인
-        if report_text.strip():  # 빈 문자열이 아닌지 확인
+        # Gemini API를 사용하여 report_text를 생성한 후
+        if report_text.strip():  # 내용이 비어 있거나 공백만 있는지 확인
             requests.post(DISCORD_WEBHOOK_URL, data={'content': report_text})
         else:
-            print(f"No content to send for {ticker}")
+            print(f"{ticker}에 대한 보낼 내용이 없습니다.")
+            requests.post(DISCORD_WEBHOOK_URL, data={'content': f"{ticker}에 대한 분석 결과를 생성할 수 없습니다."})
+
 
         # 리포트를 static/images 폴더로 이동 및 커밋
         await move_files_to_images_folder()
