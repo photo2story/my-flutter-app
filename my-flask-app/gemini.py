@@ -1,56 +1,4 @@
 # gemini.py
-import os
-import sys
-import pandas as pd
-import requests
-from dotenv import load_dotenv
-import google.generativeai as genai
-import shutil
-import asyncio  # 추가된 모듈
-
-# 루트 디렉토리를 sys.path에 추가
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from git_operations import move_files_to_images_folder
-from get_earning import get_recent_eps_and_revenue  # 새롭게 추가된 모듈 import
-
-# 환경 변수 로드
-load_dotenv()
-GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
-DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-FMP_API_KEY = os.getenv('FMP_API_KEY')
-GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
-CSV_PATH = os.getenv('CSV_PATH', 'static/images/stock_market.csv')
-
-# Gemini API 구성
-genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
-
-# CSV 파일에서 티커명과 회사 이름을 매핑하는 딕셔너리 생성
-def create_ticker_to_name_dict(csv_path):
-    df = pd.read_csv(csv_path)
-    ticker_to_name = dict(zip(df['Symbol'], df['Name']))
-    return ticker_to_name
-
-ticker_to_name = create_ticker_to_name_dict(CSV_PATH)
-
-def download_csv(ticker):
-    ticker_vs_voo_url = f"{GITHUB_RAW_BASE_URL}/result_VOO_{ticker}.csv"
-    response_ticker = requests.get(ticker_vs_voo_url)
-
-    if response_ticker.status_code == 200:
-        with open(f'result_VOO_{ticker}.csv', 'wb') as f:
-            f.write(response_ticker.content)
-        return True
-    else:
-        return False
-
-def format_earnings_text(earnings_data):
-    if not earnings_data:
-        return "No earnings data available."
-    earnings_text = "| 날짜 : EPS / Revenue |\n"
-    for end, filed, eps_val, revenue_val in earnings_data:
-        earnings_text += f"| {end} (Filed: {filed}): EPS {eps_val}, Revenue {revenue_val / 1e9:.2f} B$ |\n"
-    return earnings_text
 
 async def analyze_with_gemini(ticker):
     try:
@@ -138,6 +86,7 @@ if __name__ == '__main__':
     # 분석할 티커 설정
     ticker = 'AAPL'
     asyncio.run(analyze_with_gemini(ticker))
+
 
 
 """
