@@ -88,34 +88,34 @@ async def analyze_with_gemini(ticker):
 
         # 프롬프트 준비
         prompt_voo = f"""
-        1) 제공된 자료의 수익률(rate)와 S&P 500(VOO)의 수익률(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨 마지막 날의 누적 수익률 차이):
-           리뷰할 주식 티커명 = {ticker}
-           회사 이름과 회사 개요 설명해줘 (1줄로)
-           리뷰 주식의 누적 수익률 = {final_rate}
-           기준이 되는 비교 주식(S&P 500, VOO)의 누적 수익률 = {final_rate_vs}
-        2) 제공된 자료의 최근 주가 변동 (간단하게: 5일, 20일, 60일 이동평균 수치로):
-           5일 이동평균 = {sma_5}
-           20일 이동평균 = {sma_20}
-           60일 이동평균 = {sma_60}
+        1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
+           리뷰할 주식티커명 = {ticker}
+           회사이름과 회사 개요 설명해줘(1줄로)
+           리뷰주식의 누적수익률 = {final_rate}
+           기준이 되는 비교주식(S&P 500, VOO)의 누적수익율 = {final_rate_vs}
+        2) 제공된 자료의 최근 주가 변동(간단하게: 5일, 20일, 60일 이동평균 수치로):
+           5일이동평균 = {sma_5}
+           20일이동평균 = {sma_20}
+           60일이동평균 = {sma_60}
         3) 제공된 자료의 RSI, PPO 인덱스 지표를 분석해줘 (간단하게):
            RSI = {rsi}
            PPO = {ppo}
-        4) 최근 실적 및 전망: 제공된 자료의 실적을 분석해줘 (간단하게)
+        4) 최근 실적 및 전망: 제공된 자료의 실적을 분석해줘(간단하게)
            실적 = {earnings_text}
-           가장 최근 실적은 예상치도 함께 검토해줘
-        5) 종합적으로 분석해줘 (1~4번까지의 요약)
+           가장 최근 실적은 예상치도 함께 포함해서 검토해줘
+        5) 종합적으로 분석해줘(1~4번까지의 요약)
         6) 레포트는 한글로 만들어줘
         """
 
         # Gemini API 호출
-        response_ticker = await model.generate_content(prompt_voo)
+        response_ticker = model.generate_content(prompt_voo)
 
         # 리포트 내용 확인
-        report_text = response_ticker.text.strip()
+        report_text = response_ticker.text
         print(f"Generated report for {ticker}: {report_text}")
 
         # Discord로 리포트 전송 전에 빈 메시지인지 확인
-        if report_text:  # 빈 문자열이 아닌지 확인
+        if report_text.strip():  # 빈 문자열이 아닌지 확인
             requests.post(DISCORD_WEBHOOK_URL, data={'content': report_text})
         else:
             print(f"No content to send for {ticker}")
@@ -127,7 +127,6 @@ async def analyze_with_gemini(ticker):
         error_message = f"{ticker} 분석 중 오류 발생: {e}"
         print(error_message)
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
-
 
 
 if __name__ == '__main__':
