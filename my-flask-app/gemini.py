@@ -110,12 +110,15 @@ async def analyze_with_gemini(ticker):
         # Gemini API 호출
         response_ticker = model.generate_content(prompt_voo)
 
-        # 리포트를 텍스트로 저장
+        # 리포트 내용 확인
         report_text = response_ticker.text
-        print(report_text)
+        print(f"Generated report for {ticker}: {report_text}")
 
-        # 디스코드 웹훅 메시지로 전송
-        requests.post(DISCORD_WEBHOOK_URL, data={'content': report_text})
+        # Discord로 리포트 전송 전에 빈 메시지인지 확인
+        if report_text.strip():  # 빈 문자열이 아닌지 확인
+            requests.post(DISCORD_WEBHOOK_URL, data={'content': report_text})
+        else:
+            print(f"No content to send for {ticker}")
 
         # 리포트를 static/images 폴더로 이동 및 커밋
         await move_files_to_images_folder()
@@ -124,6 +127,7 @@ async def analyze_with_gemini(ticker):
         error_message = f"{ticker} 분석 중 오류 발생: {e}"
         print(error_message)
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
+
 
 if __name__ == '__main__':
     # 분석할 티커 설정
