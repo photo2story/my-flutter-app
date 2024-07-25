@@ -7,6 +7,7 @@ import requests
 from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
+import asyncio  # asyncio 모듈 임포트 추가
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
