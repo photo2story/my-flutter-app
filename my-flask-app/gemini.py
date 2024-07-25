@@ -102,8 +102,7 @@ def analyze_with_gemini(ticker):
            실적 = {earnings_text}
            가장 최근 실적은 예상치도 함께 포함해서 검토해줘
         5) 종합적으로 분석해줘(1~4번까지의 요약)
-        # 6) 레포트는 ["candidates"][0]["content"]["parts"][0]["text"]의 구조의 텍스트로 만들어줘
-        7) 레포트는 한글로 만들어줘
+        6) 레포트는 한글로 만들어줘
         """
 
         # Gemini API 호출
