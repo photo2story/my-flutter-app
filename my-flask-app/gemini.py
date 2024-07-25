@@ -115,26 +115,24 @@ async def analyze_with_gemini(ticker):
         print(f"Generated report for {ticker}: {report_text}")
 
         # Discord로 리포트 전송 전에 빈 메시지인지 확인
-        # Gemini API를 사용하여 report_text를 생성한 후
-        try:
-            if report_text and report_text.strip():  # None 체크와 공백만 있는지 확인
-                requests.post(DISCORD_WEBHOOK_URL, data={'content': report_text})
+        if report_text and report_text.strip():  # None 체크와 공백만 있는지 확인
+            # 메시지 길이 제한 확인 (Discord 메시지 길이 제한: 2000자)
+            if len(report_text) > 1900:  # 여유를 두고 1900자로 제한
+                chunks = [report_text[i:i+1900] for i in range(0, len(report_text), 1900)]
+                for chunk in chunks:
+                    requests.post(DISCORD_WEBHOOK_URL, data={'content': chunk})
             else:
-                error_message = f"TSLA에 대한 분석 결과를 생성할 수 없습니다. report_text: {report_text}"
-                print(error_message)
-                requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
-        except Exception as e:
-            # 예기치 않은 오류 발생 시 처리
-            error_message = f"오류 발생: {str(e)}"
+                requests.post(DISCORD_WEBHOOK_URL, data={'content': report_text})
+        else:
+            error_message = f"Analysis result for {ticker} could not be generated. Generated content is empty."
             print(error_message)
             requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
-
 
         # 리포트를 static/images 폴더로 이동 및 커밋
         await move_files_to_images_folder()
 
     except Exception as e:
-        error_message = f"{ticker} 분석 중 오류 발생: {e}"
+        error_message = f"Error occurred while analyzing {ticker}: {str(e)}"
         print(error_message)
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
 
