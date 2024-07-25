@@ -94,6 +94,7 @@ async def analyze_with_gemini(ticker):
            리뷰주식의 누적수익률 = {final_rate}
            기준이 되는 비교주식(S&P 500, VOO)의 누적수익율 = {final_rate_vs}
         2) 제공된 자료의 최근 주가 변동(간단하게: 5일, 20일, 60일 이동평균 수치로):
+           종가 = {Close}
            5일이동평균 = {sma_5}
            20일이동평균 = {sma_20}
            60일이동평균 = {sma_60}
