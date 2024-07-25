@@ -11,7 +11,7 @@ import asyncio  # asyncio 모듈 추가
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from git_operations import move_files_to_images_folder  # 비동기 함수로 정의
+from git_operations import move_files_to_images_folder
 from get_earning import get_recent_eps_and_revenue  # 새롭게 추가된 모듈 import
 
 # 환경 변수 로드
@@ -64,8 +64,8 @@ async def analyze_with_gemini(ticker):
         if not download_csv(ticker):
             error_message = f'Error: The file for {ticker} does not exist.'
             print(error_message)
-            response = requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
-            return error_message
+            await response.json({'content': error_message})
+            return
 
         # CSV 파일 로드
         voo_file = f'result_VOO_{ticker}.csv'
@@ -108,7 +108,7 @@ async def analyze_with_gemini(ticker):
         """
 
         # Gemini API 호출
-        response_ticker = model.generate_content(prompt_voo)
+        response_ticker = await model.generate_content(prompt_voo)
 
         # 리포트를 텍스트로 저장
         report_text = response_ticker.text
@@ -117,12 +117,7 @@ async def analyze_with_gemini(ticker):
         # 디스코드 웹훅 메시지로 전송
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
         print(success_message)
-        response = requests.post(DISCORD_WEBHOOK_URL, json={'content': success_message})
-
-        # 리포트를 텍스트 파일로 저장
-        report_file = f'report_{ticker}.txt'
-        with open(report_file, 'w', encoding='utf-8') as file:
-            file.write(report_text)
+        await response.json({'content': success_message})
 
         # 리포트를 static/images 폴더로 이동 및 커밋
         await move_files_to_images_folder()
@@ -132,15 +127,13 @@ async def analyze_with_gemini(ticker):
     except Exception as e:
         error_message = f"{ticker} 분석 중 오류 발생: {e}"
         print(error_message)
-        response = requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
+        await response.json({'content': error_message})
         return error_message
 
 if __name__ == '__main__':
     # 분석할 티커 설정
     ticker = 'TSLA'
     asyncio.run(analyze_with_gemini(ticker))
-
-
 
 # source .venv/bin/activate
 # python gemini.py    
