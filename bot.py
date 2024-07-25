@@ -90,7 +90,7 @@ async def stock(ctx, query: str):
                 await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
                 print(f"Error plotting {stock_name}: {e}")
                     # 파일 이동
-            move_files_to_images_folder()    
+            await move_files_to_images_folder()    
         await asyncio.sleep(10)
 
         # Gemini 분석
