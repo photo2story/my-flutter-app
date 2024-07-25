@@ -28,7 +28,7 @@ def fetch_csv_data(url):
         print(f'Error fetching CSV data: {e}')
         return None
 
-def move_files_to_images_folder():
+async def move_files_to_images_folder():
     if repo is None:
         print('No valid Git repository. Skipping git operations.')
         return
