@@ -55,6 +55,7 @@ def format_earnings_text(earnings_data):
 
 async def analyze_with_gemini(ticker):
     try:
+        print(f"Starting analysis for {ticker}")  # 로그 추가
         # 시작 메시지 전송
         start_message = f"Gemini API를 사용하여 {ticker} 분석을 시작합니다."
         print(start_message)
@@ -122,6 +123,7 @@ async def analyze_with_gemini(ticker):
         # 리포트를 static/images 폴더로 이동 및 커밋
         await move_files_to_images_folder()
 
+        print(f"Analysis completed for {ticker}")  # 로그 추가
         return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord and saved as a text file.'
 
     except Exception as e:
@@ -132,8 +134,9 @@ async def analyze_with_gemini(ticker):
 
 if __name__ == '__main__':
     # 분석할 티커 설정
-    ticker = 'AAPL'
+    ticker = 'TSLA'
     asyncio.run(analyze_with_gemini(ticker))
+
 
 """
 source .venv/bin/activate
