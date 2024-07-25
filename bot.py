@@ -89,16 +89,16 @@ async def stock(ctx, query: str):
             except KeyError as e:
                 await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
                 print(f"Error plotting {stock_name}: {e}")
-                    # 파일 이동
+            # 파일 이동
             await move_files_to_images_folder()    
         await asyncio.sleep(10)
 
         # Gemini 분석
-        result = analyze_with_gemini(stock_name)
+        result = await analyze_with_gemini(stock_name)
         await ctx.send(result)
         
         # GPT 분석
-        # result = analyze_with_gpt(stock_name)
+        # result = await analyze_with_gpt(stock_name)
         # await ctx.send(result)
         
         # 파일 이동
@@ -107,6 +107,7 @@ async def stock(ctx, query: str):
     except Exception as e:
         await ctx.send(f'An error occurred while processing {stock_name}: {e}')
         print(f'Error processing {stock_name}: {e}')
+
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
@@ -149,8 +150,8 @@ async def account(ctx, ticker: str):
 async def gemini(ctx, ticker: str):
     try:
         ticker = ticker.upper()  # 티커를 대문자로 변환
-        # report = analyze_with_gemini(ticker)
-        report = analyze_with_gpt(ticker)  # 이 부분을 수정
+        # report = await analyze_with_gemini(ticker)
+        report = await analyze_with_gpt(ticker)  # 이 부분을 수정
         await ctx.send(report)
     except Exception as e:
         await ctx.send(f'An error occurred while analyzing {ticker} with Gemini API: {e}')
@@ -181,7 +182,7 @@ if __name__ == '__main__':
 
 #  .\.venv\Scripts\activate
 # source .venv/bin/activate
-# #     
+# #  python bot.py   
 # docker build -t asia.gcr.io/my-flask-app-429017/bot .
 # docker push asia.gcr.io/my-flask-app-429017/bot
 # gcloud run deploy bot --image asia.gcr.io/my-flask-app-429017/bot --platform managed --region asia-northeast3 --allow-unauthenticated
