@@ -113,7 +113,7 @@ async def analyze_with_gemini(ticker):
         
         # 리포트를 텍스트로 저장
         report_text = response_ticker.text
-        print(report_text)
+        # print(report_text)
 
         # 디스코드 웹훅 메시지로 전송
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
