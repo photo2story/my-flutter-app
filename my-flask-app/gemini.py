@@ -115,9 +115,7 @@ async def analyze_with_gemini(ticker):
         print(report_text)
 
         # 디스코드 웹훅 메시지로 전송
-        success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
-        print(success_message)
-        requests.post(DISCORD_WEBHOOK_URL, data={'content': success_message})
+        requests.post(DISCORD_WEBHOOK_URL, data={'content': report_text})
 
         # 리포트를 static/images 폴더로 이동 및 커밋
         await move_files_to_images_folder()
@@ -131,6 +129,7 @@ if __name__ == '__main__':
     # 분석할 티커 설정
     ticker = 'TSLA'
     asyncio.run(analyze_with_gemini(ticker))
+
 
 
 # source .venv/bin/activate
