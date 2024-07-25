@@ -30,7 +30,7 @@ def get_earnings_data(ticker):
         print('Error parsing JSON:', e)
         return None
 
-def get_recent_earnings(ticker, num_entries=4):
+def get_recent_earnings(ticker, num_entries=5):
     earnings_data = get_earnings_data(ticker)
     
     if earnings_data:
