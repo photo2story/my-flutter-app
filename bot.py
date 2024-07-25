@@ -74,7 +74,7 @@ async def buddy(ctx):
         await ctx.send(f'Processing sector: {sector}')
         for stock in stocks:
             await ctx.invoke(bot.get_command("stock"), query=stock)
-            await asyncio.sleep(10)  # 각 호출 간에 10초 대기
+            await asyncio.sleep(20)  # 각 호출 간에 20초 대기
 
 @bot.command()
 async def stock(ctx, query: str):
