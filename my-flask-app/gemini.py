@@ -74,6 +74,7 @@ async def analyze_with_gemini(ticker):
         # 데이터 추출
         final_rate = df_voo['rate'].iloc[-1]
         final_rate_vs = df_voo['rate_vs'].iloc[-1]
+        Close = df_voo['Close'].iloc[-1]
         sma_5 = df_voo['sma05_ta'].iloc[-1]
         sma_20 = df_voo['sma20_ta'].iloc[-1]
         sma_60 = df_voo['sma60_ta'].iloc[-1]
