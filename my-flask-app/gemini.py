@@ -58,13 +58,13 @@ async def analyze_with_gemini(ticker):
         # 시작 메시지 전송
         start_message = f"Starting analysis for {ticker}"
         print(start_message)
-        response = requests.post(DISCORD_WEBHOOK_URL, data={'content': start_message})
+        requests.post(DISCORD_WEBHOOK_URL, data={'content': start_message})
 
         # CSV 파일 다운로드
         if not download_csv(ticker):
             error_message = f'Error: The file for {ticker} does not exist.'
             print(error_message)
-            await response.json({'content': error_message})
+            requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
             return
 
         # CSV 파일 로드
@@ -108,7 +108,7 @@ async def analyze_with_gemini(ticker):
         """
 
         # Gemini API 호출
-        response_ticker = await model.generate_content(prompt_voo)
+        response_ticker = model.generate_content(prompt_voo)
 
         # 리포트를 텍스트로 저장
         report_text = response_ticker.text
@@ -117,7 +117,7 @@ async def analyze_with_gemini(ticker):
         # 디스코드 웹훅 메시지로 전송
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
         print(success_message)
-        await response.json({'content': success_message})
+        requests.post(DISCORD_WEBHOOK_URL, data={'content': success_message})
 
         # 리포트를 static/images 폴더로 이동 및 커밋
         await move_files_to_images_folder()
@@ -127,7 +127,7 @@ async def analyze_with_gemini(ticker):
     except Exception as e:
         error_message = f"{ticker} 분석 중 오류 발생: {e}"
         print(error_message)
-        await response.json({'content': error_message})
+        requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
         return error_message
 
 if __name__ == '__main__':
