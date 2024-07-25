@@ -1,48 +1,42 @@
-## Tesla (TSLA) Stock Analysis:
+## 테슬라(TSLA) 주식 분석 리포트
 
-**1. Stock vs. Benchmark:**
+### 1. 수익률 비교 분석
 
-* **Tesla (TSLA):** Cumulative return of -7.25%
-* **S&P 500 (VOO):** Cumulative return of 23.35%
+테슬라(TSLA)는 전기 자동차 및 에너지 저장 시스템을 생산하는 미국의 회사입니다. 
 
-**TSLA has significantly underperformed the S&P 500 in the given period.**
+분석 기간 동안 테슬라 주식의 누적 수익률은 -16.88%로, S&P 500 지수(VOO)의 누적 수익률인 21.18%와 비교했을 때 **38.06%p** 낮습니다. 
 
-**2. Recent Price Trends:**
+### 2. 최근 주가 변동
 
-* **5-day Moving Average:** 246.96 - indicates short-term upward trend.
-* **20-day Moving Average:** 236.49 - suggests a slightly longer-term upward trend.
-* **60-day Moving Average:** 197.63 - shows a significant upward trend over the past 60 days.
+* 5일 이동평균: 240.46
+* 20일 이동평균: 237.92
+* 60일 이동평균: 198.42
 
-**The stock price is currently above all three moving averages, indicating potential for further upside.**
+최근 5일 동안 테슬라 주가는 20일 이동평균 위에 위치하며 상승세를 보이고 있습니다. 20일 이동평균은 60일 이동평균보다 높아 장기적으로는 상승 추세를 유지하고 있지만, 단기적으로는 변동성이 큰 편입니다. 
 
-**3. Technical Indicators:**
+### 3. 기술적 지표 분석
 
-* **RSI:** 60.48 - indicates the stock is in overbought territory, suggesting potential for a short-term correction.
-* **PPO:** -1.01 - suggests bearish momentum, but not a strong signal.
+* RSI: 44.89
+* PPO: -1.97
 
-**The RSI suggests potential for a short-term pullback, while the PPO remains neutral.**
+RSI 지표는 50을 기준으로 과매수(70 이상) 또는 과매도(30 이하) 상태를 판단합니다. 현재 RSI는 44.89로 과매수 혹은 과매도 영역에 속하지 않으며, 중립적인 수준입니다. PPO 지표는 0을 기준으로 매수 신호(0 이상) 또는 매도 신호(0 이하)를 나타냅니다. 현재 PPO는 -1.97로 매도 신호를 보여주고 있습니다.
 
-**4. Recent Earnings and Outlook:**
+### 4. 최근 실적 및 전망
 
-| Date: EPS / Revenue |
-|---|---|
-| 2024-06-30 (Filed: 2024-07-24): EPS 0.46, Revenue 25500000000.00 B$ |
-| 2024-03-31 (Filed: 2024-04-24): EPS 0.37, Revenue 21301000000.00 B$ |
-| 2023-09-30 (Filed: 2023-10-23): EPS 0.58, Revenue 23350000000.00 B$ |
-| 2023-06-30 (Filed: 2023-07-24): EPS 0.85, Revenue 24927000000.00 B$ |
+| 날짜 | EPS | Revenue | 예상 EPS | 
+|---|---|---|---|
+| 2024-06-30 (Filed: 2024-07-24) | 0.46 | 25.50 B$ | 0.51 |
+| 2024-03-31 (Filed: 2024-04-24) | 0.37 | 21.30 B$ | 0.42 |
+| 2023-09-30 (Filed: 2023-10-23) | 0.58 | 23.35 B$ | 0.61 |
+| 2023-06-30 (Filed: 2023-07-24) | 0.85 | 24.93 B$ | 0.88 |
+| 2023-06-30 (Filed: 2024-07-24) | 0.85 | 24.93 B$ | 0.88 | 
 
-**For Q2 2024:**
+가장 최근 분기 실적은 EPS가 0.46으로 예상치인 0.51을 하회했습니다. 매출은 25.50 B$로 예상치를 상회했지만, EPS가 예상치를 하회하면서 실적은 다소 부진한 것으로 평가됩니다. 
 
-* **Actual EPS:** 0.46
-* **Estimated EPS:** 0.47 (analysts' consensus)
+### 5. 종합 분석
 
-**Tesla's EPS slightly missed estimates, indicating potential concerns about the company's profitability.**
+테슬라는 S&P 500 지수 대비 수익률이 저조하며, 최근 주가는 단기적으로는 상승세를 보이지만 장기적으로는 변동성이 큰 편입니다. 기술적 지표는 중립적인 수준이지만, PPO 지표는 매도 신호를 보여주고 있습니다. 최근 실적은 예상치를 하회했으며, 향후 전망은 불확실합니다.
 
-**5. Comprehensive Summary Analysis:**
+### 6. 결론
 
-* **TSLA has underperformed the S&P 500 significantly in the given period.**
-* **Price trends show a strong upward trajectory, currently above all three moving averages.**
-* **Technical indicators suggest potential for a short-term pullback, but not a strong sell signal.**
-* **Recent earnings slightly missed estimates, raising concerns about profitability.**
-
-**Overall, TSLA remains a volatile stock with strong growth potential. However, the recent earnings miss and overbought conditions suggest a potential short-term correction. Investors should consider these factors before making any investment decisions.** 
+테슬라 주식은 현재 시장 상황과 기술적 지표, 최근 실적을 종합적으로 고려했을 때 투자에는 다소 신중한 접근이 필요합니다. 투자 결정을 내리기 전에 추가적인 분석과 리스크 관리가 중요합니다. 
