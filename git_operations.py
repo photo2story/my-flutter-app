@@ -18,7 +18,7 @@ except git.exc.InvalidGitRepositoryError:
     repo = None
 
 # 외부 URL에서 CSV 데이터를 가져오는 함수
-async def fetch_csv_data(url):
+def fetch_csv_data(url):
     try:
         response = requests.get(url)
         response.raise_for_status()  # HTTP 에러가 발생하면 예외 발생
