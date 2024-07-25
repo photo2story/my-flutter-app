@@ -1,5 +1,4 @@
 # get_earning.py
-
 import requests
 from datetime import datetime
 
@@ -36,18 +35,26 @@ def get_recent_eps_and_revenue(ticker):
     eps_data = get_financial_data(cik, "EarningsPerShareBasic")
     revenue_data = get_financial_data(cik, "RevenueFromContractWithCustomerExcludingAssessedTax")
     
-    if not eps_data or not revenue_data:
-        print("Error retrieving EPS or Revenue data.")
+    if not eps_data:
+        print("Error retrieving EPS data. Checking alternative data points.")
+        eps_data = get_financial_data(cik, "EarningsPerShareDiluted")
+
+    if not revenue_data:
+        print("Error retrieving Revenue data. Checking alternative data points.")
+        revenue_data = get_financial_data(cik, "Revenues")
+
+    if not eps_data:
+        print("No EPS data available.")
         return
     
     def extract_data(data, unit_key):
-        if unit_key not in data['units']:
-            print(f"No '{unit_key}' unit data found.")
-            return []
-        return data['units'][unit_key]
+        if data and unit_key in data['units']:
+            return data['units'][unit_key]
+        print(f"No '{unit_key}' unit data found.")
+        return []
 
     eps_facts = extract_data(eps_data, 'USD/shares')
-    revenue_facts = extract_data(revenue_data, 'USD')
+    revenue_facts = extract_data(revenue_data, 'USD') if revenue_data else []
 
     def filter_quarterly_data(data):
         quarterly_data = []
@@ -59,30 +66,52 @@ def get_recent_eps_and_revenue(ticker):
         return quarterly_data
     
     eps_facts = filter_quarterly_data(eps_facts)
-    revenue_facts = filter_quarterly_data(revenue_facts)
+    revenue_facts = filter_quarterly_data(revenue_facts) if revenue_facts else []
     
     eps_facts = sorted(eps_facts, key=lambda x: x['end'], reverse=True)
-    revenue_facts = sorted(revenue_facts, key=lambda x: x['end'], reverse=True)
+    revenue_facts = sorted(revenue_facts, key=lambda x: x['end'], reverse=True) if revenue_facts else []
 
     quarterly_results = []
-    seen_end_dates = set()  # 중복 확인을 위한 집합
+    revenue_dict = {rev['end']: rev for rev in revenue_facts}
     for eps in eps_facts:
-        for rev in revenue_facts:
-            if eps['end'] == rev['end'] and eps['end'] not in seen_end_dates:
-                quarterly_results.append((eps['end'], eps['filed'], eps['val'], rev['val']))
-                seen_end_dates.add(eps['end'])
-                break
+        eps_val = eps.get('val', None)
+        if eps_val is not None and isinstance(eps_val, (int, float)):
+            revenue_val = None
+            rev = revenue_dict.get(eps['end'], None)
+            if rev:
+                revenue_val = rev.get('val', None)
+            quarterly_results.append((eps['end'], eps['filed'], eps_val, revenue_val))
         if len(quarterly_results) == 5:
             break
 
     return quarterly_results
 
 if __name__ == '__main__':
-    # 테스트 코드
-    results = get_recent_eps_and_revenue("TSLA")
-    if results:
-        print("\nQuarterly Results:")
-        for end, filed, eps_val, revenue_val in results:
-            print(f"{end} (Filed: {filed}): EPS {eps_val}, Revenue {revenue_val / 1e9:.2f} B$")
+    # 주식 목록
+    STOCKS = {
+        'Technology': ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA'], 
+        'Financials': ['BAC'],
+        'Consumer Cyclical': ['TSLA', 'NFLX'],
+        'Healthcare': ['LLY','UNH'],
+        'Communication Services': ['META', 'VZ'],
+        'Industrials': ['GE','UPS'],
+        'Consumer Defensive': ['WMT', 'KO'],
+        'Energy': ['XOM'],
+        'Basic Materials': ['LIN','ALB'],
+        'Real Estate': ['DHI', 'ADSK'], 
+        'Utilities': ['EXC']
+    }
+
+    for sector, tickers in STOCKS.items():
+        for ticker in tickers:
+            print(f"\nAnalyzing {ticker} from sector {sector}")
+            results = get_recent_eps_and_revenue(ticker)
+            if results:
+                print("Quarterly Results:")
+                for end, filed, eps_val, revenue_val in results:
+                    print(f"{end} (Filed: {filed}): EPS {eps_val}, Revenue {revenue_val / 1e9:.2f} B$" if revenue_val is not None else f"{end} (Filed: {filed}): EPS {eps_val}, Revenue: None")
+            else:
+                print(f"No data found for {ticker}")
+
 
 # python get_earning.py    
