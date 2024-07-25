@@ -116,13 +116,18 @@ async def analyze_with_gemini(ticker):
 
         # Discord로 리포트 전송 전에 빈 메시지인지 확인
         # Gemini API를 사용하여 report_text를 생성한 후
-        if report_text.strip():  # 내용이 비어 있거나 공백만 있는지 확인
-            requests.post(DISCORD_WEBHOOK_URL, data={'content': report_text})
-        else:
-            error_message = f"TSLA에 대한 분석 결과를 생성할 수 없습니다."
+        try:
+            if report_text and report_text.strip():  # None 체크와 공백만 있는지 확인
+                requests.post(DISCORD_WEBHOOK_URL, data={'content': report_text})
+            else:
+                error_message = f"TSLA에 대한 분석 결과를 생성할 수 없습니다. report_text: {report_text}"
+                print(error_message)
+                requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
+        except Exception as e:
+            # 예기치 않은 오류 발생 시 처리
+            error_message = f"오류 발생: {str(e)}"
             print(error_message)
             requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
-
 
 
         # 리포트를 static/images 폴더로 이동 및 커밋
