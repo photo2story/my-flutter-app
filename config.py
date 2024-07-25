@@ -27,7 +27,7 @@ STOCKS = {
     'Healthcare': ['LLY','UNH'],
     'Communication Services': ['META', 'VZ'],
     'Industrials': ['GE','UPS'],
-    'Consumer Defensive': ['WMT', 'SBUX'],
+    'Consumer Defensive': ['WMT', 'COKE'],
     'Energy': ['XOM'],
     'Basic Materials': ['LIN','ALB'],
     'Real Estate': ['DHI', 'ADSK'], 

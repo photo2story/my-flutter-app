@@ -51,7 +51,7 @@ def format_earnings_text(earnings_data):
         earnings_text += f"| {end} (Filed: {filed}): EPS {eps_val}, Revenue {revenue_val / 1e9:.2f} B$ |\n"
     return earnings_text
 
-def analyze_with_gemini(ticker):
+async def analyze_with_gemini(ticker):
     try:
         # 시작 메시지 전송
         start_message = f"Gemini API를 사용하여 {ticker} 분석을 시작합니다."
