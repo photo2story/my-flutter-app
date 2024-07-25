@@ -131,7 +131,7 @@ async def analyze_with_gemini(ticker):
         return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord and saved as a text file.'
 
     except Exception as e:
-        error_message = f"Error occurred while analyzing {ticker}: {str(e)}\n{traceback.format_exc()}"
+        error_message = f"{ticker} 분석 중 오류 발생: {e}"
         print(error_message)
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
 
