@@ -6,6 +6,7 @@ import requests
 from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
+import asyncio  # asyncio 추가
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -136,8 +137,7 @@ async def analyze_with_gemini(ticker):
 if __name__ == '__main__':
     # 분석할 티커 설정
     ticker = 'AAPL'
-    analyze_with_gemini(ticker)
-
+    asyncio.run(analyze_with_gemini(ticker))
 
 
 """

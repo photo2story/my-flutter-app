@@ -31,7 +31,7 @@ STOCKS = {
     'Energy': ['XOM'],
     'Basic Materials': ['LIN','ALB'],
     'Real Estate': ['DHI', 'ADSK'], 
-    'Utilities': ['DHI', 'ADSK']
+    'Utilities': ['EXC']
     # 'ETFs': ['SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO']
 }
 
