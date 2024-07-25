@@ -54,7 +54,6 @@ def get_recent_eps_and_revenue(ticker):
         for fact in data:
             start = datetime.strptime(fact['start'], "%Y-%m-%d")
             end = datetime.strptime(fact['end'], "%Y-%m-%d")
-            # 날짜 차이가 3개월(90일)인 데이터만 필터링
             if (end - start).days <= 92:
                 quarterly_data.append(fact)
         return quarterly_data
@@ -62,15 +61,16 @@ def get_recent_eps_and_revenue(ticker):
     eps_facts = filter_quarterly_data(eps_facts)
     revenue_facts = filter_quarterly_data(revenue_facts)
     
-    # 최신 데이터 5개 추출 및 매칭
     eps_facts = sorted(eps_facts, key=lambda x: x['end'], reverse=True)
     revenue_facts = sorted(revenue_facts, key=lambda x: x['end'], reverse=True)
 
     quarterly_results = []
+    seen_end_dates = set()  # 중복 확인을 위한 집합
     for eps in eps_facts:
         for rev in revenue_facts:
-            if eps['end'] == rev['end']:
+            if eps['end'] == rev['end'] and eps['end'] not in seen_end_dates:
                 quarterly_results.append((eps['end'], eps['filed'], eps['val'], rev['val']))
+                seen_end_dates.add(eps['end'])
                 break
         if len(quarterly_results) == 5:
             break
@@ -79,12 +79,10 @@ def get_recent_eps_and_revenue(ticker):
 
 if __name__ == '__main__':
     # 테스트 코드
-    results = get_recent_eps_and_revenue("tsla")
+    results = get_recent_eps_and_revenue("TSLA")
     if results:
         print("\nQuarterly Results:")
         for end, filed, eps_val, revenue_val in results:
             print(f"{end} (Filed: {filed}): EPS {eps_val}, Revenue {revenue_val / 1e9:.2f} B$")
-
-
 
 # python get_earning.py    
