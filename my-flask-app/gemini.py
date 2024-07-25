@@ -1,6 +1,6 @@
 # gemini.py
 
-async def analyze_with_gemini(ticker):
+def analyze_with_gemini(ticker):
     try:
         # 시작 메시지 전송
         start_message = f"Gemini API를 사용하여 {ticker} 분석을 시작합니다."
