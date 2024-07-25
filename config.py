@@ -20,6 +20,7 @@ CSV_URL = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my
 GITHUB_API_URL = os.getenv('GITHUB_API_URL', 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images')
 
 # Stocks list
+# 주식 목록
 STOCKS = {
     'Technology': ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA'], 
     'Financials': ['BAC'],
@@ -27,12 +28,12 @@ STOCKS = {
     'Healthcare': ['LLY','UNH'],
     'Communication Services': ['META', 'VZ'],
     'Industrials': ['GE','UPS'],
-    'Consumer Defensive': ['WMT', 'COKE'],
+    'Consumer Defensive': ['WMT', 'KO'],
     'Energy': ['XOM'],
     'Basic Materials': ['LIN','ALB'],
     'Real Estate': ['DHI', 'ADSK'], 
     'Utilities': ['EXC']
-    # 'ETFs': ['SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO']
+# 'ETFs': ['SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO']
 }
 
 

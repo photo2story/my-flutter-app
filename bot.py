@@ -26,9 +26,6 @@ from backtest_send import backtest_and_send
 from get_ticker import is_valid_stock
 from gemini import analyze_with_gemini
 from gpt import analyze_with_gpt
-
-# get_account_balance 모듈 임포트
-from get_account_balance import get_balance, get_ticker_price, get_market_from_ticker
 from get_compare_stock_data import load_sector_info, merge_csv_files
 
 load_dotenv()
@@ -75,6 +72,19 @@ async def buddy(ctx):
         for stock in stocks:
             await ctx.invoke(bot.get_command("stock"), query=stock)
             await asyncio.sleep(5)  # 각 호출 간에 5초 대기
+    
+    # 모든 주식 분석이 완료된 후 데이터 병합
+    await merge_data(ctx)
+
+async def merge_data(ctx):
+    try:
+        sector_dict = load_sector_info()
+        folder_path = os.path.join(os.getcwd(), 'static', 'images')
+        merge_csv_files(folder_path, sector_dict)
+        await ctx.send("All stock data has been merged successfully.")
+    except Exception as e:
+        await ctx.send(f"An error occurred while merging data: {e}")
+        print(f"Error merging data: {e}")
 
 @bot.command()
 async def stock(ctx, query: str):
@@ -183,6 +193,7 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
 
 
 
