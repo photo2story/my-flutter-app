@@ -111,33 +111,23 @@ async def analyze_with_gemini(ticker):
         print(f"Sending prompt to Gemini API for {ticker}")
         response_ticker = model.generate_content(prompt_voo)
         
-        print(f"Raw response from Gemini API: {response_ticker}")  # 전체 응답 로깅
+        # 리포트를 텍스트로 저장
+        report_text = response_ticker.text
+        print(report_text)
 
-        # 리포트 내용 확인
-        # 응답 처리
-        if response_ticker and response_ticker.parts:
-            report_text = response_ticker.text
-            print(f"Generated report for {ticker}: {report_text}")
+        # 디스코드 웹훅 메시지로 전송
+        success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
+        print(success_message)
+        response = requests.post(DISCORD_WEBHOOK_URL, json={'content': success_message})
 
-            if report_text and report_text.strip():
-                # 메시지 길이 제한 확인 (Discord 메시지 길이 제한: 2000자)
-                if len(report_text) > 1900:  # 여유를 두고 1900자로 제한
-                    chunks = [report_text[i:i+1900] for i in range(0, len(report_text), 1900)]
-                    for chunk in chunks:
-                        requests.post(DISCORD_WEBHOOK_URL, data={'content': chunk})
-                else:
-                    requests.post(DISCORD_WEBHOOK_URL, data={'content': report_text})
-            else:
-                error_message = f"Analysis result for {ticker} is empty after processing."
-                print(error_message)
-                requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
-        else:
-            error_message = f"No valid response received from Gemini API for {ticker}."
-            print(error_message)
-            requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
+        # 리포트를 텍스트 파일로 저장
+        report_file = f'report_{ticker}.txt'
+        with open(report_file, 'w', encoding='utf-8') as file:
+            file.write(report_text)
 
         # 리포트를 static/images 폴더로 이동 및 커밋
         await move_files_to_images_folder()
+        return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord and saved as a text file.'
 
     except Exception as e:
         error_message = f"Error occurred while analyzing {ticker}: {str(e)}\n{traceback.format_exc()}"
