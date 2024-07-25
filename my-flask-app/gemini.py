@@ -7,12 +7,12 @@ import requests
 from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
-import asyncio  # asyncio 모듈 추가
+import asyncio
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from git_operations import move_files_to_images_folder
-from get_earning import get_recent_eps_and_revenue  # 새롭게 추가된 모듈 import
+from get_earning import get_recent_eps_and_revenue
 
 # 환경 변수 로드
 load_dotenv()
@@ -134,6 +134,7 @@ if __name__ == '__main__':
     # 분석할 티커 설정
     ticker = 'TSLA'
     asyncio.run(analyze_with_gemini(ticker))
+
 
 # source .venv/bin/activate
 # python gemini.py    
