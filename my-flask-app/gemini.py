@@ -72,7 +72,7 @@ async def analyze_with_gemini(ticker):
             file.write(report_text)
 
         # 리포트를 static/images 폴더로 이동 및 커밋
-        await move_files_to_images_folder()
+        move_files_to_images_folder()
 
         return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord and saved as a text file.'
 
