@@ -48,16 +48,16 @@ def get_recent_eps_and_revenue_fmp(ticker):
         end_date = data['date']
         actual_eps = data['actualEarningResult']
         estimated_eps = data.get('estimatedEarning', 'N/A')  # 추정치
-        revenue = data.get('revenue', 'N/A')  # 실제 매출 데이터
-        estimated_revenue = data.get('estimatedRevenue', 'N/A')  # 추정 매출 데이터
+        revenue = data.get('revenue', None)  # 실제 매출 데이터
+        estimated_revenue = data.get('estimatedRevenue', None)  # 추정 매출 데이터
         
-        # revenue와 estimated_revenue 정보가 있으면 포함
-        if revenue != 'N/A' and estimated_revenue != 'N/A':
+        if revenue and estimated_revenue:
             recent_earnings.append((end_date, actual_eps, estimated_eps, revenue, estimated_revenue))
         else:
             recent_earnings.append((end_date, actual_eps, estimated_eps))
     
     return recent_earnings
+
 
 if __name__ == "__main__":
     # 테스트 코드
