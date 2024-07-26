@@ -1,4 +1,5 @@
 # Results_plot.py
+# Results_plot.py
 import matplotlib.dates as dates
 import matplotlib
 matplotlib.use('Agg')
@@ -7,21 +8,20 @@ import pandas as pd
 import os
 import requests
 import glob
-import asyncio  # 추가
+import asyncio
 from get_ticker import get_ticker_name, is_valid_stock
 from Results_plot_mpl import plot_results_mpl
 
-
 def convert_file_path_for_saving(file_path):
-  return file_path.replace('/', '-')
+    return file_path.replace('/', '-')
 
 def convert_file_path_for_reading(file_path):
-  return file_path.replace('-', '/')
+    return file_path.replace('-', '/')
 
 def save_figure(fig, file_path):
-  file_path = convert_file_path_for_saving(file_path)
-  fig.savefig(file_path, bbox_inches='tight')
-  plt.close(fig)  # 닫지 않으면 메모리를 계속 차지할 수 있음
+    file_path = convert_file_path_for_saving(file_path)
+    fig.savefig(file_path, bbox_inches='tight')
+    plt.close(fig)  # 닫지 않으면 메모리를 계속 차지할 수 있음
 
 from PIL import Image
 
@@ -30,11 +30,11 @@ def load_image(file_path):
     image = Image.open(file_path)
     return image
 
-def plot_results(file_path, total_account_balance, total_rate, str_strategy, stock,invested_amount):
+def plot_results(file_path, total_account_balance, total_rate, str_strategy, stock, invested_amount):
     # 파일 경로 변환
-    file_path1 = convert_file_path_for_reading(file_path1)
+    file_path = convert_file_path_for_reading(file_path)
 
-    result_df = pd.read_csv(file_path, parse_dates=['Date'], index_col='Date',comment='#')
+    result_df = pd.read_csv(file_path, parse_dates=['Date'], index_col='Date', comment='#')
 
     # 해당 주식 데이터만 추출하여 새로운 DataFrame 생성
     stock_df = result_df[result_df['stock_ticker'] == stock]
@@ -69,14 +69,11 @@ def plot_results(file_path, total_account_balance, total_rate, str_strategy, sto
     # 그래프를 PNG 파일로 저장
     save_figure(fig, 'result_{}.png'.format(stock))
 
-    # fig.savefig('result_{}.png'.format(stock))
-    # plt.close()
-    ax2.cla
-    plt.cla
+    ax2.cla()
+    plt.cla()
     plt.clf()  # Clear the figure to avoid residual plots when this function is called again
-  
 
-  # Discord로 이미지 전송
+    # Discord로 이미지 전송
     DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
     message = {
         'content': f"Stock: {stock}\n"
@@ -94,7 +91,7 @@ def plot_results(file_path, total_account_balance, total_rate, str_strategy, sto
         print('Discord 메시지 전송 성공')
 
 
-def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy,invested_amount,min_stock_data_date):
+def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date):
     fig, ax2 = plt.subplots(figsize=(8, 6))
 
     # 각 주식의 데이터프레임을 읽어옵니다.
@@ -103,7 +100,6 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     file_path2 = convert_file_path_for_reading(file_path2)
     df1 = pd.read_csv(file_path1, parse_dates=['Date'], index_col='Date')
     df2 = pd.read_csv(file_path2, parse_dates=['Date'], index_col='Date')
-    # print(df2)
 
     # 주식 데이터프레임의 최소 날짜를 찾아서 그 날짜로 범위를 맞춥니다.
     start_date = min_stock_data_date
@@ -138,18 +134,16 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     plt.xlabel('Year')
 
     # 그래프를 PNG 파일로 저장
-    if len(stock1) == 6 and stock1.isdigit():  # 한국 수식 6자리숫자
+    if len(stock1) == 6 and stock1.isdigit():  # 한국 수식 6자리 숫자
         stock1_name = get_ticker_name(stock1)
         if stock1_name is not None:
             stock1 = stock1 + '_' + stock1_name
-            # print(stock1)
     save_path = f'comparison_{stock1}_{stock2}.png'
     
     # 그래프 상단 여백 조정
     plt.subplots_adjust(top=0.8)  # 상단 여백을 추가합니다.
     
     fig.savefig(save_path)
-
     
     plt.cla()
     plt.clf()
@@ -169,7 +163,6 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
         print('Discord 메시지 전송 실패')
     else:
         print('Discord 메시지 전송 성공')
-
 
 
 import time  # 추가
@@ -192,7 +185,7 @@ async def plot_results_all():
         name = get_ticker_name(stock)
         
         # 해당 주식의 CSV 파일 경로 생성
-        csv_file_path = f"static/images/result_{stock}.csv"
+        csv_file_path = f"static/images/result_VOO_{stock}.csv"
         
         if os.path.exists(csv_file_path):
             df = pd.read_csv(csv_file_path)
@@ -204,10 +197,11 @@ async def plot_results_all():
 
             # 결과 메시지 전송
             message = {
-                'content': f"Stock: {stock} ({name})\n" f"Rate: {total_rate:,.2f} %\n"
+                'content': f"Stock: {stock} ({name})\n"
                            f"Invested_amount: {invested_amount:,.0f} $\n"
                            f"Total_account_balance: {total_account_balance:,.0f} $\n"
-                           f"Last_signal: {str_last_signal} \n"
+                           f"Total_rate: {total_rate:,.0f} %\n"
+                           f"Last_signal: {str_last_signal}"
             }
             response = requests.post(DISCORD_WEBHOOK_URL, json=message)
             if response.status_code != 204:
@@ -234,4 +228,5 @@ async def plot_results_all():
             print(f'Graph 전송 성공: {stock}')
 
         await asyncio.sleep(1)  # 1초 대기
+
 

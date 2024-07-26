@@ -21,7 +21,7 @@ def estimate_stock(stock, start_date, end_date, initial_investment, monthly_inve
 
     # 결과 CSV 파일로 저장하기
     safe_ticker = stock.replace('/', '-')  # 슬래시를 하이픈으로 변경
-    file_path = 'result_{}.csv'.format(safe_ticker)  # result_TSLA.csv
+    file_path = 'result_VOO_{}.csv'.format(safe_ticker)  # VOO_TSLA.csv
     print('file_path:', file_path)
     result_df = export_csv(file_path, result_dict)
     print('estimate_stock:', stock)
@@ -49,3 +49,4 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     combined_df.to_csv(file_path, float_format='%.2f', index=False)
 
     return file_path
+
