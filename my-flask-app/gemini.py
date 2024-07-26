@@ -101,7 +101,11 @@ async def analyze_with_gemini(ticker):
             if recent_earnings is None:
                 raise Exception("No recent earnings data found from secondary source.")
                 
+        # 디버깅을 위한 출력
+        print(f"Recent earnings data for {ticker}: {recent_earnings}")
+        
         earnings_text = format_earnings_text(recent_earnings)
+        print(f"Earnings Text for {ticker}: {earnings_text}")
 
         # 프롬프트 준비
         prompt_voo = f"""
@@ -161,6 +165,7 @@ if __name__ == '__main__':
     # 분석할 티커 설정
     ticker = 'TSLA'
     asyncio.run(analyze_with_gemini(ticker))
+
 
 # source .venv/bin/activate
 # python gemini.py    
