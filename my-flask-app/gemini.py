@@ -52,7 +52,7 @@ def format_earnings_text(earnings_data):
         return "No earnings data available."
 
     # 매출 데이터가 있는지 확인
-    has_revenue = any(isinstance(entry, tuple) and len(entry) == 5 and entry[3] >= 10000 for entry in earnings_data)
+    has_revenue = any(isinstance(entry, tuple) and len(entry) >= 4 for entry in earnings_data)
 
     # 헤더 설정
     if has_revenue:
@@ -80,7 +80,6 @@ def format_earnings_text(earnings_data):
             earnings_text += "| Invalid data format |\n"
     
     return earnings_text
-
 
 
 async def analyze_with_gemini(ticker):
