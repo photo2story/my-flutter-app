@@ -154,6 +154,5 @@ if __name__ == '__main__':
     ticker = 'TSM'
     asyncio.run(analyze_with_gemini(ticker))
 
-
 # source .venv/bin/activate
 # python gemini.py    

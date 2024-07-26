@@ -1,5 +1,4 @@
 # get_earning_fmp.py 
-# get_earning_fmp.py 
 import os
 import requests
 import pandas as pd
@@ -74,7 +73,5 @@ if __name__ == "__main__":
                 print(f"{end}: EPS {actual_eps} (Estimated: {estimated_eps})")
     else:
         print("No data found for TSM")
-
-
 
 # python get_earning_fmp.py    
