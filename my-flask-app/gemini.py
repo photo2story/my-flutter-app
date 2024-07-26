@@ -155,7 +155,7 @@ async def analyze_with_gemini(ticker):
 
 if __name__ == '__main__':
     # 분석할 티커 설정
-    ticker = 'TSM'
+    ticker = 'AAPL'
     asyncio.run(analyze_with_gemini(ticker))
 
 # source .venv/bin/activate
