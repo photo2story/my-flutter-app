@@ -7,12 +7,6 @@ import numpy as np
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'my-flutter-app')))
 
-def load_sector_info():
-    csv_path = os.path.join(os.path.dirname(__file__), '..', 'static', 'images', 'stock_market.csv')
-    sector_df = pd.read_csv(csv_path)
-    sector_dict = dict(zip(sector_df['Symbol'], sector_df['Sector']))
-    return sector_dict
-
 def read_and_process_csv(file_path):
     df = pd.read_csv(file_path)
     df['Date'] = pd.to_datetime(df['Date'])  # Date 열을 datetime 형식으로 변환
@@ -22,26 +16,22 @@ def read_and_process_csv(file_path):
     # 필요한 열이 존재하는지 확인하고 처리
     if 'rate' in df.columns and 'rate_vs' in df.columns:
         result_df = df[['Date', 'rate', 'rate_vs']].copy()
-        result_df = result_df.rename(columns={'rate': f'rate_{ticker}', 'rate_vs': 'rate_VOO_20D'})
+        result_df = result_df.rename(columns={'rate': f'rate_{ticker}_5D', 'rate_vs': 'rate_VOO_20D'})
     else:
         raise KeyError(f"'rate' or 'rate_vs' columns not found in file: {file_path}")
     
     return result_df
 
-
 def save_simplified_csv(folder_path, df, ticker):
     # 이동 평균 계산
-    rate_ticker = df[f'rate_{ticker}']
-    rate_5D = rate_ticker.rolling(window=5).mean().fillna(0).to_numpy()
-
+    rate_ticker = df[f'rate_{ticker}_5D'].rolling(window=5).mean().fillna(0).to_numpy()
     rate_VOO_20D = df['rate_VOO_20D'].rolling(window=20).mean().fillna(0).to_numpy()
 
-    # 간단한 데이터프레임 생성
+    # 간단한 데이터프레임 생성 (5간격으로 축소)
     simplified_df = pd.DataFrame({
-        'Date': df['Date'],
-        f'rate_{ticker}': rate_ticker.to_numpy(),
-        f'rate_{ticker}_5D': rate_5D,
-        'rate_VOO_20D': rate_VOO_20D
+        'Date': df['Date'].iloc[::5].reset_index(drop=True),
+        f'rate_{ticker}_5D': rate_ticker[::5],
+        'rate_VOO_20D': rate_VOO_20D[::5]
     })
 
     simplified_file_path = os.path.join(folder_path, f'result_{ticker}.csv')
