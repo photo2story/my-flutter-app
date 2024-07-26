@@ -66,10 +66,10 @@ def format_earnings_text(earnings_data):
             if has_revenue:
                 if len(entry) == 5:
                     end, filed, actual_eps, revenue, estimated_revenue = entry
-                    earnings_text += f"| {end} | {actual_eps} | {revenue / 1e9:.2f} B$ |\n"
+                    earnings_text += f"| {filed} | {actual_eps} | {revenue / 1e9:.2f} B$ |\n"
                 elif len(entry) == 4:
                     end, filed, actual_eps, revenue = entry
-                    earnings_text += f"| {end} | {actual_eps} | {revenue / 1e9:.2f} B$ |\n"
+                    earnings_text += f"| {filed} | {actual_eps} | {revenue / 1e9:.2f} B$ |\n"
             else:
                 if len(entry) == 3:
                     end, actual_eps, estimated_eps = entry
@@ -181,7 +181,7 @@ async def analyze_with_gemini(ticker):
 
 if __name__ == '__main__':
     # 분석할 티커 설정
-    ticker = 'TSM'
+    ticker = 'TSLA'
     asyncio.run(analyze_with_gemini(ticker))
 
 
