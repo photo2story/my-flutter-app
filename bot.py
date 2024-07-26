@@ -125,6 +125,7 @@ async def buddy(ctx, *, query: str = None):
     for stock_name in stock_names:
         await ctx.invoke(bot.get_command("gemini"), query=stock_name)
 
+@bot.command()
 async def merge_data(ctx):
     try:
         sector_dict = load_sector_info()
