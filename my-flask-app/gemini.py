@@ -165,7 +165,7 @@ async def analyze_with_gemini(ticker):
 
 if __name__ == '__main__':
     # 분석할 티커 설정
-    ticker = 'TSLA'
+    ticker = 'TSM'
     asyncio.run(analyze_with_gemini(ticker))
 
 
