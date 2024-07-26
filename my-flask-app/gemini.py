@@ -13,6 +13,7 @@ import asyncio
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from git_operations import move_files_to_images_folder
 from get_earning import get_recent_eps_and_revenue
+from get_earning_fmp import get_recent_eps_and_revenue_fmp  # 추가
 
 # 환경 변수 로드
 load_dotenv()
@@ -20,7 +21,8 @@ GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 FMP_API_KEY = os.getenv('FMP_API_KEY')
 GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
-CSV_PATH = os.getenv('CSV_PATH', 'static/images/stock_market.csv')
+CSV_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images', 'stock_market.csv'))
+
 
 # Gemini API 구성
 genai.configure(api_key=GOOGLE_API_KEY)
@@ -49,8 +51,13 @@ def format_earnings_text(earnings_data):
     if not earnings_data:
         return "No earnings data available."
     earnings_text = "| 날짜 : EPS / Revenue |\n"
-    for end, filed, eps_val, revenue_val in earnings_data:
-        earnings_text += f"| {end} (Filed: {filed}): EPS {eps_val}, Revenue {revenue_val / 1e9:.2f} B$ |\n"
+    for entry in earnings_data:
+        if len(entry) == 5:
+            end, actual_eps, estimated_eps, revenue, estimated_revenue = entry
+            earnings_text += f"| {end}: EPS {actual_eps} (Estimated: {estimated_eps}), Revenue {revenue / 1e9:.2f} B$ (Estimated: {estimated_revenue / 1e9:.2f} B$) |\n"
+        else:
+            end, actual_eps, estimated_eps = entry
+            earnings_text += f"| {end}: EPS {actual_eps} (Estimated: {estimated_eps}) |\n"
     return earnings_text
 
 async def analyze_with_gemini(ticker):
@@ -84,7 +91,12 @@ async def analyze_with_gemini(ticker):
         # 어닝 데이터 가져오기
         recent_earnings = get_recent_eps_and_revenue(ticker)
         if recent_earnings is None:
-            raise Exception("No recent earnings data found.")
+            # 기본 데이터 소스 실패 시 보조 데이터 소스 시도
+            print(f"Primary data source failed for {ticker}, attempting secondary source...")
+            recent_earnings = get_recent_eps_and_revenue_fmp(ticker)
+            if recent_earnings is None:
+                raise Exception("No recent earnings data found from secondary source.")
+                
         earnings_text = format_earnings_text(recent_earnings)
 
         # 프롬프트 준비
@@ -139,9 +151,8 @@ async def analyze_with_gemini(ticker):
 
 if __name__ == '__main__':
     # 분석할 티커 설정
-    ticker = 'TSLA'
+    ticker = 'TSM'
     asyncio.run(analyze_with_gemini(ticker))
-
 
 
 # source .venv/bin/activate

@@ -1,3 +1,5 @@
+# get_earning_fmp.py 
+# get_earning_fmp.py 
 import os
 import requests
 import pandas as pd
@@ -15,13 +17,17 @@ if not API_KEY:
 if not DISCORD_WEBHOOK_URL:
     raise ValueError("DISCORD 웹훅 URL이 설정되지 않았습니다. .env 파일을 확인하세요.")
 
-def get_earnings_data(ticker):
+def get_cik_by_ticker(ticker):
+    """FMP API에서는 CIK가 필요 없으므로 기본 값을 반환."""
+    return "FMP"
+
+def get_financial_data(ticker):
     url = f'https://financialmodelingprep.com/api/v3/earnings-surprises/{ticker}?apikey={API_KEY}'
     
     response = requests.get(url)
-    
     if response.status_code != 200:
-        raise Exception(f"API 요청 실패: {response.status_code}")
+        print(f"Error retrieving data for {ticker}. Status code: {response.status_code}")
+        return None
     
     try:
         data = response.json()
@@ -30,48 +36,45 @@ def get_earnings_data(ticker):
         print('Error parsing JSON:', e)
         return None
 
-def get_recent_earnings(ticker, num_entries=5):
-    earnings_data = get_earnings_data(ticker)
+def get_recent_eps_and_revenue_fmp(ticker):
+    earnings_data = get_financial_data(ticker)
     
-    if earnings_data:
-        df = pd.DataFrame(earnings_data)
-        
-        # 최근 num_entries개의 데이터만 선택
-        df = df.head(num_entries)
-        
-        return df
-    else:
-        return pd.DataFrame()
-
-def send_to_discord(message):
-    data = {
-        "content": message
-    }
-    response = requests.post(DISCORD_WEBHOOK_URL, json=data)
-    if response.status_code != 204:
-        raise Exception(f"Failed to send message to Discord: {response.status_code}, {response.text}")
-
-def main():
-    ticker = 'TSLA'
-    recent_earnings = get_recent_earnings(ticker)
+    if not earnings_data:
+        print(f"No earnings data found for {ticker}.")
+        return None
     
-    if not recent_earnings.empty:
-        print("Recent Earnings Data:")
-        print(recent_earnings)
+    # 최근 5개 분기 데이터 추출
+    recent_earnings = []
+    for data in earnings_data[:5]:
+        end_date = data['date']
+        actual_eps = data['actualEarningResult']
+        estimated_eps = data.get('estimatedEarning', 'N/A')  # 추정치
+        revenue = data.get('revenue', 'N/A')  # 실제 매출 데이터
+        estimated_revenue = data.get('estimatedRevenue', 'N/A')  # 추정 매출 데이터
         
-        # 데이터 프레임을 CSV 파일로 저장
-        recent_earnings.to_csv(f'{ticker}_recent_earnings.csv', index=False)
-        print(f"Data saved to {ticker}_recent_earnings.csv")
-        
-        # 디스코드로 메시지 보내기
-        message = f"Recent Earnings Data for {ticker}:\n{recent_earnings.to_string(index=False)}"
-        send_to_discord(message)
-        print("Data sent to Discord.")
-    else:
-        print("No earnings data found.")
+        # revenue와 estimated_revenue 정보가 있으면 포함
+        if revenue != 'N/A' and estimated_revenue != 'N/A':
+            recent_earnings.append((end_date, actual_eps, estimated_eps, revenue, estimated_revenue))
+        else:
+            recent_earnings.append((end_date, actual_eps, estimated_eps))
+    
+    return recent_earnings
 
 if __name__ == "__main__":
-    main()
+    # 테스트 코드
+    results = get_recent_eps_and_revenue_fmp("TSM")
+    if results:
+        print("\nQuarterly Results:")
+        for entry in results:
+            if len(entry) == 5:
+                end, actual_eps, estimated_eps, revenue, estimated_revenue = entry
+                print(f"{end}: EPS {actual_eps} (Estimated: {estimated_eps}), Revenue {revenue / 1e9:.2f} B$ (Estimated: {estimated_revenue / 1e9:.2f} B$)")
+            else:
+                end, actual_eps, estimated_eps = entry
+                print(f"{end}: EPS {actual_eps} (Estimated: {estimated_eps})")
+    else:
+        print("No data found for TSM")
+
 
 
 # python get_earning_fmp.py    
