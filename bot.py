@@ -1,5 +1,4 @@
 # bot.py
-# bot.py
 import os
 import sys
 import asyncio
@@ -28,7 +27,6 @@ from get_ticker import is_valid_stock
 from gemini import analyze_with_gemini
 from gpt import analyze_with_gpt
 from get_compare_stock_data import load_sector_info, merge_csv_files, save_simplified_csv  # 추가된 부분
-
 
 load_dotenv()
 
