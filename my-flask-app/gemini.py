@@ -50,15 +50,19 @@ def download_csv(ticker):
 def format_earnings_text(earnings_data):
     if not earnings_data:
         return "No earnings data available."
-    earnings_text = "| 날짜 : EPS / Revenue |\n"
+    earnings_text = "| 날짜 : EPS / Estimated EPS |\n"
     for entry in earnings_data:
+        # Check the length of the entry to handle both cases
         if len(entry) == 5:
             end, actual_eps, estimated_eps, revenue, estimated_revenue = entry
             earnings_text += f"| {end}: EPS {actual_eps} (Estimated: {estimated_eps}), Revenue {revenue / 1e9:.2f} B$ (Estimated: {estimated_revenue / 1e9:.2f} B$) |\n"
-        else:
+        elif len(entry) == 3:
             end, actual_eps, estimated_eps = entry
             earnings_text += f"| {end}: EPS {actual_eps} (Estimated: {estimated_eps}) |\n"
+        else:
+            earnings_text += "| Invalid data format |\n"
     return earnings_text
+
 
 async def analyze_with_gemini(ticker):
     try:
