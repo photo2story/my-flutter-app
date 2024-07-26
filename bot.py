@@ -1,4 +1,5 @@
 # bot.py
+# bot.py
 import os
 import sys
 import asyncio
@@ -66,19 +67,63 @@ async def send_msg():
 processed_message_ids = set()
 
 @bot.command()
-async def buddy(ctx):
-    for sector, stocks in config.STOCKS.items():
-        await ctx.send(f'Processing sector: {sector}')
-        for stock in stocks:
-            await ctx.invoke(bot.get_command("stock"), query=stock)
-            await asyncio.sleep(5)  # 각 호출 간에 5초 대기
+async def stock(ctx, *, query: str = None):
+    if query:
+        stock_names = [query.upper()]
+    else:
+        stock_names = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
 
-        for stock in stocks:
-            await ctx.invoke(bot.get_command("gemini"), ticker=stock)
-            await asyncio.sleep(5)  # 각 호출 간에 5초 대기
-    
-    # 모든 주식 분석이 완료된 후 데이터 병합
+    for stock_name in stock_names:
+        await ctx.send(f'Processing stock: {stock_name}')
+        try:
+            # 백테스팅 및 결과 플로팅
+            await backtest_and_send(ctx, stock_name, 'modified_monthly', bot)
+            if is_valid_stock(stock_name):
+                try:
+                    plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
+                except KeyError as e:
+                    await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
+                    print(f"Error plotting {stock_name}: {e}")
+                # 파일 이동
+                await move_files_to_images_folder()    
+            await asyncio.sleep(10)
+        except Exception as e:
+            await ctx.send(f'An error occurred while processing {stock_name}: {e}')
+            print(f'Error processing {stock_name}: {e}')
+
+@bot.command()
+async def gemini(ctx, *, query: str = None):
+    if query:
+        tickers = [query.upper()]
+    else:
+        tickers = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
+
+    for ticker in tickers:
+        try:
+            result = await analyze_with_gemini(ticker)
+            await ctx.send(result)
+        except Exception as e:
+            error_message = f'An error occurred while analyzing {ticker} with Gemini: {str(e)}'
+            await ctx.send(error_message)
+            print(error_message)
+
+@bot.command()
+async def buddy(ctx, *, query: str = None):
+    if query:
+        stock_names = [query.upper()]
+    else:
+        stock_names = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
+
+    # stock 명령 실행
+    for stock_name in stock_names:
+        await ctx.invoke(bot.get_command("stock"), query=stock_name)
+
+    # 데이터 병합
     await merge_data(ctx)
+
+    # gemini 명령 실행
+    for stock_name in stock_names:
+        await ctx.invoke(bot.get_command("gemini"), query=stock_name)
 
 async def merge_data(ctx):
     try:
@@ -89,37 +134,6 @@ async def merge_data(ctx):
     except Exception as e:
         await ctx.send(f"An error occurred while merging data: {e}")
         print(f"Error merging data: {e}")
-
-@bot.command()
-async def stock(ctx, query: str):
-    stock_name = query.upper()
-    await ctx.send(f'Processing stock: {stock_name}')
-    try:
-        # 백테스팅 및 결과 플로팅
-        await backtest_and_send(ctx, stock_name, 'modified_monthly', bot)
-        if is_valid_stock(stock_name):
-            try:
-                plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
-            except KeyError as e:
-                await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
-                print(f"Error plotting {stock_name}: {e}")
-            # 파일 이동
-            await move_files_to_images_folder()    
-        await asyncio.sleep(10)
-    except Exception as e:
-        await ctx.send(f'An error occurred while processing {stock_name}: {e}')
-        print(f'Error processing {stock_name}: {e}')
-
-@bot.command()
-async def gemini(ctx, ticker: str):
-    try:
-        ticker = ticker.upper()  # 티커명을 대문자로 변환
-        result = await analyze_with_gemini(ticker)
-        await ctx.send(result)
-    except Exception as e:
-        error_message = f'An error occurred while analyzing {ticker} with Gemini: {str(e)}'
-        await ctx.send(error_message)
-        print(error_message)
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
@@ -158,7 +172,6 @@ async def account(ctx, ticker: str):
         await ctx.send(f'An error occurred: {e}')
         print(f'Error processing account for {ticker}: {e}')
 
-
 async def run_bot():
     await bot.start(TOKEN)
 
@@ -176,7 +189,6 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
-
 
 
 #  .\.venv\Scripts\activate
