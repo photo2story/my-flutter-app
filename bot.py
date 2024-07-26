@@ -72,6 +72,10 @@ async def buddy(ctx):
         for stock in stocks:
             await ctx.invoke(bot.get_command("stock"), query=stock)
             await asyncio.sleep(5)  # 각 호출 간에 5초 대기
+
+        for stock in stocks:
+            await ctx.invoke(bot.get_command("gemini"), ticker=stock)
+            await asyncio.sleep(5)  # 각 호출 간에 5초 대기
     
     # 모든 주식 분석이 완료된 후 데이터 병합
     await merge_data(ctx)
@@ -102,22 +106,20 @@ async def stock(ctx, query: str):
             # 파일 이동
             await move_files_to_images_folder()    
         await asyncio.sleep(10)
-
-        # Gemini 분석
-        result = await analyze_with_gemini(stock_name)
-        await ctx.send(result)
-        
-        # GPT 분석
-        # result = await analyze_with_gpt(stock_name)
-        # await ctx.send(result)
-        
-        # 파일 이동
-        # move_files_to_images_folder()
-        
     except Exception as e:
         await ctx.send(f'An error occurred while processing {stock_name}: {e}')
         print(f'Error processing {stock_name}: {e}')
 
+@bot.command()
+async def gemini(ctx, ticker: str):
+    try:
+        ticker = ticker.upper()  # 티커명을 대문자로 변환
+        result = await analyze_with_gemini(ticker)
+        await ctx.send(result)
+    except Exception as e:
+        error_message = f'An error occurred while analyzing {ticker} with Gemini: {str(e)}'
+        await ctx.send(error_message)
+        print(error_message)
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
@@ -156,25 +158,6 @@ async def account(ctx, ticker: str):
         await ctx.send(f'An error occurred: {e}')
         print(f'Error processing account for {ticker}: {e}')
 
-@bot.command()
-async def gemini(ctx, ticker: str):
-    try:
-        ticker = ticker.upper()  # 티커명을 대문자로 변환
-        report = analyze_with_gpt(ticker)  # GPT 분석 사용
-
-        # 리포트 내용 디버깅용 로그 출력
-        print(f"Generated report for {ticker}: {report}")
-
-        if report and report.strip():  # 빈 문자열이 아닌지 확인
-            await ctx.send(report)
-        else:
-            await ctx.send(f"No report generated for {ticker}.")
-    except Exception as e:
-        error_message = f'An error occurred while analyzing {ticker} with GPT API: {str(e)}'
-        await ctx.send(error_message)
-        print(error_message)
-
-
 
 async def run_bot():
     await bot.start(TOKEN)
@@ -193,10 +176,6 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
-
-
-
-
 
 
 
