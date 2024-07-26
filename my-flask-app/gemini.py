@@ -55,16 +55,17 @@ def format_earnings_text(earnings_data):
     for entry in earnings_data:
         if isinstance(entry, tuple):
             if len(entry) == 5:
-                end, actual_eps, estimated_eps, revenue, estimated_revenue = entry
-                earnings_text += f"| {end}: EPS {actual_eps} (Estimated: {estimated_eps}), Revenue {revenue / 1e9:.2f} B$ (Estimated: {estimated_revenue / 1e9:.2f} B$) |\n"
+                end, filed, actual_eps, revenue, estimated_revenue = entry
+                earnings_text += f"| {end}: EPS {actual_eps} / Estimated EPS: N/A, Revenue: {revenue / 1e9:.2f} B$ (Estimated: {estimated_revenue / 1e9:.2f} B$) |\n"
             elif len(entry) == 3:
                 end, actual_eps, estimated_eps = entry
-                earnings_text += f"| {end}: EPS {actual_eps} (Estimated: {estimated_eps}) |\n"
+                earnings_text += f"| {end}: EPS {actual_eps} / Estimated EPS: {estimated_eps} |\n"
             else:
                 earnings_text += "| Invalid data format |\n"
         else:
             earnings_text += "| Invalid data format |\n"
     return earnings_text
+
 
 
 async def analyze_with_gemini(ticker):
