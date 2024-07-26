@@ -50,24 +50,37 @@ def download_csv(ticker):
 def format_earnings_text(earnings_data):
     if not earnings_data:
         return "No earnings data available."
-    
-    earnings_text = "| 날짜 : EPS / Estimated EPS |\n"
+
+    # 매출 데이터가 있는지 확인
+    has_revenue = any(isinstance(entry, tuple) and len(entry) == 5 and entry[3] >= 10000 for entry in earnings_data)
+
+    # 헤더 설정
+    if has_revenue:
+        earnings_text = "| 날짜 | EPS | 매출 |\n|---|---|---|\n"
+    else:
+        earnings_text = "| 날짜 | EPS | 예상 EPS |\n|---|---|---|\n"
+
+    # 데이터 추가
     for entry in earnings_data:
         if isinstance(entry, tuple):
-            if len(entry) == 5:
-                end, filed, actual_eps, revenue, estimated_revenue = entry
-                earnings_text += f"| {end}: EPS {actual_eps} /  Revenue: {revenue / 1e9:.2f} B$ (Estimated: {estimated_revenue / 1e9:.2f} B$) |\n"
-            elif len(entry) == 4:
-                end, filed, actual_eps, revenue = entry
-                earnings_text += f"| {end}: EPS {actual_eps} /  Revenue: {revenue / 1e9:.2f} B$ |\n"
-            elif len(entry) == 3:
-                end, actual_eps, estimated_eps = entry
-                earnings_text += f"| {end}: EPS {actual_eps} / Estimated EPS: {estimated_eps} |\n"
+            if has_revenue:
+                if len(entry) == 5:
+                    end, filed, actual_eps, revenue, estimated_revenue = entry
+                    earnings_text += f"| {end} | {actual_eps} | {revenue / 1e9:.2f} B$ |\n"
+                elif len(entry) == 4:
+                    end, filed, actual_eps, revenue = entry
+                    earnings_text += f"| {end} | {actual_eps} | {revenue / 1e9:.2f} B$ |\n"
             else:
-                earnings_text += "| Invalid data format |\n"
+                if len(entry) == 3:
+                    end, actual_eps, estimated_eps = entry
+                    earnings_text += f"| {end} | {actual_eps} | {estimated_eps} |\n"
+                else:
+                    earnings_text += "| Invalid data format |\n"
         else:
             earnings_text += "| Invalid data format |\n"
+    
     return earnings_text
+
 
 
 async def analyze_with_gemini(ticker):
