@@ -139,8 +139,12 @@ async def analyze_with_gemini(ticker):
         with open(report_file, 'w', encoding='utf-8') as file:
             file.write(report_text)
 
-        # 리포트를 static/images 폴더로 이동 및 커밋
+        # 리포트를 루트 static/images 폴더로 이동 및 커밋
+        destination_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
+        shutil.move(report_file, os.path.join(destination_dir, report_file))
+        shutil.move(voo_file, os.path.join(destination_dir, voo_file))
         await move_files_to_images_folder()
+
         return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord and saved as a text file.'
 
     except Exception as e:
