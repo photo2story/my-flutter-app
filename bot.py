@@ -26,7 +26,7 @@ from backtest_send import backtest_and_send
 from get_ticker import is_valid_stock
 from gemini import analyze_with_gemini
 from gpt import analyze_with_gpt
-from get_compare_stock_data import load_sector_info, save_simplified_csv  # 추가된 부분
+from get_compare_stock_data import load_sector_info, save_simplified_csv, read_and_process_csv  # 추가된 부분
 
 load_dotenv()
 
@@ -65,6 +65,12 @@ async def send_msg():
 
 processed_message_ids = set()
 
+async def process_and_simplify_csv(stock_name):
+    folder_path = os.path.join(os.getcwd(), 'static', 'images')
+    file_path = os.path.join(folder_path, f'result_VOO_{stock_name}.csv')
+    df_processed = read_and_process_csv(file_path)
+    save_simplified_csv(folder_path, df_processed, stock_name)
+
 @bot.command()
 async def stock(ctx, *, query: str = None):
     if query:
@@ -85,9 +91,9 @@ async def stock(ctx, *, query: str = None):
                     print(f"Error plotting {stock_name}: {e}")
                 # 파일 이동
                 await move_files_to_images_folder()
-
+                
                 # CSV 파일 간소화
-                save_simplified_csv(stock_name)  
+                await process_and_simplify_csv(stock_name)
 
             await asyncio.sleep(10)
         except Exception as e:
@@ -120,9 +126,6 @@ async def buddy(ctx, *, query: str = None):
     # stock 명령 실행
     for stock_name in stock_names:
         await ctx.invoke(bot.get_command("stock"), query=stock_name)
-
-    # 데이터 병합
-    # await merge_data(ctx)
 
     # gemini 명령 실행
     for stock_name in stock_names:
