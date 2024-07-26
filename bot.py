@@ -27,7 +27,8 @@ from backtest_send import backtest_and_send
 from get_ticker import is_valid_stock
 from gemini import analyze_with_gemini
 from gpt import analyze_with_gpt
-from get_compare_stock_data import load_sector_info, merge_csv_files
+from get_compare_stock_data import load_sector_info, merge_csv_files, save_simplified_csv  # 추가된 부분
+
 
 load_dotenv()
 
@@ -85,7 +86,11 @@ async def stock(ctx, *, query: str = None):
                     await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
                     print(f"Error plotting {stock_name}: {e}")
                 # 파일 이동
-                await move_files_to_images_folder()    
+                await move_files_to_images_folder()
+
+                # CSV 파일 간소화
+                save_simplified_csv(stock_name)  
+
             await asyncio.sleep(10)
         except Exception as e:
             await ctx.send(f'An error occurred while processing {stock_name}: {e}')
@@ -119,7 +124,7 @@ async def buddy(ctx, *, query: str = None):
         await ctx.invoke(bot.get_command("stock"), query=stock_name)
 
     # 데이터 병합
-    await merge_data(ctx)
+    # await merge_data(ctx)
 
     # gemini 명령 실행
     for stock_name in stock_names:
