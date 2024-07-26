@@ -1,4 +1,3 @@
-# get_compare_stock_data.py
 import os
 import sys
 import pandas as pd
@@ -27,7 +26,11 @@ def save_simplified_csv(folder_path, df, ticker):
     rate_ticker = df[f'rate_{ticker}_5D'].rolling(window=5).mean().fillna(0).to_numpy()
     rate_VOO_20D = df['rate_VOO_20D'].rolling(window=20).mean().fillna(0).to_numpy()
 
-    # 간단한 데이터프레임 생성 (5간격으로 축소)
+    # 소수점 두 자리로 반올림
+    rate_ticker = np.round(rate_ticker, 2)
+    rate_VOO_20D = np.round(rate_VOO_20D, 2)
+
+    # 간단한 데이터프레임 생성 (10 간격으로 축소)
     simplified_df = pd.DataFrame({
         'Date': df['Date'].iloc[::10].reset_index(drop=True),
         f'rate_{ticker}_5D': rate_ticker[::10],
@@ -36,7 +39,7 @@ def save_simplified_csv(folder_path, df, ticker):
 
     simplified_file_path = os.path.join(folder_path, f'result_{ticker}.csv')
     simplified_df.to_csv(simplified_file_path, index=False)
-    print(f"Simplified CSV saved: {simplified_file_path}")
+    # print(f"Simplified CSV saved: {simplified_file_path}")
 
 def process_all_csv_files(folder_path):
     if not os.path.exists(folder_path):
@@ -47,7 +50,7 @@ def process_all_csv_files(folder_path):
 
     for file in csv_files:
         file_path = os.path.join(folder_path, file)
-        print(f"Processing file: {file_path}")
+        # print(f"Processing file: {file_path}")
         df_processed = read_and_process_csv(file_path)
         ticker = os.path.splitext(os.path.basename(file_path))[0].split('_')[-1]
         save_simplified_csv(folder_path, df_processed, ticker)
@@ -55,7 +58,6 @@ def process_all_csv_files(folder_path):
 if __name__ == "__main__":
     folder_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
     process_all_csv_files(folder_path)
-
 
 
 # python get_compare_stock_data.py
