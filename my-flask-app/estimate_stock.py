@@ -36,9 +36,9 @@ def estimate_stock(stock, start_date, end_date, initial_investment, monthly_inve
 
     return total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df
 
-def is_date_range_matching(file_path, min_stock_data_date, end_date):
-    """파일에 저장된 데이터의 날짜 범위가 주어진 날짜 범위와 일치하는지 확인합니다."""
-    print("is_date_range_matching called")
+
+def is_date_range_matching(file_path, min_stock_data_date, end_date, tolerance_days=0):
+    """파일에 저장된 데이터의 날짜 범위가 주어진 날짜 범위와 일정 범위 내에서 일치하는지 확인합니다."""
     try:
         df = pd.read_csv(file_path, parse_dates=['Date'])
         if df.empty:
@@ -50,44 +50,43 @@ def is_date_range_matching(file_path, min_stock_data_date, end_date):
         print(f"File date range: {file_min_date} to {file_max_date}")
         print(f"Expected date range: {min_stock_data_date} to {end_date}")
 
-        # 날짜 형식이 일치하는지 확인하고, 필요한 경우 형식을 변환
-        if isinstance(file_min_date, str):
-            file_min_date = pd.to_datetime(file_min_date)
-        if isinstance(file_max_date, str):
-            file_max_date = pd.to_datetime(file_max_date)
-        if isinstance(min_stock_data_date, str):
-            min_stock_data_date = pd.to_datetime(min_stock_data_date)
-        if isinstance(end_date, str):
-            end_date = pd.to_datetime(end_date)
+        # 날짜 형식 변환
+        min_stock_data_date = pd.to_datetime(min_stock_data_date)
+        end_date = pd.to_datetime(end_date)
 
-        return file_min_date == min_stock_data_date and file_max_date == end_date
+        # 허용 범위 내의 날짜 일치 여부 확인
+        return (abs((file_min_date - min_stock_data_date).days) <= tolerance_days and
+                abs((file_max_date - end_date).days) <= tolerance_days)
     except Exception as e:
         print(f"Error reading file {file_path}: {e}")
         return False
 
-
-import pandas as pd
-
 def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investment, monthly_investment, option_strategy, result_df):
-    # 주식 데이터를 가져옴
-    stock_data, min_stock_data_date = get_stock_data(stock2, min_stock_data_date, end_date)
-
     # VOO 퍼포먼스 데이터 로드
-    voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
-    print(f"Loaded VOO performance data with date range: {voo_performance_data.index.min()} to {voo_performance_data.index.max()}")
-
-    # 데이터 유효성 검사
-    if is_date_range_matching(config.VOO_PERFORMANCE_FILE_PATH, min_stock_data_date, end_date):
-        result_dict2 = voo_performance_data[['rate_vs']]
-        print("Using existing VOO performance data.")
+    voo_performance_data = None
+    if os.path.exists(config.VOO_PERFORMANCE_FILE_PATH):
+        print(f"VOO performance file found at {config.VOO_PERFORMANCE_FILE_PATH}.")
+        if is_date_range_matching(config.VOO_PERFORMANCE_FILE_PATH, min_stock_data_date, end_date):
+            voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
+            print("Using existing VOO performance data.")
+        else:
+            print("VOO data date range mismatch. Need to regenerate data.")
     else:
-        # 데이터가 유효하지 않으면 오류 메시지 출력
-        raise ValueError("Existing VOO data does not match the required date range. Please regenerate the data.")
+        print(f"VOO performance file not found at {config.VOO_PERFORMANCE_FILE_PATH}.")
+
+    # 유효한 VOO 데이터가 없는 경우 데이터 생성
+    if voo_performance_data is None:
+        print("Generating new VOO performance data...")
+        stock_data, _ = get_stock_data(stock2, min_stock_data_date, end_date)
+        result_dict2 = my_strategy(stock_data, initial_investment, monthly_investment, option_strategy)
+        voo_performance_data = pd.DataFrame(result_dict2['result'])
+        voo_performance_data.to_csv(config.VOO_PERFORMANCE_FILE_PATH)
+        print(f"New VOO performance data generated and saved at {config.VOO_PERFORMANCE_FILE_PATH}.")
 
     # 최종 비교 데이터를 준비
     safe_ticker = stock1.replace('/', '-')
     file_path = 'result_VOO_{}.csv'.format(safe_ticker)
-    result_df2 = result_dict2.copy()
+    result_df2 = voo_performance_data[['rate_vs']].copy()
     result_df2.rename(columns={'rate_vs': 'rate_vs'}, inplace=True)
     result_df2.fillna(0, inplace=True)
 
@@ -99,9 +98,6 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     print(f"Comparison data saved to {file_path}")
 
     return file_path
-
-
-
 
 
 # 테스트 코드
