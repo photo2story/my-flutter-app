@@ -35,6 +35,13 @@ def estimate_stock(stock, start_date, end_date, initial_investment, monthly_inve
 
     return total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df
 
+def is_date_range_matching(file_path, min_stock_data_date, end_date):
+    """파일에 저장된 데이터의 날짜 범위가 주어진 날짜 범위와 일치하는지 확인합니다."""
+    df = pd.read_csv(file_path, parse_dates=['Date'])
+    file_min_date = df['Date'].min()
+    file_max_date = df['Date'].max()
+    return file_min_date == min_stock_data_date and file_max_date == end_date
+
 def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investment, monthly_investment, option_strategy, result_df):
     stock_data, min_stock_data_date = get_stock_data(stock2, min_stock_data_date, end_date)
     print(config.VOO_PERFORMANCE_FILE_PATH)
