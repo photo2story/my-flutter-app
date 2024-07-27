@@ -85,6 +85,7 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     return file_path
 
 
+
 # 테스트 코드
 if __name__ == "__main__":
     try:
