@@ -1,5 +1,5 @@
 # estimate_stock.py
-
+import requests
 from Get_data import get_stock_data
 import My_strategy
 from Data_export import export_csv
