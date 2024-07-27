@@ -79,7 +79,16 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
 
 # 테스트 코드
 if __name__ == "__main__":
-    print(config.VOO_PERFORMANCE_FILE_PATH)
-    
+    try:
+        print(f"VOO Performance File Path: {config.VOO_PERFORMANCE_FILE_PATH}")
+        voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
+        print("Successfully loaded VOO performance data.")
+        print(voo_performance_data.head())  # 데이터의 일부를 출력하여 제대로 로드되었는지 확인
+    except FileNotFoundError:
+        print(f"File not found: {config.VOO_PERFORMANCE_FILE_PATH}")
+    except ValueError as ve:
+        print(f"ValueError: {ve}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
     
 # python estimate_stock.py    
