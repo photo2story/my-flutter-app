@@ -1,5 +1,3 @@
-# My_strategy.py
-
 import datetime
 from typing import Union, Any
 import requests 
@@ -99,7 +97,7 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
 
         # # PPO 매수 및 매도 신호 계산 (예: 12일 단기 EMA, 26일 장기 EMA, 9일 신호선)+ 상승,하강
         # My_strategy.py 파일 내에서 calculate_ppo_buy_sell_signals 함수 호출 부분 수정
-        ppo, ppo_signal, PPO_BUY, PPO_SELL, ppo_histogram, SMA_20_turn, SMA_60_turn = calculate_ppo_buy_sell_signals(stock_data, index, short_window=12, long_window=26, signal_window=9)
+        PPO_BUY, PPO_SELL, ppo_histogram, SMA_20_turn, SMA_60_turn = calculate_ppo_buy_sell_signals(stock_data, index, short_window=12, long_window=26, signal_window=9)
 
 
 
@@ -135,7 +133,7 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
             # Hold cash
             pass
 
-        sell_result = strategy_sell(current_date, stock_ticker, rsi_ta, PPO_SELL, Sudden_fall, option_strategy)
+        sell_result = strategy_sell(current_date,rsi_ta, mfi_ta, sma20_ta, sma60_ta, stock_ticker, Sudden_fall, stochk_ta, stochd_ta, PPO_SELL,option_strategy)
 
         if isinstance(sell_result, tuple):
             ta_sell_amount, sell_signal, Sudden_fall = sell_result
@@ -225,3 +223,4 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
     }
     # print(result)
     return result_dict
+
