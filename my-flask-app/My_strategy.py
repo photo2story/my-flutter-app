@@ -179,7 +179,7 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
 
         rate = (account_balance / invested_amount - 1) * 100
 
-        result.append([current_date, price/currency, Open/currency, High/currency,Low/currency, Close/currency, Volume, bb_upper_ta, bb_lower_ta, sma05_ta, sma20_ta, sma60_ta, sma120_ta, sma240_ta, recent_high/currency, aroon_up_ta, aroon_down_ta, ppo_histogram, SMA_20_turn, SMA_60_turn, recent_low/currency, account_balance, deposit, cash, portfolio_value, shares,  rate, invested_amount,  signal, rsi_ta,  stochk_ta,  stochd_ta, stock_ticker])
+        result.append([current_date, price/currency, Open/currency, High/currency,Low/currency, Close/currency, Volume, bb_upper_ta, bb_lower_ta, sma05_ta, sma20_ta, sma60_ta, sma120_ta, sma240_ta, recent_high/currency, aroon_up_ta, aroon_down_ta, ppo_histogram, SMA_20_turn, SMA_60_turn, recent_low/currency, account_balance, deposit, cash, portfolio_value, shares,  rate, invested_amount,  signal, rsi_ta,  stochk_ta,  stochd_ta, stock_ticker,rate_vs])
 
 
         if signal != '':
