@@ -16,7 +16,7 @@ def strategy_sell(date_str, stock_ticker, rsi_ta, PPO_SELL,Sudden_fall, option_s
     # 변동성이 높은 종목 리스트
     high_volatility_stocks = ['SOXL', 'UPRO', 'TQQQ']
     # 변동성이 낮은 종목 리스트
-    low_volatility_stocks = ['AAPL', 'MSFT', 'SPY', 'TSLA', 'NVDA', 'QQQ', '305540.KS', '005490.KS', '373220', 'U', 'IONQ', '086520']
+    low_volatility_stocks = ['AAPL', 'MSFT', 'SPY', 'QQQ', 'VOO']
 
     # PPO와 RSI 조건을 기반으로 매도 전략 설정
     if PPO_SELL and rsi_ta > 60:
@@ -24,8 +24,8 @@ def strategy_sell(date_str, stock_ticker, rsi_ta, PPO_SELL,Sudden_fall, option_s
             # 변동성이 높은 종목: 50% 매도
             ta_sell_amount = 0.5
         elif stock_ticker in low_volatility_stocks:
-            # 변동성이 낮은 종목: 30% 매도
-            ta_sell_amount = 0.3
+            # 변동성이 낮은 종목: 20% 매도
+            ta_sell_amount = 0.2
         else:
             # 리스트에 없는 종목에 대한 기본 설정: 30% 매도
             ta_sell_amount = 0.3
