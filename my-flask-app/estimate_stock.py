@@ -84,12 +84,12 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     else:
         # 데이터가 유효하지 않으면 오류 메시지 출력
         raise ValueError("Existing VOO data does not match the required date range. Please regenerate the data.")
-    result_dict2 = voo_performance_data[['rate_vs']]
+    result_dict2 = voo_performance_data[['rate']]
     # 최종 비교 데이터를 준비
     safe_ticker = stock1.replace('/', '-')
     file_path = 'result_VOO_{}.csv'.format(safe_ticker)
     result_df2 = result_dict2.copy()
-    result_df2.rename(columns={'rate_vs': 'rate_vs'}, inplace=True)
+    result_df2.rename(columns={'rate': 'rate_vs'}, inplace=True)
     result_df2.fillna(0, inplace=True)
 
     # 두 데이터 프레임을 결합
