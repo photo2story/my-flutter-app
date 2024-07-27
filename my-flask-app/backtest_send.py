@@ -30,6 +30,8 @@ async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
     try:
         total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df = estimate_stock(
             stock, config.START_DATE, config.END_DATE, config.INITIAL_INVESTMENT, config.MONTHLY_INVESTMENT, option_strategy)
+    # 이하 코드
+
         await ctx.send(f'backtest_and_send.command2: {stock}')  # 주식 이름을 출력
 
         min_stock_data_date = str(min_stock_data_date).split(' ')[0]
