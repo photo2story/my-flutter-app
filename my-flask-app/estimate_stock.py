@@ -52,7 +52,7 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     print(config.VOO_PERFORMANCE_FILE_PATH)
 
     # 기존 VOO 퍼포먼스 데이터 불러오기
-    result_df2 = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
+    result_df2 = pd.read_csv('https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/result_VOO_VOO.csv', index_col='Date', parse_dates=True)
     if not is_date_range_matching(config.VOO_PERFORMANCE_FILE_PATH, min_stock_data_date, end_date):
         print("Date range mismatch in VOO performance data.")
         return None
