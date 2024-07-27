@@ -54,24 +54,7 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
     voo_performance_data = voo_performance_data[['rate_vs']]
     
-    # VOO 퍼포먼스 데이터가 이미 존재하고 유효한지 확인
-    voo_performance_data = None
-    if os.path.exists(config.VOO_PERFORMANCE_FILE_PATH):
-        print(f"VOO performance file found at {config.VOO_PERFORMANCE_FILE_PATH}. Checking date range...")
-        try:
-            voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
-            print(f"Loaded VOO data with date range: {voo_performance_data.index.min()} to {voo_performance_data.index.max()}")
-            if is_date_range_matching(config.VOO_PERFORMANCE_FILE_PATH, min_stock_data_date, end_date):
-                print("VOO performance data is valid and within the required date range.")
-                voo_performance_data = voo_performance_data[['rate_vs']]
-            else:
-                print("Date range mismatch. Discarding existing VOO performance data.")
-                voo_performance_data = None
-        except Exception as e:
-            print(f"Error loading VOO performance data: {e}")
-            voo_performance_data = None
-    else:
-        print(f"VOO performance file not found at {config.VOO_PERFORMANCE_FILE_PATH}.")
+
 
     # 유효한 VOO 데이터가 없으면 새로 생성
     if voo_performance_data is None:
