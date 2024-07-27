@@ -24,8 +24,8 @@ def strategy_sell(date_str, stock_ticker, rsi_ta, PPO_SELL,Sudden_fall, option_s
             # 변동성이 높은 종목: 50% 매도
             ta_sell_amount = 0.5
         elif stock_ticker in low_volatility_stocks:
-            # 변동성이 낮은 종목: 20% 매도
-            ta_sell_amount = 0.2
+            # 변동성이 낮은 종목: 10% 매도
+            ta_sell_amount = 0.1
         else:
             # 리스트에 없는 종목에 대한 기본 설정: 30% 매도
             ta_sell_amount = 0.3
