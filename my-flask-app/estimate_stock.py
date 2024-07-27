@@ -48,6 +48,7 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     try:
         # 기존 VOO 퍼포먼스 데이터가 유효한 경우
         voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
+        print(voo_performance_data.head())
         if not is_date_range_matching(config.VOO_PERFORMANCE_FILE_PATH, min_stock_data_date, end_date):
             raise ValueError("Date range mismatch")
         print("Date range VOO performance data ok.")
