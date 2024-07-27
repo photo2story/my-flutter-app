@@ -38,15 +38,34 @@ def estimate_stock(stock, start_date, end_date, initial_investment, monthly_inve
 
 def is_date_range_matching(file_path, min_stock_data_date, end_date):
     """파일에 저장된 데이터의 날짜 범위가 주어진 날짜 범위와 일치하는지 확인합니다."""
+    print("is_date_range_matching called")
     try:
         df = pd.read_csv(file_path, parse_dates=['Date'])
+        if df.empty:
+            print(f"The file {file_path} is empty.")
+            return False
+
         file_min_date = df['Date'].min()
         file_max_date = df['Date'].max()
         print(f"File date range: {file_min_date} to {file_max_date}")
+        print(f"Expected date range: {min_stock_data_date} to {end_date}")
+
+        # 날짜 형식이 일치하는지 확인하고, 필요한 경우 형식을 변환
+        if isinstance(file_min_date, str):
+            file_min_date = pd.to_datetime(file_min_date)
+        if isinstance(file_max_date, str):
+            file_max_date = pd.to_datetime(file_max_date)
+        if isinstance(min_stock_data_date, str):
+            min_stock_data_date = pd.to_datetime(min_stock_data_date)
+        if isinstance(end_date, str):
+            end_date = pd.to_datetime(end_date)
+
         return file_min_date == min_stock_data_date and file_max_date == end_date
     except Exception as e:
         print(f"Error reading file {file_path}: {e}")
         return False
+
+
 
 import pandas as pd
 
@@ -65,7 +84,7 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     else:
         # 데이터가 유효하지 않으면 오류 메시지 출력
         raise ValueError("Existing VOO data does not match the required date range. Please regenerate the data.")
-
+    result_dict2 = voo_performance_data[['rate_vs']]
     # 최종 비교 데이터를 준비
     safe_ticker = stock1.replace('/', '-')
     file_path = 'result_VOO_{}.csv'.format(safe_ticker)
