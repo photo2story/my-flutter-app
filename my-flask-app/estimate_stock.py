@@ -61,8 +61,8 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     safe_ticker = stock1.replace('/', '-')
     file_path = 'result_VOO_{}.csv'.format(safe_ticker)
     # result_df2 = export_csv(file_path, result_dict2)
-    # result_df2.rename(columns={'rate': 'rate_vs'}, inplace=True)
-    # result_df2.fillna(0, inplace=True)
+    result_df2.rename(columns={'rate': 'rate_vs'}, inplace=True)
+    result_df2.fillna(0, inplace=True)
 
     # 두 데이터 프레임을 결합
     combined_df = result_df.join(result_df2['rate_vs'])
