@@ -1,4 +1,3 @@
-# strategy_sell.py
 from datetime import datetime
 
 def strategy_sell(date_str, rsi_ta, mfi_ta, sma20_ta, sma60_ta, stock_ticker, Sudden_fall, stochk_ta, stochd_ta, PPO_SELL,option_strategy):
