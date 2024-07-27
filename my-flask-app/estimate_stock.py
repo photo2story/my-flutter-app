@@ -52,7 +52,7 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     stock_data, min_stock_data_date = get_stock_data(stock2, min_stock_data_date, end_date)
     
     voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
-    voo_performance_data = voo_performance_data[['rate_vs']]
+    result_dict2 = voo_performance_data[['rate_vs']]
     
 
 
