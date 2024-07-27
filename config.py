@@ -39,3 +39,5 @@ STOCKS = {
 
 # Stock market CSV path
 STOCK_MARKET_CSV_PATH = os.getenv('STOCK_MARKET_CSV_PATH', 'path/to/stock_market.csv')
+# VOO Performance Data File Path
+VOO_PERFORMANCE_FILE_PATH = os.getenv('VOO_PERFORMANCE_FILE_PATH', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/result_VOO_VOO.csv')

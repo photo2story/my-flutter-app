@@ -3,9 +3,16 @@
 from Get_data import get_stock_data
 import My_strategy
 from Data_export import export_csv
-import os
+import os, sys
 from datetime import datetime
 import pandas as pd
+from dotenv import load_dotenv
+
+# 루트 디렉토리를 sys.path에 추가
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Import configuration
+import config
 
 def estimate_stock(stock, start_date, end_date, initial_investment, monthly_investment, option_strategy):
     stock_data, min_stock_data_date = get_stock_data(stock, start_date, end_date)
@@ -30,8 +37,21 @@ def estimate_stock(stock, start_date, end_date, initial_investment, monthly_inve
 
 def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investment, monthly_investment, option_strategy, result_df):
     stock_data, min_stock_data_date = get_stock_data(stock2, min_stock_data_date, end_date)
+    print(VOO_PERFORMANCE_FILE_PATH)
+    try:
+        # 기존 VOO 퍼포먼스 데이터가 유효한 경우
+        voo_performance_data = pd.read_csv(VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
+        if not is_date_range_matching(VOO_PERFORMANCE_FILE_PATH, min_stock_data_date, end_date):
+            raise ValueError("Date range mismatch")
+        voo_performance_data = voo_performance_data[['rate_vs']]
+        print("Loaded existing VOO performance data.")
+    except (FileNotFoundError, ValueError):
+        print("Generating new VOO performance data...")
+        # VOO 데이터 가져오기 및 백테스트 수행
+        result_dict2 = My_strategy.my_strategy(stock_data, initial_investment, monthly_investment, option_strategy)
 
-    result_dict2 = My_strategy.my_strategy(stock_data, initial_investment, monthly_investment, option_strategy)
+
+
     # 결과 CSV 파일로 저장하기
     safe_ticker = stock1.replace('/', '-')
     file_path = 'result_VOO_{}.csv'.format(safe_ticker)  # VOO_TSLA(stock1).csv
@@ -50,3 +70,9 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
 
     return file_path
 
+# 테스트 코드
+if __name__ == "__main__":
+    print(config.VOO_PERFORMANCE_FILE_PATH)
+    
+    
+# python estimate_stock.py    

@@ -19,7 +19,6 @@ async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
         raise ValueError("bot 변수는 None일 수 없습니다.")
 
     await ctx.send(f"backtest_and_send.command1: {stock}")
-    await ctx.send(f"backtest_and_send.command2: {stock}")
 
     if not is_valid_stock(stock):
         message = f"Stock market information updates needed. {stock}"
