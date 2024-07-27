@@ -1,33 +1,8 @@
 # estimate_stock.py
 import pandas as pd
-import os,sys
+import os
 from My_strategy import my_strategy
 from Data_export import export_csv
-# 루트 디렉토리를 sys.path에 추가
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-# Import configuration
-import config
-def estimate_stock(stock, start_date, end_date, initial_investment, monthly_investment, option_strategy):
-    stock_data, min_stock_data_date = get_stock_data(stock, start_date, end_date)
-    print('estimate_stock.1:', stock)
-    
-    result_dict = My_strategy.my_strategy(stock_data, initial_investment, monthly_investment, option_strategy)
-
-    total_account_balance = result_dict['Total_account_balance']
-    invested_amount = result_dict['Invested_amount']
-    total_rate = result_dict['Total_rate']
-    str_strategy = result_dict['Strategy']
-    str_last_signal = result_dict['Last_signal']
-
-    # 결과 CSV 파일로 저장하기
-    safe_ticker = stock.replace('/', '-')  # 슬래시를 하이픈으로 변경
-    file_path = 'result_VOO_{}.csv'.format(safe_ticker)  # VOO_TSLA.csv
-    print('file_path:', file_path)
-    result_df = export_csv(file_path, result_dict)
-    print('estimate_stock:', stock)
-
-    return total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df
 
 def is_date_range_matching(file_path, min_stock_data_date, end_date):
     """파일에 저장된 데이터의 날짜 범위가 주어진 날짜 범위와 일치하는지 확인합니다."""
@@ -75,23 +50,12 @@ if __name__ == "__main__":
         print(f"VOO Performance File Path: {config.VOO_PERFORMANCE_FILE_PATH}")
         voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
         print("Successfully loaded VOO performance data.")
-        
-        # 데이터의 일부를 출력하여 제대로 로드되었는지 확인
-        print(voo_performance_data.head())
-        
-        # 시작 날짜, 끝 날짜, 데이터 수 확인
-        start_date = voo_performance_data.index.min()
-        end_date = voo_performance_data.index.max()
-        data_count = len(voo_performance_data)
-        
-        print(f"Data range: {start_date} to {end_date}")
-        print(f"Number of records: {data_count}")
+        print(voo_performance_data.head())  # 데이터의 일부를 출력하여 제대로 로드되었는지 확인
     except FileNotFoundError:
         print(f"File not found: {config.VOO_PERFORMANCE_FILE_PATH}")
     except ValueError as ve:
         print(f"ValueError: {ve}")
     except Exception as e:
         print(f"Unexpected error: {e}")
-
     
 # python estimate_stock.py    
