@@ -44,20 +44,35 @@ def is_date_range_matching(file_path, min_stock_data_date, end_date):
 
 def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investment, monthly_investment, option_strategy, result_df):
     stock_data, min_stock_data_date = get_stock_data(stock2, min_stock_data_date, end_date)
+
     print(config.VOO_PERFORMANCE_FILE_PATH)
-    try:
-        # 기존 VOO 퍼포먼스 데이터가 유효한 경우
+    
+    # VOO 퍼포먼스 데이터 로드 시도
+    voo_performance_data = None
+    if os.path.exists(config.VOO_PERFORMANCE_FILE_PATH):
+        print("VOO performance file exists.")
         voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
-        print(voo_performance_data.head())
-        if not is_date_range_matching(config.VOO_PERFORMANCE_FILE_PATH, min_stock_data_date, end_date):
-            raise ValueError("Date range mismatch")
-        print("Date range VOO performance data ok.")
-        voo_performance_data = voo_performance_data[['rate_vs']]
-        print("Loaded existing VOO performance data.")
-    except (FileNotFoundError, ValueError):
-        print("Generating new VOO performance data.............")
-        # VOO 데이터 가져오기 및 백테스트 수행
+        print(voo_performance_data.head())  # 데이터 확인용 출력
+
+        # 데이터의 날짜 범위 유효성 검사
+        if is_date_range_matching(config.VOO_PERFORMANCE_FILE_PATH, min_stock_data_date, end_date):
+            print("Date range VOO performance data ok.")
+            voo_performance_data = voo_performance_data[['rate_vs']]
+            print("Loaded existing VOO performance data.")
+        else:
+            print("Date range mismatch.")
+            voo_performance_data = None
+    else:
+        print("VOO performance file not found.")
+
+    # 데이터가 유효하지 않으면 새로운 데이터 생성
+    if voo_performance_data is None:
+        print("Generating new VOO performance data...")
         result_dict2 = My_strategy.my_strategy(stock_data, initial_investment, monthly_investment, option_strategy)
+        voo_performance_data = pd.DataFrame(result_dict2['result'])
+        voo_performance_data.to_csv(config.VOO_PERFORMANCE_FILE_PATH)
+        print("New VOO performance data generated and saved.")
+
 
 
 
