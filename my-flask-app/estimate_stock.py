@@ -49,10 +49,9 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     stock_data, min_stock_data_date = get_stock_data(stock2, min_stock_data_date, end_date)
 
     print(config.VOO_PERFORMANCE_FILE_PATH)
-    voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
-    print(voo_performance_data.head())  # 데이터 확인용 출력
-    result_dict2 = voo_performance_data[['rate_vs']]
-    
+    result_dict2 = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
+    print(result_dict2.head())  # 데이터 확인용 출력
+
 
 
 
