@@ -4,6 +4,7 @@ from Get_data import get_stock_data
 import My_strategy
 from Data_export import export_csv
 import os, sys
+import certifi
 from datetime import datetime
 import pandas as pd
 from dotenv import load_dotenv
@@ -13,6 +14,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Import configuration
 import config
+
+os.environ['SSL_CERT_FILE'] = certifi.where()
 
 def estimate_stock(stock, start_date, end_date, initial_investment, monthly_investment, option_strategy):
     stock_data, min_stock_data_date = get_stock_data(stock, start_date, end_date)
@@ -46,6 +49,8 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     stock_data, min_stock_data_date = get_stock_data(stock2, min_stock_data_date, end_date)
 
     print(config.VOO_PERFORMANCE_FILE_PATH)
+    voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
+    print(voo_performance_data.head())  # 데이터 확인용 출력
     
     # VOO 퍼포먼스 데이터 로드 시도
     voo_performance_data = None
