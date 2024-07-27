@@ -32,9 +32,9 @@ def save_simplified_csv(folder_path, df, ticker):
 
     # 간단한 데이터프레임 생성 (10 간격으로 축소)
     simplified_df = pd.DataFrame({
-        'Date': df['Date'].iloc[::10].reset_index(drop=True),
-        f'rate_{ticker}_5D': rate_ticker[::10],
-        'rate_VOO_20D': rate_VOO_20D[::10]
+        'Date': df['Date'].iloc[::20].reset_index(drop=True),
+        f'rate_{ticker}_5D': rate_ticker[::20],
+        'rate_VOO_20D': rate_VOO_20D[::20]
     })
 
     simplified_file_path = os.path.join(folder_path, f'result_{ticker}.csv')
