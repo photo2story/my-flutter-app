@@ -1,7 +1,7 @@
 # strategy_sell.py
 from datetime import datetime
 
-def strategy_sell(date_str, rsi_ta, ppo, ppo_signal, option_strategy):
+def strategy_sell(date_str, rsi_ta, PPO_SELL,option_strategy):
     # 날짜 문자열을 datetime 객체로 변환
     date = date_str
 
@@ -19,7 +19,7 @@ def strategy_sell(date_str, rsi_ta, ppo, ppo_signal, option_strategy):
     low_volatility_stocks = ['AAPL', 'MSFT', 'SPY', 'TSLA', 'NVDA', 'QQQ', '305540.KS', '005490.KS', '373220', 'U', 'IONQ', '086520']
 
     # PPO와 RSI 조건을 기반으로 매도 전략 설정
-    if ppo < ppo_signal and rsi_ta > 60:
+    if PPO_SELL and rsi_ta > 60:
         if stock_ticker in high_volatility_stocks:
             # 변동성이 높은 종목: 50% 매도
             ta_sell_amount = 0.5
@@ -39,5 +39,5 @@ def strategy_sell(date_str, rsi_ta, ppo, ppo_signal, option_strategy):
         ta_sell_amount = 0
         sell_signal = None
 
-    return ta_sell_amount, sell_signal
+    return ta_sell_amount, sell_signal, Sudden_fall
 
