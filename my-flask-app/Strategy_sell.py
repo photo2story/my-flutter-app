@@ -39,5 +39,5 @@ def strategy_sell(date_str, rsi_ta, PPO_SELL,Sudden_fall, option_strategy):
         ta_sell_amount = 0
         sell_signal = None
 
-    return ta_sell_amount, sell_signal
+    return ta_sell_amount, sell_signal, Sudden_fall
 
