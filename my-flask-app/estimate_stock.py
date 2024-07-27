@@ -50,10 +50,11 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
         voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
         if not is_date_range_matching(config.VOO_PERFORMANCE_FILE_PATH, min_stock_data_date, end_date):
             raise ValueError("Date range mismatch")
+        print("Date range VOO performance data ok.")
         voo_performance_data = voo_performance_data[['rate_vs']]
         print("Loaded existing VOO performance data.")
     except (FileNotFoundError, ValueError):
-        print("Generating new VOO performance data...")
+        print("Generating new VOO performance data.............")
         # VOO 데이터 가져오기 및 백테스트 수행
         result_dict2 = My_strategy.my_strategy(stock_data, initial_investment, monthly_investment, option_strategy)
 
