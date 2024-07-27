@@ -38,10 +38,15 @@ def estimate_stock(stock, start_date, end_date, initial_investment, monthly_inve
 
 def is_date_range_matching(file_path, min_stock_data_date, end_date):
     """파일에 저장된 데이터의 날짜 범위가 주어진 날짜 범위와 일치하는지 확인합니다."""
-    df = pd.read_csv(file_path, parse_dates=['Date'])
-    file_min_date = df['Date'].min()
-    file_max_date = df['Date'].max()
-    return file_min_date == min_stock_data_date and file_max_date == end_date
+    try:
+        df = pd.read_csv(file_path, parse_dates=['Date'])
+        file_min_date = df['Date'].min()
+        file_max_date = df['Date'].max()
+        print(f"File date range: {file_min_date} to {file_max_date}")
+        return file_min_date == min_stock_data_date and file_max_date == end_date
+    except Exception as e:
+        print(f"Error reading file {file_path}: {e}")
+        return False
 
 def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investment, monthly_investment, option_strategy, result_df):
     stock_data, min_stock_data_date = get_stock_data(stock2, min_stock_data_date, end_date)
@@ -50,12 +55,17 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     voo_performance_data = None
     if os.path.exists(config.VOO_PERFORMANCE_FILE_PATH):
         print(f"VOO performance file found at {config.VOO_PERFORMANCE_FILE_PATH}. Checking date range...")
-        voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
-        if is_date_range_matching(config.VOO_PERFORMANCE_FILE_PATH, min_stock_data_date, end_date):
-            print("VOO performance data is valid and within the required date range.")
-            voo_performance_data = voo_performance_data[['rate_vs']]
-        else:
-            print("Date range mismatch. Discarding existing VOO performance data.")
+        try:
+            voo_performance_data = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
+            print(f"Loaded VOO data with date range: {voo_performance_data.index.min()} to {voo_performance_data.index.max()}")
+            if is_date_range_matching(config.VOO_PERFORMANCE_FILE_PATH, min_stock_data_date, end_date):
+                print("VOO performance data is valid and within the required date range.")
+                voo_performance_data = voo_performance_data[['rate_vs']]
+            else:
+                print("Date range mismatch. Discarding existing VOO performance data.")
+                voo_performance_data = None
+        except Exception as e:
+            print(f"Error loading VOO performance data: {e}")
             voo_performance_data = None
     else:
         print(f"VOO performance file not found at {config.VOO_PERFORMANCE_FILE_PATH}.")
@@ -83,6 +93,7 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     print(f"Comparison data saved to {file_path}")
 
     return file_path
+
 
 
 
