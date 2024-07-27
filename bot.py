@@ -95,7 +95,7 @@ async def stock(ctx, *, query: str = None):
                 # CSV 파일 간소화
                 await process_and_simplify_csv(stock_name)
 
-            await asyncio.sleep(10)
+            await asyncio.sleep(5)
         except Exception as e:
             await ctx.send(f'An error occurred while processing {stock_name}: {e}')
             print(f'Error processing {stock_name}: {e}')
