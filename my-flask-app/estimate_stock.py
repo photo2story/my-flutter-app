@@ -48,35 +48,36 @@ def is_date_range_matching(file_path, min_stock_data_date, end_date):
 def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investment, monthly_investment, option_strategy, result_df):
     stock_data, min_stock_data_date = get_stock_data(stock2, min_stock_data_date, end_date)
 
-    # VOO 퍼포먼스 데이터 파일 경로 출력
     print(config.VOO_PERFORMANCE_FILE_PATH)
 
-    # 기존 VOO 퍼포먼스 데이터 불러오기
-    result_df2 = pd.read_csv('https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/result_VOO_VOO.csv', index_col='Date', parse_dates=True)
-    if not is_date_range_matching(config.VOO_PERFORMANCE_FILE_PATH, min_stock_data_date, end_date):
-        print("Date range mismatch in VOO performance data.")
-        return None
+    try:
+        # 기존 VOO 퍼포먼스 데이터가 유효한 경우
+        result_df2 = pd.read_csv(config.VOO_PERFORMANCE_FILE_PATH, index_col='Date', parse_dates=True)
+        if not is_date_range_matching(config.VOO_PERFORMANCE_FILE_PATH, min_stock_data_date, end_date):
+            raise ValueError("Date range mismatch")
+        print("Date range VOO performance data ok.")
+        result_df2 = result_df2[['rate_vs']]  # 'rate_vs' 열만 선택하여 사용
+        print("Loaded existing VOO performance data.")
+    except (FileNotFoundError, ValueError):
+        print("Generating new VOO performance data...")
+        stock_data, _ = get_stock_data(stock2, min_stock_data_date, end_date)
+        result_dict2 = My_strategy.my_strategy(stock_data, initial_investment, monthly_investment, option_strategy)
+        result_df2 = pd.DataFrame(result_dict2['result'])
+        result_df2['rate_vs'] = result_df2['rate']
+        result_df2.to_csv(config.VOO_PERFORMANCE_FILE_PATH)  # 새 데이터 저장
 
-    print("Date range VOO performance data ok.")
-    result_df2 = result_df2[['rate_vs']]  # 'rate_vs' 열만 선택하여 사용
-    print("Loaded existing VOO performance data.")
-
-
-
-
-
-
-    # # 결과 CSV 파일로 저장하기
-    # safe_ticker = stock1.replace('/', '-')
-    # file_path = 'result_VOO_{}.csv'.format(safe_ticker)  # VOO_TSLA(stock1).csv
-    # result_df2 = export_csv(file_path, result_dict2)
+    # 결과 CSV 파일로 저장하기
+    safe_ticker = stock1.replace('/', '-')
+    file_path = 'result_comparison_{}.csv'.format(safe_ticker)  # VOO_TSLA(stock1).csv
+    result_df2.to_csv(file_path)  # 'rate_vs' 열 포함하여 저장
     
-    # result_df2의 'rate' 컬럼 이름을 'rate_vs'로 변경
-    # result_df2.rename(columns={'rate': 'rate_vs'}, inplace=True)
-    
-    # 누락된 값을 0으로 채우기
-    # result_df2.fillna(0, inplace=True)
-  
+    # result_df와 result_df2를 합치기 (여기서는 인덱스를 기준으로 합침)
+    combined_df = result_df.join(result_df2['rate_vs'])
+    combined_df.fillna(0, inplace=True)  # 누락된 값을 0으로 채우기
+    combined_df.to_csv(file_path, float_format='%.2f', index=False)
+
+    return file_path
+
     # result_df와 result_df2를 합치기 (여기서는 인덱스를 기준으로 합침)
     combined_df = result_df.join(result_df2['rate_vs'])
     combined_df.fillna(0, inplace=True)  # 누락된 값을 0으로 채우기
