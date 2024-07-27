@@ -1,7 +1,7 @@
 # strategy_sell.py
 from datetime import datetime
 
-def strategy_sell(date_str, rsi_ta, PPO_SELL,option_strategy):
+def strategy_sell(date_str, rsi_ta, PPO_SELL,Sudden_fall, option_strategy):
     # 날짜 문자열을 datetime 객체로 변환
     date = date_str
 
@@ -39,5 +39,5 @@ def strategy_sell(date_str, rsi_ta, PPO_SELL,option_strategy):
         ta_sell_amount = 0
         sell_signal = None
 
-    return ta_sell_amount, sell_signal, Sudden_fall
+    return ta_sell_amount, sell_signal
 
