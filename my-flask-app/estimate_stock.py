@@ -1,8 +1,12 @@
 # estimate_stock.py
-import pandas as pd
-import os,sys
-from My_strategy import my_strategy
+import requests
+from Get_data import get_stock_data
+import My_strategy
 from Data_export import export_csv
+import os, sys
+from datetime import datetime
+import pandas as pd
+from dotenv import load_dotenv
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
