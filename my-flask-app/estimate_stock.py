@@ -56,13 +56,6 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     
 
 
-    # 유효한 VOO 데이터가 없으면 새로 생성
-    if voo_performance_data is None:
-        print("Generating new VOO performance data...")
-        result_dict2 = my_strategy(stock_data, initial_investment, monthly_investment, option_strategy)
-        voo_performance_data = pd.DataFrame(result_dict2['result'])
-        voo_performance_data.to_csv(config.VOO_PERFORMANCE_FILE_PATH)
-        print(f"New VOO performance data generated and saved at {config.VOO_PERFORMANCE_FILE_PATH}.")
 
     # 최종 비교 데이터를 준비
     safe_ticker = stock1.replace('/', '-')
