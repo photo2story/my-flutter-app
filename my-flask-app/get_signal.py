@@ -51,7 +51,7 @@ def calculate_ppo_buy_sell_signals(stock_data, index, short_window, long_window,
     PPO_SELL = True if not SMA_20_turn and ppo_histogram.iloc[index] < 1.1 else False
     ppo_histogram = ppo_histogram.iloc[index]
 
-    return PPO_BUY, PPO_SELL,  ppo_histogram, SMA_20_turn, SMA_60_turn
+    return ppo, ppo_signal, PPO_BUY, PPO_SELL,  ppo_histogram, SMA_20_turn, SMA_60_turn
 
 def calculate_ppo_buy_sell_signals2(stock_data, index, short_window, long_window, signal_window):
   PPO_BUY = False
@@ -83,7 +83,7 @@ def calculate_ppo_buy_sell_signals2(stock_data, index, short_window, long_window
       SMA_60_turn = False
 
 
-  return PPO_BUY, PPO_SELL, ppo_histogram, SMA_20_turn, SMA_60_turn
+  return ppo, ppo_signal,PPO_BUY, PPO_SELL, ppo_histogram, SMA_20_turn, SMA_60_turn
 
 
 # 테스트를 위한 예제 데이터 생성
