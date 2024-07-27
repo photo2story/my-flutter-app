@@ -135,7 +135,7 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
             # Hold cash
             pass
 
-        sell_result = strategy_sell(current_date,rsi_ta, ppo, ppo_signal, option_strategy)
+        sell_result = strategy_sell(current_date,rsi_ta, PPO_SELL, option_strategy)
 
         if isinstance(sell_result, tuple):
             ta_sell_amount, sell_signal, Sudden_fall = sell_result
