@@ -19,22 +19,6 @@ MONTHLY_INVESTMENT = int(os.getenv('MONTHLY_INVESTMENT', 1000000))
 CSV_URL = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv')
 GITHUB_API_URL = os.getenv('GITHUB_API_URL', 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images')
 
-# Stocks list
-# STOCKS = {
-#     'Technology': ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA'], 
-#     'Financials': ['BAC'],
-#     'Consumer Cyclical': ['TSLA', 'NFLX'],
-#     'Healthcare': ['LLY','UNH'],
-#     'Communication Services': ['META', 'VZ'],
-#     'Industrials': ['GE','UPS'],
-#     'Consumer Defensive': ['WMT', 'KO'],
-#     'Energy': ['XOM'],
-#     'Basic Materials': ['LIN','ALB'],
-#     'Real Estate': ['DHI', 'ADSK'], 
-#     'Utilities': ['EXC']
-# }
-
-# Stocks list
 STOCKS = {
     'Technology': ['AAPL', 'MSFT', 'NVDA', 'GOOG', 'AMZN', 'META', 'CRM', 'ADBE', 'AMD', 'ACN', 'QCOM', 'CSCO', 'INTU', 'IBM', 'PDD', 'NOW', 'MS', 'ARM', 'INTC', 'ANET', 'ADI', 'KLAC', 'PANW', 'AMT'],
     'Financials': ['BRK.A', 'V', 'MA', 'BAC', 'WFC', 'BLK', 'BX', 'GS', 'C', 'KKR'],
@@ -76,3 +60,21 @@ def monthly_deposit(current_date, prev_month, monthly_investment, cash, invested
        signal = 'Monthly invest'
        prev_month = f"{current_date.year}-{current_date.month}"
     return cash, invested_amount, signal, prev_month
+
+# 추가된 함수: 분석 검증
+def is_stock_analysis_complete(ticker):
+    result_file_path = os.path.join('static', 'images', f'result_VOO_{ticker}.csv')
+    if not os.path.exists(result_file_path):
+        return False
+    
+    df = pd.read_csv(result_file_path, parse_dates=['Date'])
+    if df['Date'].min().strftime('%Y-%m-%d') != START_DATE:
+        return False
+    if df['Date'].max().strftime('%Y-%m-%d') != END_DATE:
+        return False
+    
+    return True
+
+def is_gemini_analysis_complete(ticker):
+    report_file_path = os.path.join('static', 'images', f'report_{ticker}.txt')
+    return os.path.exists(report_file_path)
