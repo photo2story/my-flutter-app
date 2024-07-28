@@ -9,6 +9,9 @@ import os
 import requests
 import glob
 import asyncio
+import pandas as pd
+import time  # 추가
+
 from get_ticker import get_ticker_name, is_valid_stock
 from Results_plot_mpl import plot_results_mpl
 
@@ -30,56 +33,6 @@ def load_image(file_path):
     image = Image.open(file_path)
     return image
 
-def plot_results(file_path, total_account_balance, total_rate, str_strategy, stock, invested_amount):
-    # 파일 경로 변환
-    file_path = convert_file_path_for_reading(file_path)
-
-    result_df = pd.read_csv(file_path, parse_dates=['Date'], index_col='Date', comment='#')
-
-    # 해당 주식 데이터만 추출하여 새로운 DataFrame 생성
-    stock_df = result_df[result_df['stock_ticker'] == stock]
-
-    fig, ax2 = plt.subplots(figsize=(8, 6))
-
-    # 하단 그래프
-    ax2.plot(stock_df['rate'], label='Daily Return')
-    ax2.set_ylabel('Daily Return (%)')
-    ax2.legend(loc='upper left')
-
-    # 주식 이름 가져오기
-    stock_name = get_ticker_name(stock)
-    max_divergence = stock_df['Divergence'].max()
-    min_divergence = stock_df['Divergence'].min()
-    current_divergence = stock_df['Divergence'].iloc[-1]
-    relative_divergence = stock_df['Relative_Divergence'].iloc[-1]
-
-    # 제목 설정
-    plt.title(f"{stock} ({stock_name}) vs VOO\n" +
-              f"Total Account Balance: {total_account_balance:,.0f} won\n" +
-              f"Total Rate: {total_rate:,.2f}% (VOO: {relative_divergence:.2f}%)\n" +
-              f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" +
-              f"Strategy: {str_strategy}")
-
-    # x축 라벨 설정
-    ax2.xaxis.set_major_locator(dates.YearLocator())
-    plt.xlabel('Year')
-
-    # 포트폴리오 가치 표시
-    plt.annotate('Portfolio Value\n{:.0f}won'.format(total_account_balance),
-                 xy=(stock_df.index[0], total_account_balance),
-                 xytext=(stock_df.index[0], total_account_balance * 1.25),
-                 arrowprops=dict(facecolor='black', headwidth=10, width=2))
-
-    # 그래프를 PNG 파일로 저장
-    save_figure(fig, 'result_{}.png'.format(stock))
-
-    ax2.cla()
-    plt.cla()
-    plt.clf()  # Clear the figure to avoid residual plots when this function is called again
-
-    # Discord 메시지 전송 기능을 plot_comparison_results로 이동
-
-import pandas as pd
 
 def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date):
     fig, ax2 = plt.subplots(figsize=(8, 6))
@@ -139,9 +92,6 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     files = {'file': open(save_path, 'rb')}
     response = requests.post(DISCORD_WEBHOOK_URL, files=files)
 
-
-
-import time  # 추가
 
 async def plot_results_all():
     DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
@@ -205,4 +155,22 @@ async def plot_results_all():
 
         await asyncio.sleep(1)  # 1초 대기
 
+if __name__ == "__main__":
+    # 테스트용 예시 데이터 설정
+    folder_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
+    stock1 = "AAPL"
+    stock2 = "VOO"
+    total_account_balance = 1000000  # 예시 값
+    total_rate = 25.0  # 예시 값
+    str_strategy = "Buy and Hold"  # 예시 전략
+    invested_amount = 500000  # 예시 초기 투자금
+    min_stock_data_date = "2019-01-02"  # 예시 시작 날짜
 
+    # 파일 경로 설정
+    file_path1 = os.path.join(folder_path, f'result_VOO_{stock1}.csv')
+    file_path2 = os.path.join(folder_path, f'result_VOO_{stock2}.csv')
+
+    # plot_comparison_results 함수 호출
+    plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date)
+    
+    # python Results_plot.py
