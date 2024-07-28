@@ -150,13 +150,15 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
               f"Invested_amount: {invested_amount:,.0f} $\n" \
               f"Total_account_balance: {total_account_balance:,.0f} $\n" \
               f"Last_signal: {str_strategy}"
-    with open(save_path, 'rb') as image:
-        response = requests.post(DISCORD_WEBHOOK_URL, json={'content': message}, files={'image': image})
-
+    response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
     if response.status_code != 204:
-        print('Discord 메시지 전송 실패')
+       print('Discord 메시지 전송 실패')
     else:
-        print('Discord 메시지 전송 성공')
+       print('Discord 메시지 전송 성공')
+
+    # 이미지 파일 전송
+    files = {'file': open(save_path, 'rb')}
+    response = requests.post(DISCORD_WEBHOOK_URL, files=files)
 
 
 
