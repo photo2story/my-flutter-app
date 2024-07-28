@@ -38,49 +38,36 @@ def load_image(file_path):
 def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date):
     fig, ax2 = plt.subplots(figsize=(8, 6))
 
-    # 전체 데이터셋 파일 경로
-    full_path1 = os.path.abspath(file_path1)
-    full_path2 = os.path.abspath(file_path2)
-    print(f"Reading full dataset for graph from: {full_path1} and {full_path2}")
-
-    # 그래프용 데이터프레임 로드 (전체 자료)
-    df1_graph = pd.read_csv(full_path1, parse_dates=['Date'], index_col='Date')
-    df2_graph = pd.read_csv(full_path2, parse_dates=['Date'], index_col='Date')
-
-    # 간략화된 데이터프레임 로드 (이격 결과)
-    simplified_df_path1 = os.path.join(os.path.dirname(full_path1), 'static', 'images', f'result_{stock1}.csv')
-    print(f"Attempting to read simplified dataset for divergence from: {simplified_df_path1}")
-
-    try:
-        df1 = pd.read_csv(simplified_df_path1, parse_dates=['Date'], index_col='Date')
-    except FileNotFoundError as e:
-        print(f"Error: {e}")
-        raise
+    df1 = pd.read_csv(file_path1, parse_dates=['Date'], index_col='Date')
+    df2 = pd.read_csv(file_path2, parse_dates=['Date'], index_col='Date')
 
     start_date = min_stock_data_date
-    end_date = min(df1_graph.index.max(), df2_graph.index.max())
+    end_date = min(df1.index.max(), df2.index.max())
 
-    df1_graph = df1_graph.loc[start_date:end_date]
-    df2_graph = df2_graph.loc[start_date:end_date]
+    df1 = df1.loc[start_date:end_date]
+    df2 = df2.loc[start_date:end_date]
 
-    df1_graph['rate_7d_avg'] = df1_graph['rate'].rolling('7D').mean()
-    df2_graph['rate_20d_avg'] = df2_graph['rate_vs'].rolling('20D').mean()
+    df1['rate_7d_avg'] = df1['rate'].rolling('7D').mean()
+    df2['rate_20d_avg'] = df2['rate_vs'].rolling('20D').mean()
 
-    ax2.plot(df1_graph.index, df1_graph['rate_7d_avg'], label=f'{stock1} 7-Day Avg Return')
-    ax2.plot(df2_graph.index, df2_graph['rate_20d_avg'], label=f'{stock2} 20-Day Avg Return')
+    ax2.plot(df1.index, df1['rate_7d_avg'], label=f'{stock1} 7-Day Avg Return')
+    ax2.plot(df2.index, df2['rate_20d_avg'], label=f'{stock2} 20-Day Avg Return')
 
-    voo_rate = df2_graph['rate_vs'].iloc[-1] if not df2_graph.empty else 0
+    voo_rate = df2['rate_vs'].iloc[-1] if not df2.empty else 0
 
     max_divergence = df1['Divergence'].max()
     min_divergence = df1['Divergence'].min()
     current_divergence = df1['Divergence'].iloc[-1]
     relative_divergence = df1['Relative_Divergence'].iloc[-1]
 
+    # Last Signal과 Current Signal 설정
+    last_signal = df1['Signal'].iloc[-1] if 'Signal' in df1.columns else 'N/A'
+    current_signal = df1['ppo_histogram'].iloc[-1] if 'ppo_histogram' in df1.columns else 'N/A'
+
     plt.title(f"{stock1} ({get_ticker_name(stock1)}) vs {stock2}\n" +
-              f"Total Account Balance: {total_account_balance:,.0f} $\n" +
-              f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%)\n" +
+              f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%, Rel: {relative_divergence:.2f}%)\n" +
               f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" +
-              f"Current Signal: {str_strategy}",
+              f"Current Signal: {current_signal}, Last Signal: {last_signal}",
               pad=10)
 
     ax2.xaxis.set_major_locator(dates.YearLocator())
@@ -93,12 +80,12 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     plt.clf()
     plt.close(fig)
 
-    # Discord 메시지
+    # Discord 메시지 전송
     DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
     message = f"Stock: {stock1} ({get_ticker_name(stock1)}) vs {stock2}\n" \
-              f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%)\n" \
+              f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%, Rel: {relative_divergence:.2f}%)\n" \
               f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" \
-              f"Current Signal: {str_strategy}"
+              f"Current Signal: {current_signal}, Last Signal: {last_signal}"
     response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
 
     if response.status_code != 204:
@@ -108,7 +95,6 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
 
     files = {'file': open(save_path, 'rb')}
     response = requests.post(DISCORD_WEBHOOK_URL, files=files)
-
 
 
 
