@@ -38,17 +38,24 @@ def load_image(file_path):
 def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date):
     fig, ax2 = plt.subplots(figsize=(8, 6))
 
-    # 파일 경로 출력
-    print(f"Reading full dataset for graph from: {file_path1} and {file_path2}")
+    # 파일 경로 출력 (전체 자료)
+    full_path1 = os.path.abspath(file_path1)
+    full_path2 = os.path.abspath(file_path2)
+    print(f"Reading full dataset for graph from: {full_path1} and {full_path2}")
 
     # 그래프용 데이터프레임 로드 (전체 자료)
-    df1_graph = pd.read_csv(file_path1, parse_dates=['Date'], index_col='Date')
-    df2_graph = pd.read_csv(file_path2, parse_dates=['Date'], index_col='Date')
+    df1_graph = pd.read_csv(full_path1, parse_dates=['Date'], index_col='Date')
+    df2_graph = pd.read_csv(full_path2, parse_dates=['Date'], index_col='Date')
 
     # 간략화된 데이터프레임 로드 (이격 결과)
-    simplified_df_path1 = file_path1.replace('result_VOO_', 'result_').replace('VOO_', '')
-    print(f"Reading simplified dataset for divergence from: {simplified_df_path1}")
-    df1 = pd.read_csv(simplified_df_path1, parse_dates=['Date'], index_col='Date')
+    simplified_df_path1 = os.path.abspath(file_path1.replace('result_VOO_', 'result_').replace('VOO_', ''))
+    print(f"Attempting to read simplified dataset for divergence from: {simplified_df_path1}")
+
+    try:
+        df1 = pd.read_csv(simplified_df_path1, parse_dates=['Date'], index_col='Date')
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        raise
 
     start_date = min_stock_data_date
     end_date = min(df1_graph.index.max(), df2_graph.index.max())
