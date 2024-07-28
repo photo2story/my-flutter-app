@@ -48,7 +48,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     df2_graph = pd.read_csv(full_path2, parse_dates=['Date'], index_col='Date')
 
     # 간략화된 데이터프레임 로드 (이격 결과)
-    simplified_df_path1 = os.path.abspath(file_path1.replace('result_VOO_', 'result_').replace('VOO_', ''))
+    simplified_df_path1 = os.path.join(os.path.dirname(full_path1), f'result_{stock1}.csv')
     print(f"Attempting to read simplified dataset for divergence from: {simplified_df_path1}")
 
     try:
@@ -108,6 +108,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
 
     files = {'file': open(save_path, 'rb')}
     response = requests.post(DISCORD_WEBHOOK_URL, files=files)
+
 
 
 async def plot_results_all():
