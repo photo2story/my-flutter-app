@@ -36,35 +36,40 @@ def load_image(file_path):
     return image
 
 def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date):
-    # 파일 경로 출력 (디버그용)
-    print(f"file_path1: {file_path1}")
-    print(f"file_path2: {file_path2}")
-
     fig, ax2 = plt.subplots(figsize=(8, 6))
 
-    df1 = pd.read_csv(file_path1, parse_dates=['Date'], index_col='Date')
-    df2 = pd.read_csv(file_path2, parse_dates=['Date'], index_col='Date')
+    # 파일 경로 출력
+    print(f"Reading full dataset for graph from: {file_path1} and {file_path2}")
+
+    # 그래프용 데이터프레임 로드 (전체 자료)
+    df1_graph = pd.read_csv(file_path1, parse_dates=['Date'], index_col='Date')
+    df2_graph = pd.read_csv(file_path2, parse_dates=['Date'], index_col='Date')
+
+    # 간략화된 데이터프레임 로드 (이격 결과)
+    simplified_df_path1 = file_path1.replace('result_VOO_', 'result_').replace('VOO_', '')
+    print(f"Reading simplified dataset for divergence from: {simplified_df_path1}")
+    df1 = pd.read_csv(simplified_df_path1, parse_dates=['Date'], index_col='Date')
 
     start_date = min_stock_data_date
-    end_date = min(df1.index.max(), df2.index.max())
+    end_date = min(df1_graph.index.max(), df2_graph.index.max())
 
-    df1 = df1.loc[start_date:end_date]
-    df2 = df2.loc[start_date:end_date]
+    df1_graph = df1_graph.loc[start_date:end_date]
+    df2_graph = df2_graph.loc[start_date:end_date]
 
-    df1['rate_7d_avg'] = df1['rate'].rolling('7D').mean()
-    df2['rate_20d_avg'] = df2['rate_vs'].rolling('20D').mean()
+    df1_graph['rate_7d_avg'] = df1_graph['rate'].rolling('7D').mean()
+    df2_graph['rate_20d_avg'] = df2_graph['rate_vs'].rolling('20D').mean()
 
-    ax2.plot(df1.index, df1['rate_7d_avg'], label=f'{stock1} 7-Day Avg Return')
-    ax2.plot(df2.index, df2['rate_20d_avg'], label=f'{stock2} 20-Day Avg Return')
+    ax2.plot(df1_graph.index, df1_graph['rate_7d_avg'], label=f'{stock1} 7-Day Avg Return')
+    ax2.plot(df2_graph.index, df2_graph['rate_20d_avg'], label=f'{stock2} 20-Day Avg Return')
 
-    voo_rate = df2['rate_vs'].iloc[-1] if not df2.empty else 0
+    voo_rate = df2_graph['rate_vs'].iloc[-1] if not df2_graph.empty else 0
 
     max_divergence = df1['Divergence'].max()
     min_divergence = df1['Divergence'].min()
     current_divergence = df1['Divergence'].iloc[-1]
     relative_divergence = df1['Relative_Divergence'].iloc[-1]
 
-    plt.title(f"{stock1} ({stock1_name}) vs {stock2}\n" +
+    plt.title(f"{stock1} ({get_ticker_name(stock1)}) vs {stock2}\n" +
               f"Total Account Balance: {total_account_balance:,.0f} $\n" +
               f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%)\n" +
               f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" +
@@ -83,7 +88,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
 
     # Discord 메시지
     DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-    message = f"Stock: {stock1} ({stock1_name}) vs {stock2}\n" \
+    message = f"Stock: {stock1} ({get_ticker_name(stock1)}) vs {stock2}\n" \
               f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%)\n" \
               f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" \
               f"Current Signal: {str_strategy}"
@@ -96,6 +101,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
 
     files = {'file': open(save_path, 'rb')}
     response = requests.post(DISCORD_WEBHOOK_URL, files=files)
+
 
 async def plot_results_all():
     DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
