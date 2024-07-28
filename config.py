@@ -1,6 +1,5 @@
-# config.py
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -20,7 +19,6 @@ CSV_URL = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my
 GITHUB_API_URL = os.getenv('GITHUB_API_URL', 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images')
 
 # Stocks list
-# 주식 목록
 STOCKS = {
     'Technology': ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA'], 
     'Financials': ['BAC'],
@@ -33,9 +31,26 @@ STOCKS = {
     'Basic Materials': ['LIN','ALB'],
     'Real Estate': ['DHI', 'ADSK'], 
     'Utilities': ['EXC']
-# 'ETFs': ['SPY', 'VOO', 'VTI', 'VGT', 'VHT', 'VCR', 'QQQ', 'TQQQ', 'SOXX', 'SOXL', 'UPRO']
 }
-
 
 # Stock market CSV path
 STOCK_MARKET_CSV_PATH = os.getenv('STOCK_MARKET_CSV_PATH', 'path/to/stock_market.csv')
+
+def initialize_trading_days(stock_data):
+    """
+    Initializes the first trading day and first saving day based on the stock data.
+
+    Args:
+        stock_data (pd.DataFrame): The stock data containing date information.
+
+    Returns:
+        tuple: A tuple containing first_trading_day and first_saving_day.
+    """
+    first_day = stock_data.index.min()
+    first_trading_day = first_day + timedelta(days=1)
+    first_saving_day = first_day + timedelta(days=1)
+
+    if first_trading_day.weekday() >= 1:
+        first_trading_day += timedelta(days=7 - first_trading_day.weekday())
+
+    return first_trading_day, first_saving_day
