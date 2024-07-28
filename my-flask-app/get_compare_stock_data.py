@@ -1,3 +1,5 @@
+# get_compare_stock_data.py
+
 import os
 import sys
 import pandas as pd
@@ -30,7 +32,7 @@ def save_simplified_csv(folder_path, df, ticker):
     rate_ticker = np.round(rate_ticker, 2)
     rate_VOO_20D = np.round(rate_VOO_20D, 2)
 
-    # 간단한 데이터프레임 생성 (10 간격으로 축소)
+    # 간단한 데이터프레임 생성 (20 간격으로 축소)
     simplified_df = pd.DataFrame({
         'Date': df['Date'].iloc[::20].reset_index(drop=True),
         f'rate_{ticker}_5D': rate_ticker[::20],
@@ -39,7 +41,7 @@ def save_simplified_csv(folder_path, df, ticker):
 
     simplified_file_path = os.path.join(folder_path, f'result_{ticker}.csv')
     simplified_df.to_csv(simplified_file_path, index=False)
-    # print(f"Simplified CSV saved: {simplified_file_path}")
+    print(f"Simplified CSV saved: {simplified_file_path}")
 
 def process_all_csv_files(folder_path):
     if not os.path.exists(folder_path):
@@ -50,14 +52,22 @@ def process_all_csv_files(folder_path):
 
     for file in csv_files:
         file_path = os.path.join(folder_path, file)
-        # print(f"Processing file: {file_path}")
+        print(f"Processing file: {file_path}")
         df_processed = read_and_process_csv(file_path)
         ticker = os.path.splitext(os.path.basename(file_path))[0].split('_')[-1]
         save_simplified_csv(folder_path, df_processed, ticker)
 
 if __name__ == "__main__":
-    folder_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
-    process_all_csv_files(folder_path)
+    # Set a flag or environment variable for testing
+    is_test = os.getenv('TEST_ENV', 'False').lower() in ('true', '1', 't')
+    
+    if is_test:
+        # Folder path for testing
+        folder_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test_data'))
+        print("Running in test mode...")
+        process_all_csv_files(folder_path)
+    else:
+        print("Not running in test mode. Skipping processing.")
 
 
 # python get_compare_stock_data.py
