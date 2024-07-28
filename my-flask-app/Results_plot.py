@@ -1,5 +1,5 @@
 # Results_plot.py
-# Results_plot.py
+
 import matplotlib.dates as dates
 import matplotlib
 matplotlib.use('Agg')
@@ -117,6 +117,9 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     ax2.plot(df1.index, df1['rate_7d_avg'], label=f'{stock1} 7-Day Avg Return')
     ax2.plot(df2.index, df2['rate_20d_avg'], label=f'{stock2} 20-Day Avg Return')
 
+    # VOO의 총 수익률 계산
+    voo_rate = df2['rate_vs'].iloc[-1] if not df2.empty else 0
+
     # 레이블, 제목, 범례 설정
     plt.ylabel('7-Day Average Daily Return (%)')
     plt.legend(loc='upper left')
@@ -125,7 +128,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     stock2_name = get_ticker_name(stock2)
 
     plt.title(f"{stock1} ({stock1_name}) vs {stock2} \n" +
-              f"\nTotal Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} %\n" +
+              f"\nTotal Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} % (VOO {voo_rate:,.0f}%)\n" +
               f"Invested Amount: {invested_amount:,.0f} $, Strategy: {str_strategy}",
               pad=10)  # 제목과 그래프 사이의 여백을 추가합니다.
 
@@ -163,6 +166,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
         print('Discord 메시지 전송 실패')
     else:
         print('Discord 메시지 전송 성공')
+
 
 
 import time  # 추가
