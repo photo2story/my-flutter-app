@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 
 # 루트 디렉토리를 sys.path에 추가
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'my-flask-app')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'my-flutter-app')))
 
 def read_and_process_csv(file_path):
     df = pd.read_csv(file_path)
@@ -23,12 +23,10 @@ def read_and_process_csv(file_path):
     
     return result_df
 
-def calculate_max_divergence(df, ticker):
-    # Max_Divergence 계산
-    max_divergence = ((df[f'rate_{ticker}_5D'] - df['rate_VOO_20D']) / abs(df['rate_VOO_20D'])) * 100
-    max_divergence = max_divergence.fillna(0)  # NaN 값을 0으로 대체
-    max_divergence = np.round(max_divergence, 2)  # 소수점 두 자리로 반올림
-    return max_divergence
+def calculate_divergence(df, ticker):
+    # Divergence 계산
+    divergence = df[f'rate_{ticker}_5D'] - df['rate_VOO_20D']
+    return divergence
 
 def save_simplified_csv(folder_path, df, ticker):
     # 이동 평균 계산
@@ -39,18 +37,21 @@ def save_simplified_csv(folder_path, df, ticker):
     rate_ticker = np.round(rate_ticker, 2)
     rate_VOO_20D = np.round(rate_VOO_20D, 2)
 
-    # Max_Divergence 계산 및 추가
-    max_divergence = calculate_max_divergence(df, ticker)
+    # Divergence 계산
+    divergence = calculate_divergence(df, ticker)
+    divergence = np.round(divergence, 2)
+
+    # 간단한 데이터프레임 생성 (20 간격으로 축소)
     simplified_df = pd.DataFrame({
-        'Date': df['Date'].reset_index(drop=True),
-        f'rate_{ticker}_5D': rate_ticker,
-        'rate_VOO_20D': rate_VOO_20D,
-        'Max_Divergence': max_divergence
+        'Date': df['Date'].iloc[::20].reset_index(drop=True),
+        f'rate_{ticker}_5D': rate_ticker[::20],
+        'rate_VOO_20D': rate_VOO_20D[::20],
+        'Divergence': divergence[::20]
     })
 
     simplified_file_path = os.path.join(folder_path, f'result_{ticker}.csv')
     simplified_df.to_csv(simplified_file_path, index=False)
-    # print(f"Simplified CSV saved: {simplified_file_path}")
+    print(f"Simplified CSV saved: {simplified_file_path}")
 
 def process_all_csv_files(folder_path):
     if not os.path.exists(folder_path):
@@ -61,28 +62,19 @@ def process_all_csv_files(folder_path):
 
     for file in csv_files:
         file_path = os.path.join(folder_path, file)
+        print(f"Processing file: {file_path}")
         df_processed = read_and_process_csv(file_path)
         ticker = os.path.splitext(os.path.basename(file_path))[0].split('_')[-1]
         save_simplified_csv(folder_path, df_processed, ticker)
 
 def process_single_ticker(folder_path, ticker):
-    """
-    지정된 티커에 대한 CSV 파일을 처리하고 결과를 저장합니다.
-
-    Args:
-        folder_path (str): CSV 파일이 있는 폴더의 경로.
-        ticker (str): 처리할 티커.
-
-    """
     file_path = os.path.join(folder_path, f'result_VOO_{ticker}.csv')
-    if os.path.exists(file_path):
-        df_processed = read_and_process_csv(file_path)
-        save_simplified_csv(folder_path, df_processed, ticker)
-    else:
-        print(f"File for ticker {ticker} not found in {folder_path}.")
+    print(f"Processing single ticker: {ticker}")
+    df_processed = read_and_process_csv(file_path)
+    save_simplified_csv(folder_path, df_processed, ticker)
 
 if __name__ == "__main__":
-    folder_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
+    folder_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'static', 'images'))
     # 특정 티커를 처리하는 경우
     test_mode = os.getenv('TEST_MODE', 'False')
     if test_mode == 'True':
@@ -90,6 +82,8 @@ if __name__ == "__main__":
         process_single_ticker(folder_path, ticker_to_test)
     else:
         process_all_csv_files(folder_path)
+
+
 
 
 # python get_compare_stock_data.py
