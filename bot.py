@@ -65,11 +65,11 @@ async def send_msg():
 
 processed_message_ids = set()
 
-async def process_and_simplify_csv(stock_name):
-    folder_path = os.path.join(os.getcwd(), 'static', 'images')
-    file_path = os.path.join(folder_path, f'result_VOO_{stock_name}.csv')
-    # df_processed = read_and_process_csv(file_path)
-    save_simplified_csv(folder_path, file_path, stock_name)
+# async def process_and_simplify_csv(stock_name):
+#     folder_path = os.path.join(os.getcwd(), 'static', 'images')
+#     file_path = os.path.join(folder_path, f'result_VOO_{stock_name}.csv')
+#     # df_processed = read_and_process_csv(file_path)
+#     save_simplified_csv(folder_path, file_path, stock_name)
 
 
 @bot.command()

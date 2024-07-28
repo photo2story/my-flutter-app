@@ -39,6 +39,7 @@ async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
         file_path = estimate_snp(stock, 'VOO', min_stock_data_date, config.END_DATE, config.INITIAL_INVESTMENT, config.MONTHLY_INVESTMENT, option_strategy, result_df)
         user_stock_file_path2 = file_path
         
+        # CSV 파일 간소화
         save_simplified_csv(file_path, stock)
 
         plot_comparison_results(user_stock_file_path1, user_stock_file_path2, stock, 'VOO', total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date)
@@ -47,9 +48,9 @@ async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
         await ctx.send(f"An error occurred while processing {stock}: {e}")
         print(f"Error processing {stock}: {e}")
 
-async def process_and_simplify_csv(stock_name):
-    folder_path = os.path.join(os.getcwd(), 'static', 'images')
-    file_path = os.path.join(folder_path, f'result_VOO_{stock_name}.csv')
-    # df_processed = read_and_process_csv(file_path)
-    save_simplified_csv(folder_path, file_path, stock_name)
+# async def process_and_simplify_csv(stock_name):
+#     folder_path = os.path.join(os.getcwd(), 'static', 'images')
+#     file_path = os.path.join(folder_path, f'result_VOO_{stock_name}.csv')
+#     # df_processed = read_and_process_csv(file_path)
+#     save_simplified_csv(folder_path, file_path, stock_name)
 
