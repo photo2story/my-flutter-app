@@ -28,7 +28,10 @@ def calculate_divergence(df, ticker):
     divergence = df[f'rate_{ticker}_5D'] - df['rate_VOO_20D']
     return divergence
 
-def save_simplified_csv(folder_path, df, ticker):
+def save_simplified_csv(folder_path, file_path, ticker):
+    # CSV 파일 읽기 및 처리
+    df = read_and_process_csv(file_path)
+    
     # Divergence 계산
     divergence = calculate_divergence(df, ticker)
     df['Divergence'] = np.round(divergence, 2)  # 소수점 두 자리로 반올림
@@ -66,20 +69,16 @@ def process_all_csv_files(folder_path):
         print(f"Processing file: {file_path}")
         df_processed = read_and_process_csv(file_path)
         ticker = os.path.splitext(os.path.basename(file_path))[0].split('_')[-1]
-        save_simplified_csv(folder_path, df_processed, ticker)
-
-def process_single_ticker(folder_path, ticker):
-    file_path = os.path.join(folder_path, f'result_VOO_{ticker}.csv')
-    print(f"Processing single ticker: {ticker}")
-    df_processed = read_and_process_csv(file_path)
-    save_simplified_csv(folder_path, df_processed, ticker)
+        save_simplified_csv(folder_path, file_path, ticker)
 
 if __name__ == "__main__":
     # 루트 디렉토리 경로를 기준으로 설정
     root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     folder_path = os.path.join(root_path, 'static', 'images')
     ticker_to_test = 'TSLA'
-    process_single_ticker(folder_path, ticker_to_test)
+    file_path = os.path.join(folder_path, f'result_VOO_{ticker_to_test}.csv')
+    save_simplified_csv(folder_path, file_path, ticker_to_test)
+
 
 
 
