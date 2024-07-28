@@ -189,12 +189,10 @@ async def analyze_with_gemini(ticker):
         print(error_message)
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
 
-
 if __name__ == '__main__':
     # 분석할 티커 설정
     ticker = 'TSLA'
     asyncio.run(analyze_with_gemini(ticker))
-
 
 # source .venv/bin/activate
 # python gemini.py    
