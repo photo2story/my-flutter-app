@@ -51,7 +51,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     last_signal_row = df1_graph.dropna(subset=['signal']).iloc[-1] if 'signal' in df1_graph.columns else None
     last_signal = last_signal_row['signal'] if last_signal_row is not None else 'N/A'
 
-    current_signal = df1_graph['ppo_histo'].iloc[-1] if 'ppo_histo' in df1_graph.columns else 'N/A'
+    current_signal = df1_graph['ppo_histogram'].iloc[-1] if 'ppo_histogram' in df1_graph.columns else 'N/A'
 
     # 간략화된 데이터프레임 로드 (이격 결과)
     simplified_df_path1 = os.path.join(os.path.dirname(full_path1), 'static', 'images', f'result_{stock1}.csv')
@@ -88,7 +88,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     plt.title(f"{stock1} ({get_ticker_name(stock1)}) vs {stock2}\n" +
               f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%)), Relative_Divergence: {relative_divergence:.2f}%\n" +
               f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" +
-              f"Current Signal: {current_signal}, Last Signal: {last_signal}",
+              f"Current Signal(PPO): {current_signal}, Last Signal: {last_signal}",
               pad=10)
 
     ax2.xaxis.set_major_locator(dates.YearLocator())
@@ -106,7 +106,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     message = f"Stock: {stock1} ({get_ticker_name(stock1)}) vs {stock2}\n" \
               f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%, Rel: {relative_divergence:.2f}%)\n" \
               f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" \
-              f"Current Signal: {current_signal}, Last Signal: {last_signal}"
+              f"Current Signal(PPO): {current_signal}, Last Signal: {last_signal}"
     response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
 
     if response.status_code != 204:
