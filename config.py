@@ -1,3 +1,4 @@
+# config.py
 import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
@@ -37,15 +38,6 @@ STOCKS = {
 STOCK_MARKET_CSV_PATH = os.getenv('STOCK_MARKET_CSV_PATH', 'path/to/stock_market.csv')
 
 def initialize_trading_days(stock_data):
-    """
-    Initializes the first trading day and first saving day based on the stock data.
-
-    Args:
-        stock_data (pd.DataFrame): The stock data containing date information.
-
-    Returns:
-        tuple: A tuple containing first_trading_day and first_saving_day.
-    """
     first_day = stock_data.index.min()
     first_trading_day = first_day + timedelta(days=1)
     first_saving_day = first_day + timedelta(days=1)
@@ -56,17 +48,15 @@ def initialize_trading_days(stock_data):
     return first_trading_day, first_saving_day
 
 def should_invest_today(current_date, first_trading_day):
-    """
-    Determines whether to invest today based on the current date and the first trading day.
-
-    Args:
-        current_date (datetime): The current date.
-        first_trading_day (datetime): The first trading day.
-
-    Returns:
-        bool: True if today is a trading day, otherwise False.
-    """
     if current_date.weekday() == 0 or (current_date.day <= 7 and current_date >= first_trading_day):
         return True
     return False
 
+def monthly_deposit(current_date, prev_month, monthly_investment, cash, invested_amount):
+    signal = ''
+    if prev_month != f"{current_date.year}-{current_date.month}":
+       cash += monthly_investment
+       invested_amount += monthly_investment
+       signal = 'Monthly invest'
+       prev_month = f"{current_date.year}-{current_date.month}"
+    return cash, invested_amount, signal, prev_month

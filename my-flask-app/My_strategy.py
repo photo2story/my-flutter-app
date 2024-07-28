@@ -10,24 +10,14 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # 사용자 정의 모듈 임포트
 from Strategy_sell import strategy_sell
 from Strategy_buy import strategy_buy
-from get_signal import calculate_ppo_buy_sell_signals, monthly_deposit, make_investment_decision
+from get_signal import calculate_ppo_buy_sell_signals
 import config  # config.py 모듈 임포트
 
-import datetime
-from typing import Union, Any
-import requests 
-import yaml
-import config
-
-from Strategy_sell import strategy_sell
-from Strategy_buy import strategy_buy
-from get_signal import calculate_ppo_buy_sell_signals, monthly_deposit
-
 def my_strategy(stock_data, initial_investment, monthly_investment, option_strategy):
-    result = [] # 거래 결과를 초기화, 저장하는 용도
-    portfolio_value = 0 # 계좌 잔고
-    cash = initial_investment # 현금
-    deposit = 0 # 보관금,
+    result = []  # 거래 결과를 초기화, 저장하는 용도
+    portfolio_value = 0  # 계좌 잔고
+    cash = initial_investment  # 현금
+    deposit = 0  # 보관금
     invested_amount = initial_investment
     account_balance = 0
     shares = 0
@@ -37,13 +27,13 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
     Sudden_fall = False
     signal = ''
     recent_signal = ''
-    prev_month = None # 현재 월을 비교하여 다르다면, 이는 새로운 달이 시작
+    prev_month = None  # 현재 월을 비교하여 다르다면, 이는 새로운 달이 시작
     currency = 1300
     stock_ticker = stock_data.iloc[0]['Stock']
-    
+
     if '.K' in stock_ticker or (len(stock_ticker) == 6 and stock_ticker.isdigit()):
         currency = 1
-    
+
     PPO_BUY = False  # Initialize neither buy nor sell signal is active
     PPO_SELL = False
 
@@ -54,17 +44,17 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
     for i, row in stock_data.iterrows():
         current_date = row.name
         index = stock_data.index.get_loc(i)
-        
+
         # 매달 적립 수행
-        cash, invested_amount, signal, prev_month = monthly_deposit(current_date, prev_month, monthly_investment, cash, invested_amount)
+        cash, invested_amount, signal, prev_month = config.monthly_deposit(current_date, prev_month, monthly_investment, cash, invested_amount)
 
         # 투자 결정 확인
         Invest_day = config.should_invest_today(current_date, first_trading_day)
 
         # Calculate current price and performance
-        price = row['Close'] * currency # 종가(원화환산)
+        price = row['Close'] * currency  # 종가(원화환산)
         performance = (price - recent_high) / recent_high if recent_high else 0
-  
+
         # Update recent high and low
         recent_high = max(recent_high, price)
         recent_low = min(recent_low, price)
@@ -84,7 +74,7 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
             deposit += shares_to_sell * price * 0.5
             signal = 'sell 50 %' + ' ' + signal
 
-        if Sudden_fall and (SMA_60_turn or PPO_BUY):
+        if Sudden_fall and PPO_BUY:
             shares_to_buy_depot = 0.5 * max(0, deposit) // price
             shares_to_buy_cash = 1.0 * max(0, cash) // price
             shares += shares_to_buy_depot + shares_to_buy_cash
@@ -102,7 +92,7 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
             signal = 'Act1 end!  sell 50%' + ' ' + signal
 
         sell_result = strategy_sell(current_date, rsi_ta, PPO_SELL, stock_ticker, Sudden_fall, option_strategy)
-        
+
         if isinstance(sell_result, tuple):
             ta_sell_amount, sell_signal, Sudden_fall = sell_result
         else:
@@ -116,7 +106,7 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
             signal = sell_signal + ' ' + signal
 
         buy_result = strategy_buy(current_date, price, performance, PPO_BUY, option_strategy)
-        
+
         if isinstance(buy_result, tuple):
             perform_buy_amount, buy_signal = buy_result
         else:
@@ -164,5 +154,4 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
     }
 
     return result_dict
-
 
