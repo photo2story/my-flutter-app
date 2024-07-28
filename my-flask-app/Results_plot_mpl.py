@@ -33,7 +33,7 @@ def save_figure(fig, file_path):
   plt.close(fig)  # 닫지 않으면 메모리를 계속 차지할 수 있음
 
 def get_tradingview_analysis(ticker):
-
+  # tv_symbol = f"{ticker.upper()}/USD"  # 트레이딩뷰에서 사용하는 심볼 형식
   market = get_ticker_market(ticker, ticker_path) # file_path='stock_market.csv'
   if market == 'KRX':
     screener = "korea"
@@ -105,7 +105,6 @@ def plot_results_mpl(ticker,start_date, end_date):
 
     # 그래프를 PNG 파일로 저장
     save_figure(fig, 'result_mpl_{}.png'.format(ticker))
-    file_path = f'result_mpl_{ticker}.png'
     
     # Discord로 이미지 전송
     import requests
@@ -127,15 +126,9 @@ def plot_results_mpl(ticker,start_date, end_date):
        print('Discord 메시지 전송 성공')
 
     # 이미지 파일 전송
-    # files = {'file': open('result_mpl_{}.png'.format(ticker), 'rb')}
-    # response = requests.post(DISCORD_WEBHOOK_URL, files=files)
-    # 이미지 파일 전송
-    with open(file_path, 'rb') as f:
-        response = requests.post(DISCORD_WEBHOOK_URL, files={'file': f})
-        if response.status_code != 204:
-            print('Discord 이미지 전송 실패')
-        else:
-            print('Discord 이미지 전송 성공')
+    files = {'file': open('result_mpl_{}.png'.format(ticker), 'rb')}
+    response = requests.post(DISCORD_WEBHOOK_URL, files=files)
+
 
 if __name__ == "__main__":
     # 사용 예시

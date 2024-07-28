@@ -1,4 +1,3 @@
-# My_strategy.py
 import datetime
 from typing import Union, Any
 import requests 
