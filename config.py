@@ -10,7 +10,7 @@ DISCORD_CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID', 'your_channel_id_here')
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL', 'your_webhook_url_here')
 
 # Investment and backtest configuration
-START_DATE = os.getenv('START_DATE', '2022-01-01')
+START_DATE = os.getenv('START_DATE', '2020-01-01')
 END_DATE = datetime.today().strftime('%Y-%m-%d')
 INITIAL_INVESTMENT = int(os.getenv('INITIAL_INVESTMENT', 30000000))
 MONTHLY_INVESTMENT = int(os.getenv('MONTHLY_INVESTMENT', 1000000))
