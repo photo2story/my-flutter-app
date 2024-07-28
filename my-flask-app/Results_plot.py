@@ -74,6 +74,10 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
 
     ax2.plot(df1_graph.index, df1_graph['rate_7d_avg'], label=f'{stock1} 7-Day Avg Return')
     ax2.plot(df2_graph.index, df2_graph['rate_20d_avg'], label=f'{stock2} 20-Day Avg Return')
+    
+    # 레이블, 제목, 범례 설정
+    plt.ylabel('rate (%)')
+    plt.legend(loc='upper left')
 
     voo_rate = df2_graph['rate_vs'].iloc[-1] if not df2_graph.empty else 0
 
