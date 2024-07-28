@@ -95,7 +95,6 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     fig, ax2 = plt.subplots(figsize=(8, 6))
 
     # 각 주식의 데이터프레임을 읽어옵니다.
-    # 파일 경로 변환
     file_path1 = convert_file_path_for_reading(file_path1)
     file_path2 = convert_file_path_for_reading(file_path2)
     df1 = pd.read_csv(file_path1, parse_dates=['Date'], index_col='Date')
@@ -118,9 +117,9 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     ax2.plot(df2.index, df2['rate_20d_avg'], label=f'{stock2} 20-Day Avg Return')
 
     # VOO의 총 수익률 계산
-    voo_rate = df2['rate_vs'].iloc[-1] if 'rate_vs' in df2.columns else 0
+    voo_rate = df2['rate_vs'].iloc[-1] if not df2.empty else 0
 
-    print(f"VOO Rate: {voo_rate}")  # 디버깅을 위한 출력
+    print(f"VOO Rate: {voo_rate}")  # 디버깅용 출력
 
     # 레이블, 제목, 범례 설정
     plt.ylabel('7-Day Average Daily Return (%)')
@@ -154,17 +153,14 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     plt.clf()
     plt.close(fig)
 
-    # 텍스트 형식화
-    total_rate_text = f"Total_rate: {total_rate:,.0f} % (VOO {voo_rate:,.0f}%)"
-
     # Discord로 메시지와 이미지 전송
     DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
     message = {
         'content': f"Stock: {stock1}\n"
-                f"{total_rate_text}\n"
-                f"Invested_amount: {invested_amount:,.0f} $\n"
-                f"Total_account_balance: {total_account_balance:,.0f} $\n"
-                f"Last_signal: {str_strategy}"
+                   f"Total_rate: {total_rate:,.0f} % (VOO {voo_rate:,.0f}%)\n"
+                   f"Invested_amount: {invested_amount:,.0f} $\n"
+                   f"Total_account_balance: {total_account_balance:,.0f} $\n"
+                   f"Last_signal: {str_strategy}"
     }
     with open(save_path, 'rb') as image:
         response = requests.post(DISCORD_WEBHOOK_URL, json=message, files={'image': image})
@@ -173,10 +169,6 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
         print('Discord 메시지 전송 실패')
     else:
         print('Discord 메시지 전송 성공')
-
-
-
-
 
 import time  # 추가
 
