@@ -55,13 +55,15 @@ async def on_ready():
         bot_started = True
 
 @tasks.loop(minutes=5)
-async def send_msg():
-    channel = bot.get_channel(CHANNEL_ID)
-    if channel:
-        await channel.send('Hello')
-        print(f'Message sent to channel {CHANNEL_ID}')
-    else:
-        print(f"Failed to find channel with ID: {CHANNEL_ID}")
+async def buddy_loop():
+    sector_list = list(config.STOCKS.keys())
+    for sector in sector_list:
+        stock_names = config.STOCKS[sector]
+        for stock_name in stock_names:
+            channel = bot.get_channel(CHANNEL_ID)
+            if channel:
+                await channel.send(f'Processing buddy for sector {sector}, stock: {stock_name}')
+                await bot.get_command("buddy")(await bot.get_context(channel.last_message), query=stock_name)
 
 processed_message_ids = set()
 

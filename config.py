@@ -20,19 +20,35 @@ CSV_URL = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my
 GITHUB_API_URL = os.getenv('GITHUB_API_URL', 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images')
 
 # Stocks list
-STOCKS = {
-    'Technology': ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA'], 
-    'Financials': ['BAC'],
-    'Consumer Cyclical': ['TSLA', 'NFLX'],
-    'Healthcare': ['LLY','UNH'],
-    'Communication Services': ['META', 'VZ'],
-    'Industrials': ['GE','UPS'],
-    'Consumer Defensive': ['WMT', 'KO'],
-    'Energy': ['XOM'],
-    'Basic Materials': ['LIN','ALB'],
-    'Real Estate': ['DHI', 'ADSK'], 
-    'Utilities': ['EXC']
+# STOCKS = {
+#     'Technology': ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA'], 
+#     'Financials': ['BAC'],
+#     'Consumer Cyclical': ['TSLA', 'NFLX'],
+#     'Healthcare': ['LLY','UNH'],
+#     'Communication Services': ['META', 'VZ'],
+#     'Industrials': ['GE','UPS'],
+#     'Consumer Defensive': ['WMT', 'KO'],
+#     'Energy': ['XOM'],
+#     'Basic Materials': ['LIN','ALB'],
+#     'Real Estate': ['DHI', 'ADSK'], 
+#     'Utilities': ['EXC']
 }
+
+# Stocks list
+STOCKS = {
+    'Technology': ['AAPL', 'MSFT', 'NVDA', 'GOOG', 'AMZN', 'META', 'CRM', 'ADBE', 'AMD', 'ACN', 'QCOM', 'CSCO', 'INTU', 'IBM', 'PDD', 'NOW', 'MS', 'ARM', 'INTC', 'ANET', 'ADI', 'KLAC', 'PANW', 'AMT'],
+    'Financials': ['BRK.A', 'V', 'MA', 'BAC', 'WFC', 'BLK', 'BX', 'GS', 'C', 'KKR'],
+    'Consumer Cyclical': ['TSLA', 'AMZN', 'HD', 'NKE', 'MCD', 'SBUX', 'TJX', 'BKNG', 'CMG', 'TGT', 'LOW', 'EXPE', 'DG', 'JD'],
+    'Healthcare': ['LLY', 'UNH', 'ABBV', 'JNJ', 'MRK', 'TMO', 'ABT', 'PFE', 'DHR', 'CVS', 'CI', 'GILD', 'AMGN', 'ISRG', 'REGN', 'VRTX', 'HCA'],
+    'Communication Services': ['META', 'GOOGL', 'NFLX', 'DIS', 'VZ', 'T', 'CMCSA', 'SPOT', 'TWTR', 'ROKU', 'LYFT', 'UBER', 'EA'],
+    'Industrials': ['GE', 'UPS', 'BA', 'CAT', 'MMM', 'HON', 'RTX', 'DE', 'LMT', 'NOC', 'UNP', 'WM', 'ETN', 'CSX', 'FDX'],
+    'Consumer Defensive': ['WMT', 'KO', 'PEP', 'PG', 'COST', 'MDLZ', 'CL', 'PM', 'MO', 'KHC', 'HSY', 'KR', 'GIS', 'EL', 'STZ', 'MKC'],
+    'Energy': ['XOM', 'CVX', 'COP', 'EOG', 'PSX', 'MPC', 'VLO', 'OKE', 'KMI', 'WMB', 'SLB', 'HAL', 'BKR'],
+    'Basic Materials': ['LIN', 'ALB', 'NEM', 'FMC', 'APD', 'CF', 'ECL', 'LYB', 'PPG', 'SHW', 'CE', 'DD'],
+    'Real Estate': ['AMT', 'PLD', 'EQIX', 'PSA', 'AVB', 'SPG', 'O', 'VICI', 'EXR', 'MAA', 'EQR'],
+    'Utilities': ['NEE', 'DUK', 'SO', 'AEP', 'EXC', 'D', 'SRE', 'XEL', 'ED', 'ES', 'PEG', 'WEC']
+}
+
 
 # Stock market CSV path
 STOCK_MARKET_CSV_PATH = os.getenv('STOCK_MARKET_CSV_PATH', 'path/to/stock_market.csv')
