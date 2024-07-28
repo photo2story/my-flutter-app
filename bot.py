@@ -101,13 +101,12 @@ async def stock(ctx, *, query: str = None):
                 try:
                     plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
                 except KeyError as e:
-                    await asyncio.sleep(5)
                     await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
                     print(f"Error plotting {stock_name}: {e}")
                 # 파일 이동
                 await move_files_to_images_folder()
                 await ctx.send(f'Completing stock: {stock_name}')
-            # await asyncio.sleep(5)
+            await asyncio.sleep(10)
         except Exception as e:
             await ctx.send(f'An error occurred while processing {stock_name}: {e}')
             print(f'Error processing {stock_name}: {e}')
