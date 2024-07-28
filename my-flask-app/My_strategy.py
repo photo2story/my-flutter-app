@@ -11,10 +11,15 @@ from data_preprocessing import initialize_variables, get_first_trading_day
 
 
 def my_strategy(stock_data, initial_investment, monthly_investment, option_strategy):
+    # 초기 변수 설정
     vars = initialize_variables(initial_investment)
     stock_ticker = stock_data.iloc[0]['Stock']
+    
+    # 주식 티커에 따라 currency 설정
     if '.K' in stock_ticker or (len(stock_ticker) == 6 and stock_ticker.isdigit()):
-        vars['currency'] = 1
+        currency = 1
+    else:
+        currency = 1300  # 기본 환율 값
 
     first_day = stock_data.index.min()
     first_trading_day = get_first_trading_day(first_day)
