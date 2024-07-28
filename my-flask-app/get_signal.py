@@ -83,7 +83,7 @@ def calculate_ppo_buy_sell_signals2(stock_data, index, short_window, long_window
       SMA_60_turn = False
 
 
-  return PPO_BUY, PPO_SELL, ppo_histogram, SMA_20_turn, SMA_60_turn
+  return PPO_BUY, PPO_SELL, ppo_histogram
 
 
 # 테스트를 위한 예제 데이터 생성

@@ -73,7 +73,7 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
         rsi_ta = row['RSI_14']
 
         # PPO 매수 및 매도 신호 계산
-        PPO_BUY, PPO_SELL, ppo_histogram, SMA_60_turn = calculate_ppo_buy_sell_signals(stock_data, index, short_window=12, long_window=26, signal_window=9)
+        PPO_BUY, PPO_SELL, ppo_histogram = calculate_ppo_buy_sell_signals(stock_data, index, short_window=12, long_window=26, signal_window=9)
 
         if performance < -0.4:
             Sudden_fall = True
