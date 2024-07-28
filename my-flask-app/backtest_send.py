@@ -28,7 +28,7 @@ async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
         return
 
     try:
-        await ctx.send(f'backtest_and_send.estimate_snp: {stock}')  # 주식 이름을 출력
+        await ctx.send(f'Estimate_snp: {stock}')  # 주식 이름을 출력
         total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df = estimate_stock(
             stock, config.START_DATE, config.END_DATE, config.INITIAL_INVESTMENT, config.MONTHLY_INVESTMENT, option_strategy)
 
@@ -48,9 +48,4 @@ async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
         await ctx.send(f"An error occurred while processing {stock}: {e}")
         print(f"Error processing {stock}: {e}")
 
-# async def process_and_simplify_csv(stock_name):
-#     folder_path = os.path.join(os.getcwd(), 'static', 'images')
-#     file_path = os.path.join(folder_path, f'result_VOO_{stock_name}.csv')
-#     # df_processed = read_and_process_csv(file_path)
-#     save_simplified_csv(folder_path, file_path, stock_name)
 
