@@ -60,14 +60,16 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     current_divergence = df1['Divergence'].iloc[-1]
     relative_divergence = df1['Relative_Divergence'].iloc[-1]
 
-    # Last Signal과 Current Signal 설정
-    last_signal = df1['Signal'].iloc[-1] if 'Signal' in df1.columns else 'N/A'
-    current_signal = df1['ppo_histogram'].iloc[-1] if 'ppo_histogram' in df1.columns else 'N/A'
+    # 데이터프레임에서 가장 마지막 줄의 신호를 가져옵니다.
+    last_signal_data = df1.iloc[-1]
+    last_signal = last_signal_data.name  # 인덱스에 해당하는 날짜
+    last_signal_value = last_signal_data['Signal']  # 마지막 신호 값 (Signal 열이 존재한다고 가정)
+    current_signal = df1['Signal'].iloc[-1] if 'Signal' in df1.columns else 'N/A'
 
     plt.title(f"{stock1} ({get_ticker_name(stock1)}) vs {stock2}\n" +
               f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%, Rel: {relative_divergence:.2f}%)\n" +
               f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" +
-              f"Current Signal: {current_signal}, Last Signal: {last_signal}",
+              f"Current Signal: {current_signal}, Last Signal: {last_signal}: {last_signal_value}",
               pad=10)
 
     ax2.xaxis.set_major_locator(dates.YearLocator())
@@ -85,7 +87,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     message = f"Stock: {stock1} ({get_ticker_name(stock1)}) vs {stock2}\n" \
               f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%, Rel: {relative_divergence:.2f}%)\n" \
               f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" \
-              f"Current Signal: {current_signal}, Last Signal: {last_signal}"
+              f"Current Signal: {current_signal}, Last Signal: {last_signal}: {last_signal_value}"
     response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
 
     if response.status_code != 204:
@@ -95,7 +97,6 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
 
     files = {'file': open(save_path, 'rb')}
     response = requests.post(DISCORD_WEBHOOK_URL, files=files)
-
 
 
 async def plot_results_all():
