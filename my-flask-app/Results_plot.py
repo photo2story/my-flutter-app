@@ -152,20 +152,23 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     plt.clf()
     plt.close(fig)
 
-    # Discord로 이미지 전송
+    # Discord로 메시지와 이미지 전송
     DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
     message = {
-        'content': f"Stock: {stock1}\nInvested Amount: {invested_amount:,.0f} $, " +
-                   f"Total Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} %, " +
-                   f"Strategy: {str_strategy}"
+        'content': f"Stock: {stock1}\n"
+                   f"Total_rate: {total_rate:,.0f} % (VOO {voo_rate:,.0f}%)\n"
+                   f"Invested_amount: {invested_amount:,.0f} $\n"
+                   f"Total_account_balance: {total_account_balance:,.0f} $\n"
+                   f"Last_signal: {str_strategy}"
     }
-    with open(f'comparison_{stock1}_{stock2}.png', 'rb') as image:
+    with open(save_path, 'rb') as image:
         response = requests.post(DISCORD_WEBHOOK_URL, json=message, files={'image': image})
 
     if response.status_code != 204:
         print('Discord 메시지 전송 실패')
     else:
         print('Discord 메시지 전송 성공')
+
 
 
 
