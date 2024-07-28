@@ -38,7 +38,7 @@ def load_image(file_path):
 def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date):
     fig, ax2 = plt.subplots(figsize=(8, 6))
 
-    # 파일 경로 출력 (전체 자료)
+    # 전체 데이터셋 파일 경로
     full_path1 = os.path.abspath(file_path1)
     full_path2 = os.path.abspath(file_path2)
     print(f"Reading full dataset for graph from: {full_path1} and {full_path2}")
@@ -48,7 +48,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     df2_graph = pd.read_csv(full_path2, parse_dates=['Date'], index_col='Date')
 
     # 간략화된 데이터프레임 로드 (이격 결과)
-    simplified_df_path1 = os.path.join(os.path.dirname(full_path1), f'result_{stock1}.csv')
+    simplified_df_path1 = os.path.join(os.path.dirname(full_path1), 'static', 'images', f'result_{stock1}.csv')
     print(f"Attempting to read simplified dataset for divergence from: {simplified_df_path1}")
 
     try:
@@ -108,6 +108,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
 
     files = {'file': open(save_path, 'rb')}
     response = requests.post(DISCORD_WEBHOOK_URL, files=files)
+
 
 
 
