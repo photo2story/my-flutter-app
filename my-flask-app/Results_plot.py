@@ -77,12 +77,12 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     relative_divergence = df1['Relative_Divergence'].iloc[-1]
     
     # Last Signal과 Current Signal 설정
-    last_signal = df2_graph['Signal'].iloc[-1] if 'Signal' in df1.columns else 'N/A'
-    current_signal = df2_graph['ppo_histogram'].iloc[-1] if 'ppo_histogram' in df1.columns else 'N/A'
+    last_signal = df1_graph['Signal'].iloc[-1] if 'Signal' in df1.columns else 'N/A'
+    current_signal = df1_graph['ppo_histogram'].iloc[-1] if 'ppo_histogram' in df1.columns else 'N/A'
 
 
     plt.title(f"{stock1} ({get_ticker_name(stock1)}) vs {stock2}\n" +
-              f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%, Rel: {relative_divergence:.2f}%)\n" +
+              f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%)), Relative_Divergence: {relative_divergence:.2f}%\n" +
               f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" +
               f"Current Signal: {current_signal}, Last Signal: {last_signal}",
               pad=10)
