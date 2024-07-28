@@ -29,25 +29,12 @@ def calculate_divergence(df, ticker):
     return divergence
 
 def save_simplified_csv(folder_path, df, ticker):
-    # 이동 평균 계산
-    rate_ticker = df[f'rate_{ticker}_5D'].rolling(window=5).mean().fillna(0).to_numpy()
-    rate_VOO_20D = df['rate_VOO_20D'].rolling(window=20).mean().fillna(0).to_numpy()
-
-    # 소수점 두 자리로 반올림
-    rate_ticker = np.round(rate_ticker, 2)
-    rate_VOO_20D = np.round(rate_VOO_20D, 2)
-
     # Divergence 계산
     divergence = calculate_divergence(df, ticker)
-    divergence = np.round(divergence, 2)
+    df['Divergence'] = np.round(divergence, 2)  # 소수점 두 자리로 반올림
 
     # 간단한 데이터프레임 생성 (20 간격으로 축소)
-    simplified_df = pd.DataFrame({
-        'Date': df['Date'].iloc[::20].reset_index(drop=True),
-        f'rate_{ticker}_5D': rate_ticker[::20],
-        'rate_VOO_20D': rate_VOO_20D[::20],
-        'Divergence': divergence[::20]
-    })
+    simplified_df = df.iloc[::20].reset_index(drop=True)
 
     simplified_file_path = os.path.join(folder_path, f'result_{ticker}.csv')
     simplified_df.to_csv(simplified_file_path, index=False)
@@ -74,16 +61,11 @@ def process_single_ticker(folder_path, ticker):
     save_simplified_csv(folder_path, df_processed, ticker)
 
 if __name__ == "__main__":
-    folder_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'static', 'images'))
-    # 특정 티커를 처리하는 경우
-    test_mode = os.getenv('TEST_MODE', 'False')
-    if test_mode == 'True':
-        ticker_to_test = 'AAPL'
-        process_single_ticker(folder_path, ticker_to_test)
-    else:
-        process_all_csv_files(folder_path)
-
-
+    # 루트 디렉토리 경로를 기준으로 설정
+    root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    folder_path = os.path.join(root_path, 'static', 'images')
+    ticker_to_test = 'TSLA'
+    process_single_ticker(folder_path, ticker_to_test)
 
 
 # python get_compare_stock_data.py
