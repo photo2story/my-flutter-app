@@ -134,13 +134,18 @@ async def buddy(ctx, *, query: str = None):
     else:
         stock_names = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
 
-    # stock 명령 실행
     for stock_name in stock_names:
-        await ctx.invoke(bot.get_command("stock"), query=stock_name)
-
-    # gemini 명령 실행
-    for stock_name in stock_names:
-        await ctx.invoke(bot.get_command("gemini"), query=stock_name)
+        # 주식 분석이 완료되었는지 확인
+        if config.is_stock_analysis_complete(stock_name):
+            await ctx.send(f'Stock analysis for {stock_name} is already up-to-date.')
+        else:
+            await ctx.invoke(bot.get_command("stock"), query=stock_name)
+        
+        # Gemini 분석이 완료되었는지 확인
+        if config.is_gemini_analysis_complete(stock_name):
+            await ctx.send(f'Gemini analysis for {stock_name} is already up-to-date.')
+        else:
+            await ctx.invoke(bot.get_command("gemini"), query=stock_name)
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
