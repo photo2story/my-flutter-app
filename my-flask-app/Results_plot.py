@@ -1,5 +1,7 @@
 # Results_plot.py
 
+# Results_plot.py
+
 import matplotlib.dates as dates
 import matplotlib
 matplotlib.use('Agg')
@@ -33,8 +35,11 @@ def load_image(file_path):
     image = Image.open(file_path)
     return image
 
-
 def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date):
+    # 파일 경로 출력 (디버그용)
+    print(f"file_path1: {file_path1}")
+    print(f"file_path2: {file_path2}")
+
     fig, ax2 = plt.subplots(figsize=(8, 6))
 
     df1 = pd.read_csv(file_path1, parse_dates=['Date'], index_col='Date')
@@ -91,7 +96,6 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
 
     files = {'file': open(save_path, 'rb')}
     response = requests.post(DISCORD_WEBHOOK_URL, files=files)
-
 
 async def plot_results_all():
     DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
@@ -172,5 +176,5 @@ if __name__ == "__main__":
 
     # plot_comparison_results 함수 호출
     plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date)
-    
+
     # python Results_plot.py
