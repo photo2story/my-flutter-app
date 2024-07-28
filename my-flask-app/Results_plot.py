@@ -106,7 +106,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     voo_rate = df2['rate_vs'].iloc[-1] if not df2.empty else 0
 
     # 레이블, 제목, 범례 설정
-    plt.ylabel('7-Day Average Daily Return (%)')
+    plt.ylabel('rate (%)')
     plt.legend(loc='upper left')
 
     stock1_name = get_ticker_name(stock1)
