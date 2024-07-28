@@ -5,21 +5,6 @@ import pandas as pd
 import numpy as np
 NaN = np.nan
 
-def monthly_deposit(current_date, prev_month, monthly_investment, cash, invested_amount):
-    signal = '' # Initialize signal with an empty string
-    if prev_month != f"{current_date.year}-{current_date.month}":
-       cash += monthly_investment
-       invested_amount += monthly_investment
-       signal = 'Monthly invest'
-       prev_month = f"{current_date.year}-{current_date.month}"
-    return cash, invested_amount, signal, prev_month
-
-#월의 첫 번째 주 중 첫 번째 평일 등)에 따라 투자 결정을 내리는 데 사용됩니다.
-def make_investment_decision(current_date, first_trading_day):
-    if current_date.weekday() == 0 or (current_date.day <= 7 and current_date >= first_trading_day):
-        return True
-    return False
-
 def calculate_ppo_buy_sell_signals(stock_data, index, short_window, long_window, signal_window):
     PPO_BUY = False
     PPO_SELL = False
