@@ -32,7 +32,7 @@ GITHUB_API_URL = os.getenv('GITHUB_API_URL', 'https://api.github.com/repos/photo
 #     'Basic Materials': ['LIN','ALB'],
 #     'Real Estate': ['DHI', 'ADSK'], 
 #     'Utilities': ['EXC']
-}
+# }
 
 # Stocks list
 STOCKS = {
