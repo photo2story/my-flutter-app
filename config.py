@@ -2,6 +2,8 @@
 import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+import pandas as pd
+import pytz
 load_dotenv()
 
 # Discord configuration
@@ -62,6 +64,28 @@ def monthly_deposit(current_date, prev_month, monthly_investment, cash, invested
     return cash, invested_amount, signal, prev_month
 
 # 추가된 함수: 분석 검증
+# 미국 동부 표준시(EST)로 시간 설정
+us_eastern = pytz.timezone('US/Eastern')
+korea_time = datetime.now().astimezone(pytz.timezone('Asia/Seoul'))
+us_market_close = korea_time.astimezone(us_eastern).replace(hour=16, minute=0, second=0, microsecond=0)
+us_market_close_in_korea_time = us_market_close.astimezone(pytz.timezone('Asia/Seoul'))
+
+# 기본적인 미국 주식시장 휴일 리스트 (업데이트 필요)
+us_market_holidays = {
+    "New Year's Day": (1, 1),
+    "Independence Day": (7, 4),
+    "Christmas Day": (12, 25),
+    # 다른 주요 휴일 추가
+}
+
+def is_us_market_holiday(date):
+    for holiday in us_market_holidays.values():
+        if (date.month, date.day) == holiday:
+            return True
+    return False
+
+from datetime import datetime, timedelta
+
 def is_stock_analysis_complete(ticker):
     result_file_path = os.path.join('static', 'images', f'result_VOO_{ticker}.csv')
     if not os.path.exists(result_file_path):
@@ -70,11 +94,27 @@ def is_stock_analysis_complete(ticker):
     df = pd.read_csv(result_file_path, parse_dates=['Date'])
     if df['Date'].min().strftime('%Y-%m-%d') != START_DATE:
         return False
-    if df['Date'].max().strftime('%Y-%m-%d') != END_DATE:
-        return False
     
+    latest_data_date = df['Date'].max()
+    
+    # 최신 데이터 날짜 출력
+    print(f"Latest data date in dataset for {ticker}: {latest_data_date.strftime('%Y-%m-%d')}")
+
     return True
+
+
+
 
 def is_gemini_analysis_complete(ticker):
     report_file_path = os.path.join('static', 'images', f'report_{ticker}.txt')
     return os.path.exists(report_file_path)
+
+if __name__ == '__main__':
+    # 분석할 티커 설정
+    ticker = 'TSLA'
+    stock_analysis_complete = is_stock_analysis_complete(ticker )
+    gemini_analysis_complete = is_gemini_analysis_complete(ticker )
+    print(f"Stock analysis complete for {ticker}: {stock_analysis_complete}")
+    print(f"Gemini analysis complete for {ticker}: {gemini_analysis_complete}")
+    
+# python config.py    

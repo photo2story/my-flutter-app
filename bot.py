@@ -136,11 +136,21 @@ async def buddy(ctx, *, query: str = None):
 
     # stock 명령 실행
     for stock_name in stock_names:
-        await ctx.invoke(bot.get_command("stock"), query=stock_name)
+        stock_analysis_complete = config.is_stock_analysis_complete(stock_name)
+        gemini_analysis_complete = config.is_gemini_analysis_complete(stock_name)
 
-    # gemini 명령 실행
-    for stock_name in stock_names:
-        await ctx.invoke(bot.get_command("gemini"), query=stock_name)
+        # 주식 분석 상태 출력
+        await ctx.send(f"Stock analysis complete for {stock_name}: {stock_analysis_complete}")
+
+        if not stock_analysis_complete:
+            await ctx.invoke(bot.get_command("stock"), query=stock_name)
+
+        # 제미니 분석 상태 출력
+        await ctx.send(f"Gemini analysis complete for {stock_name}: {gemini_analysis_complete}")
+
+        if not gemini_analysis_complete:
+            await ctx.invoke(bot.get_command("gemini"), query=stock_name)
+
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
