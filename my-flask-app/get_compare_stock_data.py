@@ -33,6 +33,12 @@ def save_simplified_csv(folder_path, df, ticker):
     divergence = calculate_divergence(df, ticker)
     df['Divergence'] = np.round(divergence, 2)  # 소수점 두 자리로 반올림
 
+    # 최대 및 최소 divergence를 이용하여 Relative_Divergence 계산
+    max_divergence = df['Divergence'].max()
+    min_divergence = df['Divergence'].min()
+    df['Relative_Divergence'] = ((df['Divergence'] - min_divergence) / (max_divergence - min_divergence)) * 100
+    df['Relative_Divergence'] = np.round(df['Relative_Divergence'], 2)
+
     # 간단한 데이터프레임 생성 (20 간격으로 축소)
     simplified_df = df.iloc[::20].reset_index(drop=True)
 
@@ -60,12 +66,23 @@ def process_single_ticker(folder_path, ticker):
     df_processed = read_and_process_csv(file_path)
     save_simplified_csv(folder_path, df_processed, ticker)
 
+    # 현재 Divergence와 Relative_Divergence 출력
+    latest_entry = df_processed.iloc[-1]
+    current_divergence = latest_entry['Divergence']
+    max_divergence = df_processed['Divergence'].max()
+    min_divergence = df_processed['Divergence'].min()
+    current_relative_divergence = latest_entry['Relative_Divergence']
+    
+    print(f"Current Divergence for {ticker}: {current_divergence} (max {max_divergence}, min {min_divergence})")
+    print(f"Current Relative Divergence for {ticker}: {current_relative_divergence}")
+
 if __name__ == "__main__":
     # 루트 디렉토리 경로를 기준으로 설정
     root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     folder_path = os.path.join(root_path, 'static', 'images')
     ticker_to_test = 'TSLA'
     process_single_ticker(folder_path, ticker_to_test)
+
 
 
 # python get_compare_stock_data.py

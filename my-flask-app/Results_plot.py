@@ -112,9 +112,10 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     stock1_name = get_ticker_name(stock1)
     stock2_name = get_ticker_name(stock2)
 
-    plt.title(f"{stock1} ({stock1_name}) vs {stock2} \n" +
-              f"\nTotal Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} % (VOO {voo_rate:,.0f}%)\n" +
-              f"Invested Amount: {invested_amount:,.0f} $, Strategy: {str_strategy}",
+    plt.title(f"{stock1} ({stock1_name}) vs {stock2}\n" +
+              f"\nTotal Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} % (VOO: {voo_rate:,.0f}%)\n" +
+              f"Current Divergence: {df1['Divergence'].iloc[-1]:.2f}, Relative Divergence: {df1['Relative_Divergence'].iloc[-1]:.2f} (max: {df1['Divergence'].max():.2f}, min: {df1['Divergence'].min():.2f})\n" +
+              f"Current Signal: {current_signal}, Last Signal: {str_strategy}",
               pad=10)  # 제목과 그래프 사이의 여백을 추가합니다.
 
     # x축 라벨 설정
@@ -133,12 +134,12 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
     # 결과 메시지 전송
-    message = f"Stock: {stock1} ({stock1_name})\n" \
-              f"Total_rate: {total_rate:,.0f} % (VOO {voo_rate:,.0f}%)\n" \
-              f"Invested_amount: {invested_amount:,.0f} $\n" \
-              f"Total_account_balance: {total_account_balance:,.0f} $\n" \
-              f"Last_signal: {str_strategy}"
+    message = f"Stock: {stock1} ({stock1_name}) vs {stock2}\n" \
+            f"Total Rate: {total_rate:,.0f} % (VOO: {voo_rate:,.0f}%)\n" \
+            f"Current Divergence: {df1['Divergence'].iloc[-1]:.2f}, Relative Divergence: {df1['Relative_Divergence'].iloc[-1]:.2f} (max: {df1['Divergence'].max():.2f}, min: {df1['Divergence'].min():.2f})\n" \
+            f"Current Signal: {current_signal}, Last Signal: {str_strategy}"
     response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
+
     if response.status_code != 204:
        print('Discord 메시지 전송 실패')
     else:
