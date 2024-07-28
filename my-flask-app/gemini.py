@@ -13,7 +13,7 @@ import asyncio
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from git_operations import move_files_to_images_folder
 from get_earning import get_recent_eps_and_revenue
-from get_earning_fmp import get_recent_eps_and_revenue_fmp  # 추가
+from get_earning_fmp import get_recent_eps_and_revenue_fmp
 
 # 환경 변수 로드
 load_dotenv()
@@ -22,7 +22,6 @@ DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 FMP_API_KEY = os.getenv('FMP_API_KEY')
 GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
 CSV_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images', 'stock_market.csv'))
-
 
 # Gemini API 구성
 genai.configure(api_key=GOOGLE_API_KEY)
@@ -38,11 +37,15 @@ ticker_to_name = create_ticker_to_name_dict(CSV_PATH)
 
 def download_csv(ticker):
     ticker_vs_voo_url = f"{GITHUB_RAW_BASE_URL}/result_VOO_{ticker}.csv"
+    simplified_ticker_url = f"{GITHUB_RAW_BASE_URL}/result_{ticker}.csv"
     response_ticker = requests.get(ticker_vs_voo_url)
+    response_simplified = requests.get(simplified_ticker_url)
 
-    if response_ticker.status_code == 200:
+    if response_ticker.status_code == 200 and response_simplified.status_code == 200:
         with open(f'result_VOO_{ticker}.csv', 'wb') as f:
             f.write(response_ticker.content)
+        with open(f'result_{ticker}.csv', 'wb') as f:
+            f.write(response_simplified.content)
         return True
     else:
         return False
@@ -81,7 +84,6 @@ def format_earnings_text(earnings_data):
     
     return earnings_text
 
-
 async def analyze_with_gemini(ticker):
     try:
         # 시작 메시지 전송
@@ -98,7 +100,9 @@ async def analyze_with_gemini(ticker):
 
         # CSV 파일 로드
         voo_file = f'result_VOO_{ticker}.csv'
+        simplified_file = f'result_{ticker}.csv'
         df_voo = pd.read_csv(voo_file)
+        df_simplified = pd.read_csv(simplified_file)
 
         # 데이터 추출
         final_rate = df_voo['rate'].iloc[-1]
@@ -109,6 +113,12 @@ async def analyze_with_gemini(ticker):
         sma_60 = df_voo['sma60_ta'].iloc[-1]
         rsi = df_voo['rsi_ta'].iloc[-1]
         ppo = df_voo['ppo_histogram'].iloc[-1]
+
+        # Divergence 데이터 추출
+        max_divergence = df_simplified['Divergence'].max()
+        min_divergence = df_simplified['Divergence'].min()
+        current_divergence = df_simplified['Divergence'].iloc[-1]
+        relative_divergence = df_simplified['Relative_Divergence'].iloc[-1]
 
         # 어닝 데이터 가져오기
         recent_earnings = get_recent_eps_and_revenue(ticker)
@@ -132,6 +142,7 @@ async def analyze_with_gemini(ticker):
            회사이름과 회사 개요 설명해줘(1줄로)
            리뷰주식의 누적수익률 = {final_rate}
            기준이 되는 비교주식(S&P 500, VOO)의 누적수익율 = {final_rate_vs}
+           이격도 (max: {max_divergence}, min: {min_divergence}, 현재: {current_divergence}, 상대이격도: {relative_divergence})
         2) 제공된 자료의 최근 주가 변동(간단하게: 5일, 20일, 60일 이동평균 수치로):
            종가 = {Close}
            5일이동평균 = {sma_5}
