@@ -54,3 +54,19 @@ def initialize_trading_days(stock_data):
         first_trading_day += timedelta(days=7 - first_trading_day.weekday())
 
     return first_trading_day, first_saving_day
+
+def should_invest_today(current_date, first_trading_day):
+    """
+    Determines whether to invest today based on the current date and the first trading day.
+
+    Args:
+        current_date (datetime): The current date.
+        first_trading_day (datetime): The first trading day.
+
+    Returns:
+        bool: True if today is a trading day, otherwise False.
+    """
+    if current_date.weekday() == 0 or (current_date.day <= 7 and current_date >= first_trading_day):
+        return True
+    return False
+
