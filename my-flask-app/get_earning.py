@@ -89,17 +89,17 @@ def get_recent_eps_and_revenue(ticker):
 if __name__ == '__main__':
     # 주식 목록
     STOCKS = {
-        'Technology': ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA'], 
-        'Financials': ['BAC'],
+        # 'Technology': ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA'], 
+        # 'Financials': ['BAC'],
         'Consumer Cyclical': ['TSLA', 'NFLX'],
-        'Healthcare': ['LLY','UNH'],
-        'Communication Services': ['META', 'VZ'],
-        'Industrials': ['GE','UPS'],
-        'Consumer Defensive': ['WMT', 'KO'],
-        'Energy': ['XOM'],
-        'Basic Materials': ['LIN','ALB'],
-        'Real Estate': ['DHI', 'ADSK'], 
-        'Utilities': ['EXC']
+        # 'Healthcare': ['LLY','UNH'],
+        # 'Communication Services': ['META', 'VZ'],
+        # 'Industrials': ['GE','UPS'],
+        # 'Consumer Defensive': ['WMT', 'KO'],
+        # 'Energy': ['XOM'],
+        # 'Basic Materials': ['LIN','ALB'],
+        # 'Real Estate': ['DHI', 'ADSK'], 
+        # 'Utilities': ['EXC']
     }
 
     for sector, tickers in STOCKS.items():
