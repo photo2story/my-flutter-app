@@ -144,6 +144,7 @@ async def buddy(ctx, *, query: str = None):
 
         if not stock_analysis_complete:
             await ctx.invoke(bot.get_command("stock"), query=stock_name)
+            await asyncio.sleep(10)
 
         # 제미니 분석 상태 출력
         await ctx.send(f"Gemini analysis complete for {stock_name}: {gemini_analysis_complete}")
