@@ -67,7 +67,6 @@ def process_all_csv_files(folder_path):
     for file in csv_files:
         file_path = os.path.join(folder_path, file)
         print(f"Processing file: {file_path}")
-        df_processed = read_and_process_csv(file_path)
         ticker = os.path.splitext(os.path.basename(file_path))[0].split('_')[-1]
         save_simplified_csv(folder_path, file_path, ticker)
 
@@ -78,8 +77,6 @@ if __name__ == "__main__":
     ticker_to_test = 'TSLA'
     file_path = os.path.join(folder_path, f'result_VOO_{ticker_to_test}.csv')
     save_simplified_csv(folder_path, file_path, ticker_to_test)
-
-
 
 
 # python get_compare_stock_data.py
