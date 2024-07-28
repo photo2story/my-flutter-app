@@ -111,6 +111,11 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
 
     stock1_name = get_ticker_name(stock1)
     stock2_name = get_ticker_name(stock2)
+    
+    max_divergence = df1['Divergence'].max()
+    min_divergence = df1['Divergence'].min()
+    current_divergence = df1['Divergence'].iloc[-1]
+    relative_divergence = df1['Relative_Divergence'].iloc[-1]
 
     plt.title(f"{stock1} ({stock1_name}) vs {stock2}\n" +
               f"\nTotal Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} % (VOO: {voo_rate:,.0f}%)\n" +
