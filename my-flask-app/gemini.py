@@ -50,17 +50,35 @@ def download_csv(ticker):
 def format_earnings_text(earnings_data):
     if not earnings_data:
         return "No earnings data available."
-    earnings_text = "| 날짜 : EPS / Estimated EPS |\n"
+
+    # 매출 데이터가 있는지 확인
+    has_revenue = any(isinstance(entry, tuple) and len(entry) >= 4 for entry in earnings_data)
+
+    # 헤더 설정
+    if has_revenue:
+        earnings_text = "| 날짜 | EPS | 매출 |\n|---|---|---|\n"
+    else:
+        earnings_text = "| 날짜 | EPS | 예상 EPS |\n|---|---|---|\n"
+
+    # 데이터 추가
     for entry in earnings_data:
-        # Check the length of the entry to handle both cases
-        if len(entry) == 5:
-            end, actual_eps, estimated_eps, revenue, estimated_revenue = entry
-            earnings_text += f"| {end}: EPS {actual_eps} (Estimated: {estimated_eps}), Revenue {revenue / 1e9:.2f} B$ (Estimated: {estimated_revenue / 1e9:.2f} B$) |\n"
-        elif len(entry) == 3:
-            end, actual_eps, estimated_eps = entry
-            earnings_text += f"| {end}: EPS {actual_eps} (Estimated: {estimated_eps}) |\n"
+        if isinstance(entry, tuple):
+            if has_revenue:
+                if len(entry) == 5:
+                    end, filed, actual_eps, revenue, estimated_revenue = entry
+                    earnings_text += f"| {filed} | {actual_eps} | {revenue / 1e9:.2f} B$ |\n"
+                elif len(entry) == 4:
+                    end, filed, actual_eps, revenue = entry
+                    earnings_text += f"| {filed} | {actual_eps} | {revenue / 1e9:.2f} B$ |\n"
+            else:
+                if len(entry) == 3:
+                    end, actual_eps, estimated_eps = entry
+                    earnings_text += f"| {end} | {actual_eps} | {estimated_eps} |\n"
+                else:
+                    earnings_text += "| Invalid data format |\n"
         else:
             earnings_text += "| Invalid data format |\n"
+    
     return earnings_text
 
 
@@ -101,7 +119,11 @@ async def analyze_with_gemini(ticker):
             if recent_earnings is None:
                 raise Exception("No recent earnings data found from secondary source.")
                 
+        # 디버깅을 위한 출력
+        print(f"Recent earnings data for {ticker}: {recent_earnings}")
+        
         earnings_text = format_earnings_text(recent_earnings)
+        print(f"Earnings Text for {ticker}: {earnings_text}")
 
         # 프롬프트 준비
         prompt_voo = f"""
@@ -159,8 +181,9 @@ async def analyze_with_gemini(ticker):
 
 if __name__ == '__main__':
     # 분석할 티커 설정
-    ticker = 'AAPL'
+    ticker = 'TSM'
     asyncio.run(analyze_with_gemini(ticker))
+
 
 # source .venv/bin/activate
 # python gemini.py    
