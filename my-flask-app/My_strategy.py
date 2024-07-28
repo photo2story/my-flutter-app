@@ -1,3 +1,4 @@
+# My_strategy.py
 import datetime
 from typing import Union, Any
 import requests 
@@ -6,60 +7,24 @@ import yaml
 from Strategy_sell import strategy_sell
 from Strategy_buy import strategy_buy
 from get_signal import calculate_ppo_buy_sell_signals, monthly_deposit, make_investment_decision
-
+from data_preprocessing import initialize_variables, get_first_trading_day
 
 
 def my_strategy(stock_data, initial_investment, monthly_investment, option_strategy):
-
-    result = [] #거래 결과를 초기화, 저장하는 용도
-    # Initialize variables
-    portfolio_value = 0 #계좌 잔고
-    cash = initial_investment # 현금
-    deposit = 0 # 보관금,
-    invested_amount = initial_investment
-    account_balance = 0
-    shares = 0
-    recent_high = 0
-    recent_low = 1000000000000000000
-    # val_ave = 0
-    Invest_day = False
-    Monthly_invested = False
-    Sudden_fall = False
-    signal = ''
-    str_strategy = ""
-    recent_signal = ''
-    prev_month = None #현재 월을 비교하여 다르다면, 이는 새로운 달이 시작
-    currency = 1300
+    vars = initialize_variables(initial_investment)
     stock_ticker = stock_data.iloc[0]['Stock']
-    print(stock_ticker)
-    if '.K' in stock_ticker: currency = 1 # 한국주식의 경우
-    # 한국 주식 티커의 경우 환율을 1로 설정
-    if len(stock_ticker) == 6 and stock_ticker.isdigit():
-        currency = 1
-    print(currency)
-    PPO_BUY = False  # Initialize neither buy nor sell signal is active
-    PPO_SELL = False
+    if '.K' in stock_ticker or (len(stock_ticker) == 6 and stock_ticker.isdigit()):
+        vars['currency'] = 1
 
-      
-    # Find the first trading day
-    # first_day = stock_data.iloc[1]['Date']
     first_day = stock_data.index.min()
-    # first_day = stock_data.iloc[1]['Date Time']
-    first_trading_day = first_day + datetime.timedelta(days=1) #매매일
+    first_trading_day = get_first_trading_day(first_day)
+    first_investing_day = first_day + datetime.timedelta(days=1)
 
-    first_investing_day = first_day + datetime.timedelta(days=1) #투자적립일
-
-    if first_trading_day.weekday() >= 1:
-        first_trading_day += datetime.timedelta(days=7 - first_trading_day.weekday())
-
-    # Loop over data
     for i, row in stock_data.iterrows():
-        # current_date = row['Date']
         current_date = row.name
         index = stock_data.index.get_loc(i)
-        # 매달 적립 수행# 현재 날짜를 확인하고 새로운 달이 시작되면 자동으로 적립을 수행합니다.
-        cash, invested_amount, signal, prev_month = monthly_deposit(current_date, prev_month, monthly_investment, cash, invested_amount)
-
+        vars['cash'], vars['invested_amount'], vars['signal'], vars['prev_month'] = monthly_deposit(current_date, vars['prev_month'], monthly_investment, vars['cash'], vars['invested_amount'])
+        
         # Open High Low Close Volume
         # row['Date'].weekday()는 현재 데이터의 요일, row['Date'].day는 현재 데이터의 일
         # 첫 번째 주 중에 현재 날짜가 있거나, 일이 7 이하이고 거래 시작일 이후이면 Invest_day를 True로
