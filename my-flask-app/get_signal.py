@@ -51,7 +51,7 @@ def calculate_ppo_buy_sell_signals(stock_data, index, short_window, long_window,
     PPO_SELL = True if not SMA_20_turn and ppo_histogram.iloc[index] < 1.1 else False
     ppo_histogram = ppo_histogram.iloc[index]
 
-    return PPO_BUY, PPO_SELL,  ppo_histogram, SMA_20_turn, SMA_60_turn
+    return PPO_BUY, PPO_SELL,  ppo_histogram
 
 def calculate_ppo_buy_sell_signals2(stock_data, index, short_window, long_window, signal_window):
   PPO_BUY = False
@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
     # PPO 매수 및 매도 신호 계산
     # 여기서는 마지막 날짜(인덱스 99)에 대한 신호를 계산합니다.
-    PPO_BUY, PPO_SELL, SMA_20_turn, SMA_60_turn  = calculate_ppo_buy_sell_signals(stock_data, 99, short_window=12, long_window=26, signal_window=9)
+    PPO_BUY, PPO_SELL, ppo_histogram  = calculate_ppo_buy_sell_signals(stock_data, 99, short_window=12, long_window=26, signal_window=9)
 
     print("PPO Buy Signal:", PPO_BUY)
     print("PPO Sell Signal:", PPO_SELL)
