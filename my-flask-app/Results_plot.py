@@ -145,6 +145,10 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     # 이미지 파일 전송
     files = {'file': open(save_path, 'rb')}
     response = requests.post(DISCORD_WEBHOOK_URL, files=files)
+    if response.status_code != 204:
+        print('Discord 메시지 전송 실패')
+    else:
+        print('Discord 메시지 전송 성공')
 
 
 import time  # 추가
