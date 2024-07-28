@@ -67,6 +67,23 @@ async def buddy_loop():
 
 processed_message_ids = set()
 
+@bot.command()
+async def start_buddy_loop(ctx):
+    """Starts the buddy loop task."""
+    if not buddy_loop.is_running():
+        buddy_loop.start()
+        await ctx.send("Buddy loop started.")
+    else:
+        await ctx.send("Buddy loop is already running.")
+
+@bot.command()
+async def stop_buddy_loop(ctx):
+    """Stops the buddy loop task."""
+    if buddy_loop.is_running():
+        buddy_loop.stop()
+        await ctx.send("Buddy loop stopped.")
+    else:
+        await ctx.send("Buddy loop is not running.")
 
 @bot.command()
 async def stock(ctx, *, query: str = None):
