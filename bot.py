@@ -65,12 +65,6 @@ async def send_msg():
 
 processed_message_ids = set()
 
-# async def process_and_simplify_csv(stock_name):
-#     folder_path = os.path.join(os.getcwd(), 'static', 'images')
-#     file_path = os.path.join(folder_path, f'result_VOO_{stock_name}.csv')
-#     # df_processed = read_and_process_csv(file_path)
-#     save_simplified_csv(folder_path, file_path, stock_name)
-
 
 @bot.command()
 async def stock(ctx, *, query: str = None):
@@ -88,14 +82,12 @@ async def stock(ctx, *, query: str = None):
                 try:
                     plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
                 except KeyError as e:
+                    await asyncio.sleep(5)
                     await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
                     print(f"Error plotting {stock_name}: {e}")
                 # 파일 이동
                 await move_files_to_images_folder()
                 
-                # CSV 파일 간소화
-                # await process_and_simplify_csv(stock_name)
-
             await asyncio.sleep(5)
         except Exception as e:
             await ctx.send(f'An error occurred while processing {stock_name}: {e}')
