@@ -73,23 +73,7 @@ def plot_results(file_path, total_account_balance, total_rate, str_strategy, sto
     plt.cla()
     plt.clf()  # Clear the figure to avoid residual plots when this function is called again
 
-    # Discord로 이미지 전송
-    DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-    message = {
-        'content': f"Stock: {stock}\n"
-                   f"Invested_amount: {invested_amount:,.0f} $\n"
-                   f"Total_account_balance: {total_account_balance:,.0f} $\n"
-                   f"Total_rate: {total_rate:,.0f} %\n"
-                   f"Strategy: {str_strategy} %\n"
-                   f" "
-    }
-    response = requests.post(DISCORD_WEBHOOK_URL, json=message, files={'image': open('result_{}.png'.format(stock), 'rb')})
-
-    if response.status_code != 204:
-        print('Discord 메시지 전송 실패')
-    else:
-        print('Discord 메시지 전송 성공')
-
+    # Discord 메시지 전송 기능을 plot_comparison_results로 이동
 
 def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date):
     fig, ax2 = plt.subplots(figsize=(8, 6))
@@ -98,7 +82,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     file_path1 = convert_file_path_for_reading(file_path1)
     file_path2 = convert_file_path_for_reading(file_path2)
     df1 = pd.read_csv(file_path1, parse_dates=['Date'], index_col='Date')
-    df2 = pd.read_csv(file_path2, parse_dates=['Date'], index_col='Date')
+    df2 = pd.read_csv(file_path2, parse_dates['Date'], index_col='Date')
 
     # 주식 데이터프레임의 최소 날짜를 찾아서 그 날짜로 범위를 맞춥니다.
     start_date = min_stock_data_date
@@ -159,6 +143,7 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     # 이미지 파일 전송
     files = {'file': open(save_path, 'rb')}
     response = requests.post(DISCORD_WEBHOOK_URL, files=files)
+
 
 
 
