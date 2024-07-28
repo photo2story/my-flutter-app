@@ -119,8 +119,6 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     # VOO의 총 수익률 계산
     voo_rate = df2['rate_vs'].iloc[-1] if not df2.empty else 0
 
-    print(f"VOO Rate: {voo_rate}")  # 디버깅용 출력
-
     # 레이블, 제목, 범례 설정
     plt.ylabel('7-Day Average Daily Return (%)')
     plt.legend(loc='upper left')
@@ -138,17 +136,9 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     plt.xlabel('Year')
 
     # 그래프를 PNG 파일로 저장
-    if len(stock1) == 6 and stock1.isdigit():  # 한국 수식 6자리 숫자
-        stock1_name = get_ticker_name(stock1)
-        if stock1_name is not None:
-            stock1 = stock1 + '_' + stock1_name
     save_path = f'comparison_{stock1}_{stock2}.png'
-    
-    # 그래프 상단 여백 조정
-    plt.subplots_adjust(top=0.8)  # 상단 여백을 추가합니다.
-    
+    plt.subplots_adjust(top=0.8)
     fig.savefig(save_path)
-    
     plt.cla()
     plt.clf()
     plt.close(fig)
@@ -162,14 +152,15 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
                    f"Total_account_balance: {total_account_balance:,.0f} $\n"
                    f"Last_signal: {str_strategy}"
     }
-    # 이미지 파일을 읽고 Discord로 전송
     with open(save_path, 'rb') as image:
         response = requests.post(DISCORD_WEBHOOK_URL, json=message, files={'image': image})
-        print(f"Discord Response Code: {response.status_code}")
-        if response.status_code != 204:
-            print('Discord 메시지 전송 실패')
-        else:
-            print('Discord 메시지 전송 성공')
+
+    if response.status_code != 204:
+        print('Discord 메시지 전송 실패')
+    else:
+        print('Discord 메시지 전송 성공')
+
+
 
 import time  # 추가
 
