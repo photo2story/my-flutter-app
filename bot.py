@@ -94,7 +94,7 @@ async def stock(ctx, *, query: str = None):
                 await move_files_to_images_folder()
                 
                 # CSV 파일 간소화
-                await process_and_simplify_csv(stock_name)
+                # await process_and_simplify_csv(stock_name)
 
             await asyncio.sleep(5)
         except Exception as e:

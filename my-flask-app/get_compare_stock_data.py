@@ -28,7 +28,7 @@ def calculate_divergence(df, ticker):
     divergence = df[f'rate_{ticker}_5D'] - df['rate_VOO_20D']
     return divergence
 
-def save_simplified_csv(folder_path, file_path, ticker):
+def save_simplified_csv(file_path, ticker):
     # CSV 파일 읽기 및 처리
     df = read_and_process_csv(file_path)
     
