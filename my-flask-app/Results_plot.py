@@ -48,13 +48,17 @@ def plot_results(file_path, total_account_balance, total_rate, str_strategy, sto
 
     # 주식 이름 가져오기
     stock_name = get_ticker_name(stock)
+    max_divergence = stock_df['Divergence'].max()
+    min_divergence = stock_df['Divergence'].min()
+    current_divergence = stock_df['Divergence'].iloc[-1]
+    relative_divergence = stock_df['Relative_Divergence'].iloc[-1]
 
     # 제목 설정
-    plt.title(f"{stock} ({stock_name})\n" +
-              "\nTotal_account_balance: {:,.0f} won,".format(total_account_balance) +
-              "Total_rate: {:,.0f} %".format(total_rate) +
-              "\nInvested_amount: {:,.0f} $".format(invested_amount) +
-              "\nStrategy: {} %".format(str_strategy))
+    plt.title(f"{stock} ({stock_name}) vs VOO\n" +
+              f"Total Account Balance: {total_account_balance:,.0f} won\n" +
+              f"Total Rate: {total_rate:,.2f}% (VOO: {relative_divergence:.2f}%)\n" +
+              f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" +
+              f"Strategy: {str_strategy}")
 
     # x축 라벨 설정
     ax2.xaxis.set_major_locator(dates.YearLocator())
@@ -80,55 +84,38 @@ import pandas as pd
 def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date):
     fig, ax2 = plt.subplots(figsize=(8, 6))
 
-    # 각 주식의 데이터프레임을 읽어옵니다.
-    file_path1 = convert_file_path_for_reading(file_path1)
-    file_path2 = convert_file_path_for_reading(file_path2)
     df1 = pd.read_csv(file_path1, parse_dates=['Date'], index_col='Date')
     df2 = pd.read_csv(file_path2, parse_dates=['Date'], index_col='Date')
 
-    # 주식 데이터프레임의 최소 날짜를 찾아서 그 날짜로 범위를 맞춥니다.
     start_date = min_stock_data_date
     end_date = min(df1.index.max(), df2.index.max())
 
-    # 두 데이터프레임의 날짜 범위를 조정합니다.
     df1 = df1.loc[start_date:end_date]
     df2 = df2.loc[start_date:end_date]
 
-    # 7일 이동 평균으로 리샘플링합니다.
     df1['rate_7d_avg'] = df1['rate'].rolling('7D').mean()
     df2['rate_20d_avg'] = df2['rate_vs'].rolling('20D').mean()
 
-    # 주식 1과 주식 2의 7일 이동 평균 데이터를 그래프에 추가
     ax2.plot(df1.index, df1['rate_7d_avg'], label=f'{stock1} 7-Day Avg Return')
     ax2.plot(df2.index, df2['rate_20d_avg'], label=f'{stock2} 20-Day Avg Return')
 
-    # VOO의 총 수익률 계산
     voo_rate = df2['rate_vs'].iloc[-1] if not df2.empty else 0
 
-    # 레이블, 제목, 범례 설정
-    plt.ylabel('rate (%)')
-    plt.legend(loc='upper left')
-
-    stock1_name = get_ticker_name(stock1)
-    stock2_name = get_ticker_name(stock2)
-    
     max_divergence = df1['Divergence'].max()
     min_divergence = df1['Divergence'].min()
     current_divergence = df1['Divergence'].iloc[-1]
     relative_divergence = df1['Relative_Divergence'].iloc[-1]
-    print(f"Current Divergence: {current_divergence:.2f}, Relative Divergence: {relative_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})")
 
     plt.title(f"{stock1} ({stock1_name}) vs {stock2}\n" +
-              f"\nTotal Account Balance: {total_account_balance:,.0f} $, Total Rate: {total_rate:,.0f} % (VOO: {voo_rate:,.0f}%)\n" +
-              f"Current Divergence: {df1['Divergence'].iloc[-1]:.2f}, Relative Divergence: {df1['Relative_Divergence'].iloc[-1]:.2f} (max: {df1['Divergence'].max():.2f}, min: {df1['Divergence'].min():.2f})\n" +
-              f"Current Signal: {current_signal}, Last Signal: {str_strategy}",
-              pad=10)  # 제목과 그래프 사이의 여백을 추가합니다.
+              f"Total Account Balance: {total_account_balance:,.0f} $\n" +
+              f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%)\n" +
+              f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" +
+              f"Current Signal: {str_strategy}",
+              pad=10)
 
-    # x축 라벨 설정
     ax2.xaxis.set_major_locator(dates.YearLocator())
     plt.xlabel('Year')
 
-    # 그래프를 PNG 파일로 저장
     save_path = f'comparison_{stock1}_{stock2}.png'
     plt.subplots_adjust(top=0.8)
     fig.savefig(save_path)
@@ -136,14 +123,12 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     plt.clf()
     plt.close(fig)
 
-    # Discord로 이미지 전송
+    # Discord 메시지
     DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-
-    # 결과 메시지 전송
     message = f"Stock: {stock1} ({stock1_name}) vs {stock2}\n" \
-            f"Total Rate: {total_rate:,.0f} % (VOO: {voo_rate:,.0f}%)\n" \
-            f"Current Divergence: {df1['Divergence'].iloc[-1]:.2f}, Relative Divergence: {df1['Relative_Divergence'].iloc[-1]:.2f} (max: {df1['Divergence'].max():.2f}, min: {df1['Divergence'].min():.2f})\n" \
-            f"Current Signal: {current_signal}, Last Signal: {str_strategy}"
+              f"Total Rate: {total_rate:.2f}% (VOO: {voo_rate:.2f}%)\n" \
+              f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" \
+              f"Current Signal: {str_strategy}"
     response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
 
     if response.status_code != 204:
@@ -151,7 +136,6 @@ def plot_comparison_results(file_path1, file_path2, stock1, stock2, total_accoun
     else:
        print('Discord 메시지 전송 성공')
 
-    # 이미지 파일 전송
     files = {'file': open(save_path, 'rb')}
     response = requests.post(DISCORD_WEBHOOK_URL, files=files)
 
