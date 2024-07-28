@@ -7,7 +7,6 @@ import yaml
 from Strategy_sell import strategy_sell
 from Strategy_buy import strategy_buy
 from get_signal import calculate_ppo_buy_sell_signals, monthly_deposit, make_investment_decision
-from data_preprocessing import initialize_variables, get_first_trading_day
 
 
 def my_strategy(stock_data, initial_investment, monthly_investment, option_strategy):
