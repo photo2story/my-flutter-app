@@ -21,7 +21,7 @@ GITHUB_API_URL = os.getenv('GITHUB_API_URL', 'https://api.github.com/repos/photo
 
 STOCKS = {
     'Technology': ['AAPL', 'MSFT', 'NVDA', 'GOOG', 'AMZN', 'META', 'CRM', 'ADBE', 'AMD', 'ACN', 'QCOM', 'CSCO', 'INTU', 'IBM', 'PDD', 'NOW', 'MS', 'ARM', 'INTC', 'ANET', 'ADI', 'KLAC', 'PANW', 'AMT'],
-    'Financials': ['BRK.A', 'V', 'MA', 'BAC', 'WFC', 'BLK', 'BX', 'GS', 'C', 'KKR'],
+    'Financials': [ 'V', 'MA', 'BAC', 'WFC', 'BLK', 'BX', 'GS', 'C', 'KKR'],
     'Consumer Cyclical': ['TSLA', 'AMZN', 'HD', 'NKE', 'MCD', 'SBUX', 'TJX', 'BKNG', 'CMG', 'TGT', 'LOW', 'EXPE', 'DG', 'JD'],
     'Healthcare': ['LLY', 'UNH', 'ABBV', 'JNJ', 'MRK', 'TMO', 'ABT', 'PFE', 'DHR', 'CVS', 'CI', 'GILD', 'AMGN', 'ISRG', 'REGN', 'VRTX', 'HCA'],
     'Communication Services': ['META', 'GOOGL', 'NFLX', 'DIS', 'VZ', 'T', 'CMCSA', 'SPOT', 'TWTR', 'ROKU', 'LYFT', 'UBER', 'EA'],
