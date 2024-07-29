@@ -106,7 +106,8 @@ def is_stock_analysis_complete(ticker):
 
 
 def is_gemini_analysis_complete(ticker):
-    report_file_path = os.path.join('static', 'images', f'report_{ticker}.txt')
+    today_date_str = datetime.now().strftime('%Y-%m-%d')
+    report_file_path = os.path.join('static', 'images', f'{today_date_str}-report_{ticker}.txt')
     return os.path.exists(report_file_path)
 
 if __name__ == '__main__':
