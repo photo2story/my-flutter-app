@@ -1,11 +1,9 @@
 # config.py
-# config.py
 import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import pandas as pd
 import pytz
-
 load_dotenv()
 
 # Discord configuration
@@ -86,6 +84,8 @@ def is_us_market_holiday(date):
             return True
     return False
 
+from datetime import datetime, timedelta
+
 def is_stock_analysis_complete(ticker):
     result_file_path = os.path.join('static', 'images', f'result_VOO_{ticker}.csv')
     if not os.path.exists(result_file_path):
@@ -102,17 +102,33 @@ def is_stock_analysis_complete(ticker):
 
     return True
 
+
 def is_gemini_analysis_complete(ticker):
-    today_date_str = datetime.now().strftime('%Y-%m-%d')
-    report_file_path = os.path.join('static', 'images', f'{today_date_str}-report_{ticker}.txt')
-    return os.path.exists(report_file_path)
+    report_file_path = os.path.join('static', 'images', f'report_{ticker}.txt')
+    
+    if not os.path.exists(report_file_path):
+        return False
+    
+    try:
+        with open(report_file_path, 'r', encoding='utf-8') as file:
+            first_line = file.readline().strip()
+            today_date_str = datetime.now().strftime('%Y-%m-%d')
+            
+            if today_date_str in first_line:
+                return True
+            else:
+                return False
+    except Exception as e:
+        print(f"Error reading report file for {ticker}: {e}")
+        return False
+
 
 if __name__ == '__main__':
     # 분석할 티커 설정
-    ticker = 'SOXX'
-    stock_analysis_complete = is_stock_analysis_complete(ticker)
-    gemini_analysis_complete = is_gemini_analysis_complete(ticker)
+    ticker = 'TSLA'
+    stock_analysis_complete = is_stock_analysis_complete(ticker )
+    gemini_analysis_complete = is_gemini_analysis_complete(ticker )
     print(f"Stock analysis complete for {ticker}: {stock_analysis_complete}")
     print(f"Gemini analysis complete for {ticker}: {gemini_analysis_complete}")
-
+    
 # python config.py    
