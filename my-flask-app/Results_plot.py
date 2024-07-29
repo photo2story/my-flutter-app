@@ -1,14 +1,14 @@
-# Results_plot2.py
+# Results_plot.py
 
 import matplotlib.dates as dates
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
-import os, sys
+import os
+import sys
 import requests
 import asyncio
-import pandas as pd
 import time
 from dotenv import load_dotenv
 
@@ -76,7 +76,7 @@ def plot_comparison_results(ticker, start_date, end_date):
 
     ax2.plot(df1_graph.index, df1_graph['rate_7d_avg'], label=f'{ticker} 7-Day Avg Return')
     ax2.plot(df2_graph.index, df2_graph['rate_20d_avg'], label=f'{stock2} 20-Day Avg Return')
-    
+
     plt.ylabel('rate (%)')
     plt.legend(loc='upper left')
 
@@ -95,15 +95,14 @@ def plot_comparison_results(ticker, start_date, end_date):
     ax2.xaxis.set_major_locator(dates.YearLocator())
     plt.xlabel('Year')
 
-    save_path = f'comparison_{ticker}_{stock2}.png'
+    save_path = f'comparison_{ticker}_VOO.png'
     plt.subplots_adjust(top=0.8)
     fig.savefig(save_path)
     plt.cla()
     plt.clf()
     plt.close(fig)
 
-    DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-    message = f"Stock: {ticker} ({get_ticker_name(ticker)}) vs {stock2}\n" \
+    message = f"Stock: {ticker} ({get_ticker_name(ticker)}) vs VOO\n" \
               f"Total Rate: {df1_graph['rate'].iloc[-1]:.2f}% (VOO: {voo_rate:.2f}%), Relative_Divergence: {relative_divergence:.2f}\n" \
               f"Current Divergence: {current_divergence:.2f} (max: {max_divergence:.2f}, min: {min_divergence:.2f})\n" \
               f"Current Signal(PPO): {current_signal}, Last Signal: {last_signal}"
@@ -117,15 +116,16 @@ def plot_comparison_results(ticker, start_date, end_date):
     # 이미지 파일 전송
     try:
         with open(save_path, 'rb') as image:
+            print(f"Sending image: {save_path}")  # 디버깅 메시지
             response = requests.post(
                 DISCORD_WEBHOOK_URL,
                 files={'file': image}
             )
-            if response.status_code != 204:
+            if response.status_code in [200, 204]:
+                print(f'Graph 전송 성공: {ticker}')
+            else:
                 print(f'Graph 전송 실패: {ticker}')
                 print(f"Response: {response.status_code} {response.text}")
-            else:
-                print(f'Graph 전송 성공: {ticker}')
     except Exception as e:
         print(f"Error occurred while sending image: {e}")
 
@@ -142,6 +142,5 @@ if __name__ == "__main__":
         print("Plotting completed successfully.")
     except Exception as e:
         print(f"Error occurred while plotting results: {e}")
-
 
     # python Results_plot2.py

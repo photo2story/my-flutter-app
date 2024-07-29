@@ -126,13 +126,18 @@ async def gemini(ctx, *, query: str = None):
         tickers = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
 
     for ticker in tickers:
-        try:
-            result = await analyze_with_gemini(ticker)
-            await ctx.send(result)
-        except Exception as e:
-            error_message = f'An error occurred while analyzing {ticker} with Gemini: {str(e)}'
-            await ctx.send(error_message)
-            print(error_message)
+        gemini_analysis_complete = config.is_gemini_analysis_complete(ticker)
+
+        if gemini_analysis_complete:
+            await ctx.send(f"Gemini analysis for {ticker} is already complete. Displaying results.")
+        else:
+            try:
+                result = await analyze_with_gemini(ticker)
+                await ctx.send(result)
+            except Exception as e:
+                error_message = f'An error occurred while analyzing {ticker} with Gemini: {str(e)}'
+                await ctx.send(error_message)
+                print(error_message)
 
 @bot.command()
 async def buddy(ctx, *, query: str = None):
