@@ -19,7 +19,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flas
 from git_operations import move_files_to_images_folder
 from get_ticker import load_tickers, search_tickers_and_respond, get_ticker_name, update_stock_market_csv, get_ticker_from_korean_name
 from estimate_stock import estimate_stock
-from Results_plot import plot_results_all
+from Results_plot import plot_comparison_results
 from Results_plot_mpl import plot_results_mpl
 from github_operations import ticker_path
 from backtest_send import backtest_and_send
@@ -93,7 +93,8 @@ async def stock(ctx, *, query: str = None):
         stock_names = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
 
     for stock_name in stock_names:
-        stock_analysis_complete = config.is_stock_analysis_complete(stock_name)
+        # stock_analysis_complete = config.is_stock_analysis_complete(stock_name)
+        stock_analysis_complete = False
 
         # 스톡 분석 상태 출력
         await ctx.send(f"Stock analysis complete for {stock_name}: {stock_analysis_complete}")
@@ -184,7 +185,7 @@ async def ticker(ctx, *, query: str = None):
 @bot.command()
 async def show_all(ctx):
     try:
-        await plot_results_all()
+        await plot_comparison_results()
         await ctx.send("All results have been successfully displayed.")
     except Exception as e:
         await ctx.send(f"An error occurred: {e}")
