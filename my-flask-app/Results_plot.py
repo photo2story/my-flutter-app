@@ -5,12 +5,11 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
-import os,sys
+import os, sys
 import requests
-import glob
 import asyncio
 import pandas as pd
-import time  # 추가
+import time
 from dotenv import load_dotenv
 
 from get_ticker import get_ticker_name, is_valid_stock
@@ -28,34 +27,29 @@ GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-
 CSV_PATH = os.getenv('CSV_PATH', 'static/images/stock_market.csv')
 
 def convert_file_path_for_saving(file_path):
-  return file_path.replace('/', '-')
+    return file_path.replace('/', '-')
 
 def convert_file_path_for_reading(file_path):
-  return file_path.replace('-', '/')
+    return file_path.replace('-', '/')
 
 def save_figure(fig, file_path):
-  file_path = convert_file_path_for_saving(file_path)
-  fig.savefig(file_path)
-  plt.close(fig)  # 닫지 않으면 메모리를 계속 차지할 수 있음
+    file_path = convert_file_path_for_saving(file_path)
+    fig.savefig(file_path)
+    plt.close(fig)
 
 def load_image(file_path):
     file_path = convert_file_path_for_reading(file_path)
     image = Image.open(file_path)
     return image
 
-def plot_comparison_results(ticker,start_date, end_date):
+def plot_comparison_results(ticker, start_date, end_date):
     stock2 ='VOO'
     fig, ax2 = plt.subplots(figsize=(8, 6))
 
     full_path1 = f"{GITHUB_RAW_BASE_URL}/result_VOO_{ticker}.csv"
-    
     full_path2 = f"{GITHUB_RAW_BASE_URL}/result_VOO_{ticker}.csv"
     simplified_df_path1 = f"{GITHUB_RAW_BASE_URL}/result_{ticker}.csv"
 
-    print(f"Reading full dataset for graph from: {full_path1}")
-    
-    print(f"Reading full dataset for graph from: {full_path2} ")
-    
     df1_graph = pd.read_csv(full_path1, parse_dates=['Date'], index_col='Date')
     df2_graph = pd.read_csv(full_path2, parse_dates=['Date'], index_col='Date')
 
@@ -121,15 +115,19 @@ def plot_comparison_results(ticker,start_date, end_date):
         print('Discord 메시지 전송 성공')
 
     # 이미지 파일 전송
-    with open(save_path, 'rb') as image:
-        response = requests.post(
-            DISCORD_WEBHOOK_URL,
-            files={'image': image}
-        )
-        if response.status_code != 204:
-            print(f'Graph 전송 실패: {ticker}')
-        else:
-            print(f'Graph 전송 성공: {ticker}')
+    try:
+        with open(save_path, 'rb') as image:
+            response = requests.post(
+                DISCORD_WEBHOOK_URL,
+                files={'file': image}
+            )
+            if response.status_code != 204:
+                print(f'Graph 전송 실패: {ticker}')
+                print(f"Response: {response.status_code} {response.text}")
+            else:
+                print(f'Graph 전송 성공: {ticker}')
+    except Exception as e:
+        print(f"Error occurred while sending image: {e}")
 
 
 if __name__ == "__main__":

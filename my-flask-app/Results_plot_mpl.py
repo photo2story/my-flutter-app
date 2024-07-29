@@ -1,49 +1,29 @@
-
 ## Results_plot_mpl.py
 
 
 import yfinance as yf
 import matplotlib.pyplot as plt
 from mplchart.chart import Chart
-from mplchart.primitives import Candlesticks, Volume, TradeMarker, TradeSpan
-from mplchart.indicators import SMA, EMA, RSI, MACD, PPO
-import yfinance as yf
+from mplchart.primitives import Candlesticks, Volume, TradeSpan
+from mplchart.indicators import SMA, PPO, RSI
 import pandas_ta as ta
 import pandas as pd
 import requests
 import numpy as np
 import FinanceDataReader as fdr
 from datetime import datetime
-from get_ticker import get_ticker_name, get_ticker_market, is_valid_stock
-from tradingview_ta import TA_Handler, Interval, Exchange
-
-import os, sys
-from github_operations import save_csv_to_github, save_image_to_github, ticker_path # ticker_path=stock_market.csv 파일 경로
-NaN = np.nan
-
-def convert_file_path_for_saving(file_path):
-  return file_path.replace('/', '-')
-
-def convert_file_path_for_reading(file_path):
-  return file_path.replace('-', '/')
-
-import os
-import requests
-import pandas as pd
-import numpy as np
-import FinanceDataReader as fdr
-from datetime import datetime
 from get_ticker import get_ticker_name
 from github_operations import save_csv_to_github, save_image_to_github
-import matplotlib.pyplot as plt
-from mplchart.chart import Chart
-from mplchart.primitives import Candlesticks, Volume
-from mplchart.indicators import SMA, PPO, RSI
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 def save_figure(fig, file_path):
     file_path = file_path.replace('/', '-')
     fig.savefig(file_path, bbox_inches='tight')
-    plt.close(fig)  # 닫지 않으면 메모리를 계속 차지할 수 있음
+    plt.close(fig)
 
 def plot_results_mpl(ticker, start_date, end_date):
     prices = fdr.DataReader(ticker, start_date, end_date)
@@ -69,12 +49,10 @@ def plot_results_mpl(ticker, start_date, end_date):
     chart.plot(prices, indicators)
 
     fig = chart.figure
-
     image_filename = f'result_mpl_{ticker}.png'
     save_figure(fig, image_filename)
 
     # Discord로 이미지 및 메시지 전송
-    DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
     message = (f"Stock: {ticker} ({name})\n"
                f"Close: {prices['Close'].iloc[-1]:,.2f}\n"
                f"SMA 20: {SMA20.iloc[-1]:,.2f}\n"
@@ -84,6 +62,7 @@ def plot_results_mpl(ticker, start_date, end_date):
     response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
     if response.status_code != 204:
         print('Discord 메시지 전송 실패')
+        print(f"Response: {response.status_code} {response.text}")
     else:
         print('Discord 메시지 전송 성공')
 
@@ -92,18 +71,22 @@ def plot_results_mpl(ticker, start_date, end_date):
         response = requests.post(DISCORD_WEBHOOK_URL, files={'file': image_file})
         if response.status_code != 204:
             print(f'Graph 전송 실패: {ticker}')
+            print(f"Response: {response.status_code} {response.text}")
         else:
             print(f'Graph 전송 성공: {ticker}')
 
-
-
-
 if __name__ == "__main__":
-    # 사용 예시
-  ticker ='VOO'
-  start_date = "2022-01-01"
-  end_date = datetime.today().strftime('%Y-%m-%d')  # 오늘 날짜 문자열로 변환하기
-  plot_results_mpl(ticker,start_date , end_date)
+    print("Starting test for plotting results.")
+    ticker = "AAPL"
+    start_date = "2019-01-02"
+    end_date = "2024-07-28"
+    print(f"Plotting results for {ticker} from {start_date} to {end_date}")
+
+    try:
+        plot_results_mpl(ticker, start_date, end_date)
+        print("Plotting completed successfully.")
+    except Exception as e:
+        print(f"Error occurred while plotting results: {e}")
 
 
 ## python Results_plot_mpl.py
