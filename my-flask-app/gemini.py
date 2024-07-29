@@ -124,20 +124,15 @@ async def analyze_with_gemini(ticker):
         # 어닝 데이터 가져오기
         recent_earnings = get_recent_eps_and_revenue(ticker)
         if recent_earnings is None:
-            # 기본 데이터 소스 실패 시 보조 데이터 소스 시도
             print(f"Primary data source failed for {ticker}, attempting secondary source...")
             recent_earnings = get_recent_eps_and_revenue_fmp(ticker)
             if recent_earnings is None:
                 raise Exception("No recent earnings data found from secondary source.")
                 
-        # 디버깅을 위한 출력
         print(f"Recent earnings data for {ticker}: {recent_earnings}")
         
         earnings_text = format_earnings_text(recent_earnings)
         print(f"Earnings Text for {ticker}: {earnings_text}")
-
-        # 분석 날짜 추가
-        analysis_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         # 프롬프트 준비
         prompt_voo = f"""
@@ -160,7 +155,6 @@ async def analyze_with_gemini(ticker):
            가장 최근 실적은 예상치도 함께 포함해서 검토해줘
         5) 종합적으로 분석해줘(1~4번까지의 요약)
         6) 레포트는 한글로 만들어줘
-        7) 분석 날짜: {analysis_date}
         """
 
         # Gemini API 호출
@@ -169,7 +163,7 @@ async def analyze_with_gemini(ticker):
         
         # 리포트를 텍스트로 저장
         report_text = response_ticker.text
-        # print(report_text)
+        print(report_text)
 
         # 디스코드 웹훅 메시지로 전송
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
@@ -178,19 +172,19 @@ async def analyze_with_gemini(ticker):
 
         today = datetime.now().strftime('%Y-%m-%d')
         report_file = f'{today}-report_{ticker}.txt'
-        report_file_path = os.path.join('static', 'images', report_file)
+        destination_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
+        report_file_path = os.path.join(destination_dir, report_file)
 
         # 기존 파일 삭제
-        existing_files = [f for f in os.listdir('static/images') if f.startswith(f"report_{ticker}") and f.endswith('.txt')]
+        existing_files = [f for f in os.listdir(destination_dir) if f.startswith(f"report_{ticker}") and f.endswith('.txt')]
         for file in existing_files:
-            os.remove(os.path.join('static', 'images', file))
+            os.remove(os.path.join(destination_dir, file))
 
         # 리포트를 파일로 저장
         with open(report_file_path, 'w', encoding='utf-8') as file:
             file.write(report_text)
 
-        # 리포트를 루트 static/images 폴더로 이동 및 커밋
-        destination_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
+        # 추가된 파일들을 루트 static/images 폴더로 이동 및 커밋
         shutil.move(voo_file, os.path.join(destination_dir, voo_file))
         await move_files_to_images_folder()
 
@@ -204,6 +198,6 @@ async def analyze_with_gemini(ticker):
 if __name__ == '__main__':
     ticker = 'TSLA'
     asyncio.run(analyze_with_gemini(ticker))
-    
+  
 # source .venv/bin/activate
 # python gemini.py    
