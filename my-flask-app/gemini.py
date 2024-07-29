@@ -55,16 +55,13 @@ def format_earnings_text(earnings_data):
     if not earnings_data:
         return "No earnings data available."
 
-    # 매출 데이터가 있는지 확인
     has_revenue = any(isinstance(entry, tuple) and len(entry) >= 4 for entry in earnings_data)
 
-    # 헤더 설정
     if has_revenue:
         earnings_text = "| 날짜 | EPS | 매출 |\n|---|---|---|\n"
     else:
         earnings_text = "| 날짜 | EPS | 예상 EPS |\n|---|---|---|\n"
 
-    # 데이터 추가
     for entry in earnings_data:
         if isinstance(entry, tuple):
             if has_revenue:
@@ -87,25 +84,21 @@ def format_earnings_text(earnings_data):
 
 async def analyze_with_gemini(ticker):
     try:
-        # 시작 메시지 전송
         start_message = f"Starting analysis for {ticker}"
         print(start_message)
         requests.post(DISCORD_WEBHOOK_URL, data={'content': start_message})
 
-        # CSV 파일 다운로드
         if not download_csv(ticker):
             error_message = f'Error: The file for {ticker} does not exist.'
             print(error_message)
             requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
             return
 
-        # CSV 파일 로드
         voo_file = f'result_VOO_{ticker}.csv'
         simplified_file = f'result_{ticker}.csv'
         df_voo = pd.read_csv(voo_file)
         df_simplified = pd.read_csv(simplified_file)
 
-        # 데이터 추출
         final_rate = df_voo['rate'].iloc[-1]
         final_rate_vs = df_voo['rate_vs'].iloc[-1]
         Close = df_voo['Close'].iloc[-1]
@@ -115,13 +108,11 @@ async def analyze_with_gemini(ticker):
         rsi = df_voo['rsi_ta'].iloc[-1]
         ppo = df_voo['ppo_histogram'].iloc[-1]
 
-        # Divergence 데이터 추출
         max_divergence = df_simplified['Divergence'].max()
         min_divergence = df_simplified['Divergence'].min()
         current_divergence = df_simplified['Divergence'].iloc[-1]
         relative_divergence = df_simplified['Relative_Divergence'].iloc[-1]
 
-        # 어닝 데이터 가져오기
         recent_earnings = get_recent_eps_and_revenue(ticker)
         if recent_earnings is None or all(entry[3] is None for entry in recent_earnings):
             print(f"Primary data source failed for {ticker}, attempting secondary source...")
@@ -134,7 +125,6 @@ async def analyze_with_gemini(ticker):
         earnings_text = format_earnings_text(recent_earnings)
         print(f"Earnings Text for {ticker}: {earnings_text}")
 
-        # 프롬프트 준비
         prompt_voo = f"""
         1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
            리뷰할 주식티커명 = {ticker}
@@ -156,34 +146,28 @@ async def analyze_with_gemini(ticker):
         5) 종합적으로 분석해줘(1~4번까지의 요약)
         6) 레포트는 한글로 만들어줘
         """
-        # Gemini API 호출
+        
         print(f"Sending prompt to Gemini API for {ticker}")
         response_ticker = model.generate_content(prompt_voo)
         
-        # 리포트를 텍스트로 저장
-        report_text = response_ticker.text
+        report_text = f"{datetime.now().strftime('%Y-%m-%d')} - Analysis Report\n" + response_ticker.text
         print(report_text)
 
-        # 디스코드 웹훅 메시지로 전송
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
         print(success_message)
         requests.post(DISCORD_WEBHOOK_URL, json={'content': success_message})
 
-        today = datetime.now().strftime('%Y-%m-%d')
-        report_file = f'{today}-report_{ticker}.txt'
+        report_file = f'report_{ticker}.txt'
         destination_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
         report_file_path = os.path.join(destination_dir, report_file)
 
-        # 기존 파일 삭제
         existing_files = [f for f in os.listdir(destination_dir) if f.startswith(f"report_{ticker}") and f.endswith('.txt')]
         for file in existing_files:
             os.remove(os.path.join(destination_dir, file))
 
-        # 리포트를 파일로 저장
         with open(report_file_path, 'w', encoding='utf-8') as file:
             file.write(report_text)
 
-        # 추가된 파일들을 루트 static/images 폴더로 이동 및 커밋
         shutil.move(voo_file, os.path.join(destination_dir, voo_file))
         await move_files_to_images_folder()
 
@@ -193,9 +177,11 @@ async def analyze_with_gemini(ticker):
         error_message = f"{ticker} 분석 중 오류 발생: {e}"
         print(error_message)
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
+
 if __name__ == '__main__':
     ticker = 'NVDA'
     asyncio.run(analyze_with_gemini(ticker))
+
   
 # source .venv/bin/activate
 # python gemini.py    
