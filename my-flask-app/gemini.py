@@ -176,14 +176,21 @@ async def analyze_with_gemini(ticker):
         print(success_message)
         response = requests.post(DISCORD_WEBHOOK_URL, json={'content': success_message})
 
-        # 리포트를 텍스트 파일로 저장
-        report_file = f'report_{ticker}.txt'
-        with open(report_file, 'w', encoding='utf-8') as file:
+        today = datetime.now().strftime('%Y-%m-%d')
+        report_file = f'{today}-report_{ticker}.txt'
+        report_file_path = os.path.join('static', 'images', report_file)
+
+        # 기존 파일 삭제
+        existing_files = [f for f in os.listdir('static/images') if f.startswith(f"report_{ticker}") and f.endswith('.txt')]
+        for file in existing_files:
+            os.remove(os.path.join('static', 'images', file))
+
+        # 리포트를 파일로 저장
+        with open(report_file_path, 'w', encoding='utf-8') as file:
             file.write(report_text)
 
         # 리포트를 루트 static/images 폴더로 이동 및 커밋
         destination_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
-        shutil.move(report_file, os.path.join(destination_dir, report_file))
         shutil.move(voo_file, os.path.join(destination_dir, voo_file))
         await move_files_to_images_folder()
 
@@ -195,9 +202,8 @@ async def analyze_with_gemini(ticker):
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
 
 if __name__ == '__main__':
-    # 분석할 티커 설정
     ticker = 'TSLA'
     asyncio.run(analyze_with_gemini(ticker))
-
+    
 # source .venv/bin/activate
 # python gemini.py    
