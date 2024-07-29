@@ -52,9 +52,9 @@ def plot_comparison_results(ticker,start_date, end_date):
     full_path2 = f"{GITHUB_RAW_BASE_URL}/result_VOO_{ticker}.csv"
     simplified_df_path1 = f"{GITHUB_RAW_BASE_URL}/result_{ticker}.csv"
 
-    print(f"Reading full dataset for graph from: {full_path1} and {full_path2}")
+    print(f"Reading full dataset for graph from: {full_path1}")
     
-    print(f"Reading full dataset for graph from: {full_path1} and {full_path2}")
+    print(f"Reading full dataset for graph from: {full_path2} ")
     
     df1_graph = pd.read_csv(full_path1, parse_dates=['Date'], index_col='Date')
     df2_graph = pd.read_csv(full_path2, parse_dates=['Date'], index_col='Date')

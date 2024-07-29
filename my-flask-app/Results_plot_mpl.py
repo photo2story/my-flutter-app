@@ -54,7 +54,7 @@ def get_tradingview_analysis(ticker):
   return tv_analysis
 
 def plot_results_mpl(ticker,start_date, end_date):
-    # print(plt.style.available)
+    print(str(datetime.now()) + " : " + ticker + " : " + start_date + " ~ " + end_date)
 
     # ticker = 'AAPL'
     prices = fdr.DataReader(ticker,start_date, end_date)
