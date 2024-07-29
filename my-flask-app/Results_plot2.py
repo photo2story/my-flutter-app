@@ -38,12 +38,12 @@ def save_figure(fig, file_path):
   fig.savefig(file_path)
   plt.close(fig)  # 닫지 않으면 메모리를 계속 차지할 수 있음
 
-# def load_image(file_path):
-#     file_path = convert_file_path_for_reading(file_path)
-#     image = Image.open(file_path)
-#     return image
+def load_image(file_path):
+    file_path = convert_file_path_for_reading(file_path)
+    image = Image.open(file_path)
+    return image
 
-async def plot_comparison_results(ticker,start_date, end_date):
+def plot_comparison_results(ticker,start_date, end_date):
     stock2 ='VOO'
     fig, ax2 = plt.subplots(figsize=(8, 6))
 
