@@ -93,6 +93,15 @@ async def stock(ctx, *, query: str = None):
         stock_names = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
 
     for stock_name in stock_names:
+        stock_analysis_complete = config.is_stock_analysis_complete(stock_name)
+
+        # 스톡 분석 상태 출력
+        await ctx.send(f"Stock analysis complete for {stock_name}: {stock_analysis_complete}")
+
+        if stock_analysis_complete:
+            await ctx.send(f"Stock analysis for {stock_name} is already complete. Skipping...")
+            continue
+
         await ctx.send(f'Processing stock: {stock_name}')
         try:
             # 백테스팅 및 결과 플로팅
@@ -111,6 +120,7 @@ async def stock(ctx, *, query: str = None):
             await ctx.send(f'An error occurred while processing {stock_name}: {e}')
             print(f'Error processing {stock_name}: {e}')
 
+
 @bot.command()
 async def gemini(ctx, *, query: str = None):
     if query:
@@ -119,6 +129,15 @@ async def gemini(ctx, *, query: str = None):
         tickers = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
 
     for ticker in tickers:
+        gemini_analysis_complete = config.is_gemini_analysis_complete(ticker)
+
+        # 제미니 분석 상태 출력
+        await ctx.send(f"Gemini analysis complete for {ticker}: {gemini_analysis_complete}")
+
+        if gemini_analysis_complete:
+            await ctx.send(f"Gemini analysis for {ticker} is already complete. Skipping...")
+            continue
+
         try:
             result = await analyze_with_gemini(ticker)
             await ctx.send(result)
