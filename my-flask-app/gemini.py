@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import asyncio
+from datetime import datetime
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -123,13 +124,11 @@ async def analyze_with_gemini(ticker):
         # 어닝 데이터 가져오기
         recent_earnings = get_recent_eps_and_revenue(ticker)
         if recent_earnings is None:
-            # 기본 데이터 소스 실패 시 보조 데이터 소스 시도
             print(f"Primary data source failed for {ticker}, attempting secondary source...")
             recent_earnings = get_recent_eps_and_revenue_fmp(ticker)
             if recent_earnings is None:
                 raise Exception("No recent earnings data found from secondary source.")
                 
-        # 디버깅을 위한 출력
         print(f"Recent earnings data for {ticker}: {recent_earnings}")
         
         earnings_text = format_earnings_text(recent_earnings)
@@ -164,21 +163,28 @@ async def analyze_with_gemini(ticker):
         
         # 리포트를 텍스트로 저장
         report_text = response_ticker.text
-        # print(report_text)
+        print(report_text)
 
         # 디스코드 웹훅 메시지로 전송
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
         print(success_message)
         response = requests.post(DISCORD_WEBHOOK_URL, json={'content': success_message})
 
-        # 리포트를 텍스트 파일로 저장
-        report_file = f'report_{ticker}.txt'
-        with open(report_file, 'w', encoding='utf-8') as file:
+        today = datetime.now().strftime('%Y-%m-%d')
+        report_file = f'{today}-report_{ticker}.txt'
+        destination_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
+        report_file_path = os.path.join(destination_dir, report_file)
+
+        # 기존 파일 삭제
+        existing_files = [f for f in os.listdir(destination_dir) if f.startswith(f"report_{ticker}") and f.endswith('.txt')]
+        for file in existing_files:
+            os.remove(os.path.join(destination_dir, file))
+
+        # 리포트를 파일로 저장
+        with open(report_file_path, 'w', encoding='utf-8') as file:
             file.write(report_text)
 
-        # 리포트를 루트 static/images 폴더로 이동 및 커밋
-        destination_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
-        shutil.move(report_file, os.path.join(destination_dir, report_file))
+        # 추가된 파일들을 루트 static/images 폴더로 이동 및 커밋
         shutil.move(voo_file, os.path.join(destination_dir, voo_file))
         await move_files_to_images_folder()
 
@@ -190,9 +196,9 @@ async def analyze_with_gemini(ticker):
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
 
 if __name__ == '__main__':
-    # 분석할 티커 설정
     ticker = 'TSLA'
     asyncio.run(analyze_with_gemini(ticker))
+
 
 # source .venv/bin/activate
 # python gemini.py    
