@@ -19,7 +19,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flas
 from git_operations import move_files_to_images_folder
 from get_ticker import load_tickers, search_tickers_and_respond, get_ticker_name, update_stock_market_csv, get_ticker_from_korean_name
 from estimate_stock import estimate_stock
-from Results_plot import plot_results_all
+from Results_plot2 import plot_results_all, plot_comparison_results
 from Results_plot_mpl import plot_results_mpl
 from github_operations import ticker_path
 from backtest_send import backtest_and_send
@@ -99,6 +99,7 @@ async def stock(ctx, *, query: str = None):
             await backtest_and_send(ctx, stock_name, 'modified_monthly', bot)
             if is_valid_stock(stock_name):
                 try:
+                    plot_comparison_results(stock_name, config.START_DATE,config.END_DATE)
                     plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
                 except KeyError as e:
                     await ctx.send(f"An error occurred while plotting {stock_name}: {e}")

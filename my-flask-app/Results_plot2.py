@@ -132,7 +132,6 @@ def plot_comparison_results(ticker,start_date, end_date):
             print(f'Graph 전송 성공: {ticker}')
 
 
-
 if __name__ == "__main__":
     print("Starting test for plotting results.")
     stock1 = "AAPL"
