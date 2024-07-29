@@ -132,20 +132,26 @@ async def gemini(ctx, *, query: str = None):
     for ticker in tickers:
         gemini_analysis_complete = config.is_gemini_analysis_complete(ticker)
 
-        # 제미니 분석 상태 출력
-        await ctx.send(f"Gemini analysis complete for {ticker}: {gemini_analysis_complete}")
-
         if gemini_analysis_complete:
-            await ctx.send(f"Gemini analysis for {ticker} is already complete. Skipping...")
-            continue
+            report_file = f'report_{ticker}.txt'
+            destination_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
+            report_file_path = os.path.join(destination_dir, report_file)
 
-        try:
-            result = await analyze_with_gemini(ticker)
-            await ctx.send(result)
-        except Exception as e:
-            error_message = f'An error occurred while analyzing {ticker} with Gemini: {str(e)}'
-            await ctx.send(error_message)
-            print(error_message)
+            if os.path.exists(report_file_path):
+                with open(report_file_path, 'r', encoding='utf-8') as file:
+                    report_text = file.read()
+                await send_report_to_discord(report_text, ticker)
+            else:
+                await ctx.send(f"No existing report found for {ticker}.")
+        else:
+            try:
+                result = await analyze_with_gemini(ticker)
+                await ctx.send(result)
+            except Exception as e:
+                error_message = f'An error occurred while analyzing {ticker} with Gemini: {str(e)}'
+                await ctx.send(error_message)
+                print(error_message)
+
 
 @bot.command()
 async def buddy(ctx, *, query: str = None):

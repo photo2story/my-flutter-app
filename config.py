@@ -103,12 +103,25 @@ def is_stock_analysis_complete(ticker):
     return True
 
 
-
-
 def is_gemini_analysis_complete(ticker):
-    today_date_str = datetime.now().strftime('%Y-%m-%d')
-    report_file_path = os.path.join('static', 'images', f'{today_date_str}-report_{ticker}.txt')
-    return os.path.exists(report_file_path)
+    report_file_path = os.path.join('static', 'images', f'report_{ticker}.txt')
+    
+    if not os.path.exists(report_file_path):
+        return False
+    
+    try:
+        with open(report_file_path, 'r', encoding='utf-8') as file:
+            first_line = file.readline().strip()
+            today_date_str = datetime.now().strftime('%Y-%m-%d')
+            
+            if today_date_str in first_line:
+                return True
+            else:
+                return False
+    except Exception as e:
+        print(f"Error reading report file for {ticker}: {e}")
+        return False
+
 
 if __name__ == '__main__':
     # 분석할 티커 설정
