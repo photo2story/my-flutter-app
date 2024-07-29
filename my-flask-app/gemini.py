@@ -156,7 +156,6 @@ async def analyze_with_gemini(ticker):
         5) 종합적으로 분석해줘(1~4번까지의 요약)
         6) 레포트는 한글로 만들어줘
         """
-
         # Gemini API 호출
         print(f"Sending prompt to Gemini API for {ticker}")
         response_ticker = model.generate_content(prompt_voo)
