@@ -126,8 +126,12 @@ def plot_results_mpl(ticker,start_date, end_date):
        print('Discord 메시지 전송 성공')
 
     # 이미지 파일 전송
-    files = {'file': open('result_mpl_{}.png'.format(ticker), 'rb')}
-    response = requests.post(DISCORD_WEBHOOK_URL, files=files)
+    with open(image_filename, 'rb') as image_file:
+        response = requests.post(DISCORD_WEBHOOK_URL, files={'file': image_file})
+        if response.status_code != 204:
+            print(f'Graph 전송 실패: {ticker}')
+        else:
+            print(f'Graph 전송 성공: {ticker}')
 
 
 if __name__ == "__main__":
