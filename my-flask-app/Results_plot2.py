@@ -43,7 +43,7 @@ def save_figure(fig, file_path):
 #     image = Image.open(file_path)
 #     return image
 
-def plot_comparison_results(ticker,start_date, end_date):
+async def plot_comparison_results(ticker,start_date, end_date):
     stock2 ='VOO'
     fig, ax2 = plt.subplots(figsize=(8, 6))
 
@@ -126,10 +126,10 @@ def plot_comparison_results(ticker,start_date, end_date):
             DISCORD_WEBHOOK_URL,
             files={'image': image}
         )
-        # if response.status_code != 204:
-        #     print(f'Graph 전송 실패: {ticker}')
-        # else:
-        #     print(f'Graph 전송 성공: {ticker}')
+        if response.status_code != 204:
+            print(f'Graph 전송 실패: {ticker}')
+        else:
+            print(f'Graph 전송 성공: {ticker}')
 
 
 if __name__ == "__main__":
