@@ -93,24 +93,30 @@ async def stock(ctx, *, query: str = None):
         stock_names = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
 
     for stock_name in stock_names:
-        await ctx.send(f'Processing stock: {stock_name}')
+        stock_analysis_complete = config.is_stock_analysis_complete(stock_name)
+
+        if stock_analysis_complete:
+            await ctx.send(f"Stock analysis for {stock_name} is already complete. Displaying results.")
+        else:
+            await ctx.send(f'Stock analysis for {stock_name} is not complete. Proceeding with analysis.')
+            try:
+                # Analysis logic
+                await backtest_and_send(ctx, stock_name, 'modified_monthly', bot)
+            except Exception as e:
+                await ctx.send(f'An error occurred while processing {stock_name}: {e}')
+                print(f'Error processing {stock_name}: {e}')
+
+        # Display results
         try:
-            # 백테스팅 및 결과 플로팅
-            await backtest_and_send(ctx, stock_name, 'modified_monthly', bot)
-            if is_valid_stock(stock_name):
-                try:
-                    plot_comparison_results(stock_name, config.START_DATE,config.END_DATE)
-                    plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
-                except KeyError as e:
-                    await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
-                    print(f"Error plotting {stock_name}: {e}")
-                # 파일 이동
-                await move_files_to_images_folder()
-                await ctx.send(f'Completing stock: {stock_name}')
-            await asyncio.sleep(20)
+            plot_comparison_results(stock_name, config.START_DATE, config.END_DATE)
+            plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
+            await ctx.send(f'Results for {stock_name} displayed successfully.')
         except Exception as e:
-            await ctx.send(f'An error occurred while processing {stock_name}: {e}')
-            print(f'Error processing {stock_name}: {e}')
+            await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
+            print(f"Error plotting {stock_name}: {e}")
+
+        await asyncio.sleep(20)
+
 
 @bot.command()
 async def gemini(ctx, *, query: str = None):
