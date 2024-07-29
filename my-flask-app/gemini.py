@@ -123,7 +123,7 @@ async def analyze_with_gemini(ticker):
 
         # 어닝 데이터 가져오기
         recent_earnings = get_recent_eps_and_revenue(ticker)
-        if recent_earnings is None:
+        if recent_earnings is None or all(entry[3] is None for entry in recent_earnings):
             print(f"Primary data source failed for {ticker}, attempting secondary source...")
             recent_earnings = get_recent_eps_and_revenue_fmp(ticker)
             if recent_earnings is None:
@@ -168,7 +168,7 @@ async def analyze_with_gemini(ticker):
         # 디스코드 웹훅 메시지로 전송
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
         print(success_message)
-        response = requests.post(DISCORD_WEBHOOK_URL, json={'content': success_message})
+        requests.post(DISCORD_WEBHOOK_URL, json={'content': success_message})
 
         today = datetime.now().strftime('%Y-%m-%d')
         report_file = f'{today}-report_{ticker}.txt'
@@ -196,7 +196,7 @@ async def analyze_with_gemini(ticker):
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
 
 if __name__ == '__main__':
-    ticker = 'TSLA'
+    ticker = 'NVDA'
     asyncio.run(analyze_with_gemini(ticker))
 
 
