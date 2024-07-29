@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import asyncio
+from datetime import datetime  # 추가된 부분
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -135,6 +136,9 @@ async def analyze_with_gemini(ticker):
         earnings_text = format_earnings_text(recent_earnings)
         print(f"Earnings Text for {ticker}: {earnings_text}")
 
+        # 분석 날짜 추가
+        analysis_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
         # 프롬프트 준비
         prompt_voo = f"""
         1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
@@ -156,6 +160,7 @@ async def analyze_with_gemini(ticker):
            가장 최근 실적은 예상치도 함께 포함해서 검토해줘
         5) 종합적으로 분석해줘(1~4번까지의 요약)
         6) 레포트는 한글로 만들어줘
+        7) 분석 날짜: {analysis_date}
         """
 
         # Gemini API 호출
