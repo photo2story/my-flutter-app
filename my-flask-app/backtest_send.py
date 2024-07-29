@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from discord.ext import commands
 import discord  # discord 모듈 추가
-from Results_plot import plot_comparison_results
+from Results_plot2 import plot_comparison_results
 from get_ticker import get_ticker_name, is_valid_stock
 from estimate_stock import estimate_stock, estimate_snp
 from get_compare_stock_data import save_simplified_csv, read_and_process_csv  # 추가된 부분
@@ -42,6 +42,7 @@ async def backtest_and_send(ctx, stock, option_strategy='1', bot=None):
         # CSV 파일 간소화
         save_simplified_csv(file_path, stock)
 
+        # plot_comparison_results(user_stock_file_path1, user_stock_file_path2, stock, 'VOO', total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date)
         plot_comparison_results(user_stock_file_path1, user_stock_file_path2, stock, 'VOO', total_account_balance, total_rate, str_strategy, invested_amount, min_stock_data_date)
         await bot.change_presence(status=discord.Status.online, activity=discord.Game("Waiting"))
     except Exception as e:
