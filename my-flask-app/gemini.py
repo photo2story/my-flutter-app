@@ -194,6 +194,18 @@ async def analyze_with_gemini(ticker):
         error_message = f"{ticker} 분석 중 오류 발생: {e}"
         print(error_message)
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
+        
+async def send_report_to_discord(report_text, ticker):
+    """기존에 생성된 보고서를 Discord로 전송합니다."""
+    try:
+        success_message = f"Existing Gemini Analysis for {ticker}:\n{report_text}"
+        print(success_message)
+        requests.post(DISCORD_WEBHOOK_URL, data={'content': success_message})
+    except Exception as e:
+        error_message = f"Error sending report to Discord: {e}"
+        print(error_message)
+        requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
+        
 
 if __name__ == '__main__':
     ticker = 'NVDA'

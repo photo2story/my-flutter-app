@@ -9,6 +9,7 @@ import certifi
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import threading
 import config  # config.py 임포트
+from datetime import datetime  # 추가된 부분
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 
@@ -24,7 +25,7 @@ from Results_plot_mpl import plot_results_mpl
 from github_operations import ticker_path
 from backtest_send import backtest_and_send
 from get_ticker import is_valid_stock
-from gemini import analyze_with_gemini
+from gemini import analyze_with_gemini, send_report_to_discord
 from gpt import analyze_with_gpt
 from get_compare_stock_data import save_simplified_csv, read_and_process_csv  # 추가된 부분
 
@@ -129,7 +130,16 @@ async def gemini(ctx, *, query: str = None):
         gemini_analysis_complete = config.is_gemini_analysis_complete(ticker)
 
         if gemini_analysis_complete:
+            # 이미 분석이 완료된 보고서를 Discord로 전송
             await ctx.send(f"Gemini analysis for {ticker} is already complete. Displaying results.")
+            try:
+                with open(f"static/images/{datetime.now().strftime('%Y-%m-%d')}-report_{ticker}.txt", 'r', encoding='utf-8') as file:
+                    report_text = file.read()
+                await send_report_to_discord(report_text, ticker)
+            except FileNotFoundError:
+                await ctx.send(f"Report file for {ticker} not found.")
+            except Exception as e:
+                await ctx.send(f"An error occurred while sending the report: {e}")
         else:
             try:
                 result = await analyze_with_gemini(ticker)
@@ -138,6 +148,7 @@ async def gemini(ctx, *, query: str = None):
                 error_message = f'An error occurred while analyzing {ticker} with Gemini: {str(e)}'
                 await ctx.send(error_message)
                 print(error_message)
+
 
 @bot.command()
 async def buddy(ctx, *, query: str = None):
