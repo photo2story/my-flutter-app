@@ -46,8 +46,8 @@ def save_simplified_csv(file_path, ticker):
         print(f"Divergence column not found in dataframe for {ticker}")
         return
 
-    # 간단한 데이터프레임 생성 (20 간격으로 축소)
-    simplified_df = df.iloc[::20].reset_index(drop=True)
+    # 간단한 데이터프레임 생성 (40 간격으로 축소)
+    simplified_df = df.iloc[::40].reset_index(drop=True)
     
     folder_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
     simplified_file_path = os.path.join(folder_path, f'result_{ticker}.csv')

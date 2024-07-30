@@ -100,7 +100,7 @@ async def stock(ctx, *, query: str = None):
             await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
             print(f"Error plotting {stock_name}: {e}")
 
-        await asyncio.sleep(20)
+        await asyncio.sleep(5)
 
 @bot.command()
 async def gemini(ctx, *, query: str = None):
@@ -145,11 +145,11 @@ async def buddy(ctx, *, query: str = None):
     for stock_name in stock_names:
         # stock 명령 호출
         await ctx.invoke(bot.get_command("stock"), query=stock_name)
-        await asyncio.sleep(10)  # 각 명령 호출 사이에 10초 대기
+        await asyncio.sleep(5)  # 각 명령 호출 사이에 10초 대기
 
         # gemini 명령 호출
         await ctx.invoke(bot.get_command("gemini"), query=stock_name)
-        await asyncio.sleep(10)  # 각 명령 호출 사이에 10초 대기
+        await asyncio.sleep(5)  # 각 명령 호출 사이에 10초 대기
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):
