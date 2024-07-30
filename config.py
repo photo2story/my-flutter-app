@@ -121,6 +121,7 @@ def is_gemini_analysis_complete(ticker):
         print(f"Error reading report file for {ticker}: {e}")
         return False
 
+
 # 테스트 코드
 if __name__ == '__main__':
     # 분석할 티커 설정

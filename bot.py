@@ -150,7 +150,6 @@ async def gemini(ctx, *, query: str = None):
                 error_message = f'An error occurred while analyzing {ticker} with Gemini: {str(e)}'
                 await ctx.send(error_message)
                 print(error_message)
-
 @bot.command()
 async def buddy(ctx, *, query: str = None):
     if query:
