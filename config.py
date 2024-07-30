@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import pandas as pd
 import pytz
+
 load_dotenv()
 
 # Discord configuration
@@ -34,7 +35,6 @@ STOCKS = {
     'Real Estate': ['AMT', 'PLD', 'EQIX', 'PSA', 'AVB', 'SPG', 'O', 'VICI', 'EXR', 'MAA', 'EQR'],
     'Utilities': ['NEE', 'DUK', 'SO', 'AEP', 'EXC', 'D', 'SRE', 'XEL', 'ED', 'ES', 'PEG', 'WEC']
 }
-
 
 # Stock market CSV path
 STOCK_MARKET_CSV_PATH = os.getenv('STOCK_MARKET_CSV_PATH', 'path/to/stock_market.csv')
@@ -102,7 +102,6 @@ def is_stock_analysis_complete(ticker):
 
     return True
 
-
 def is_gemini_analysis_complete(ticker):
     report_file_path = os.path.join('static', 'images', f'report_{ticker}.txt')
     
@@ -122,13 +121,13 @@ def is_gemini_analysis_complete(ticker):
         print(f"Error reading report file for {ticker}: {e}")
         return False
 
-
+# 테스트 코드
 if __name__ == '__main__':
     # 분석할 티커 설정
-    ticker = 'TSLA'
-    stock_analysis_complete = is_stock_analysis_complete(ticker )
-    gemini_analysis_complete = is_gemini_analysis_complete(ticker )
+    ticker = 'AAPL'
+    stock_analysis_complete = is_stock_analysis_complete(ticker)
+    gemini_analysis_complete = is_gemini_analysis_complete(ticker)
     print(f"Stock analysis complete for {ticker}: {stock_analysis_complete}")
     print(f"Gemini analysis complete for {ticker}: {gemini_analysis_complete}")
-    
+
 # python config.py    

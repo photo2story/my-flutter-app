@@ -24,7 +24,7 @@ from Results_plot_mpl import plot_results_mpl
 from github_operations import ticker_path
 from backtest_send import backtest_and_send
 from get_ticker import is_valid_stock
-from gemini import analyze_with_gemini, send_report_to_discord
+from gemini import analyze_with_gemini
 from gpt import analyze_with_gpt
 from get_compare_stock_data import save_simplified_csv, read_and_process_csv  # 추가된 부분
 
@@ -35,6 +35,8 @@ CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
 H_APIKEY = os.getenv('H_APIKEY')
 H_SECRET = os.getenv('H_SECRET')
 H_ACCOUNT = os.getenv('H_ACCOUNT')
+
+GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -93,34 +95,29 @@ async def stock(ctx, *, query: str = None):
         stock_names = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
 
     for stock_name in stock_names:
-        # stock_analysis_complete = config.is_stock_analysis_complete(stock_name)
-        stock_analysis_complete = False
-
-        # 스톡 분석 상태 출력
-        await ctx.send(f"Stock analysis complete for {stock_name}: {stock_analysis_complete}")
+        stock_analysis_complete = config.is_stock_analysis_complete(stock_name)
 
         if stock_analysis_complete:
-            await ctx.send(f"Stock analysis for {stock_name} is already complete. Skipping...")
-            continue
+            await ctx.send(f"Stock analysis for {stock_name} is already complete. Displaying results.")
+        else:
+            await ctx.send(f'Stock analysis for {stock_name} is not complete. Proceeding with analysis.')
+            try:
+                # Analysis logic
+                await backtest_and_send(ctx, stock_name, 'modified_monthly', bot)
+            except Exception as e:
+                await ctx.send(f'An error occurred while processing {stock_name}: {e}')
+                print(f'Error processing {stock_name}: {e}')
 
-        await ctx.send(f'Processing stock: {stock_name}')
+        # Display results
         try:
-            # 백테스팅 및 결과 플로팅
-            await backtest_and_send(ctx, stock_name, 'modified_monthly', bot)
-            if is_valid_stock(stock_name):
-                try:
-                    plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
-                except KeyError as e:
-                    await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
-                    print(f"Error plotting {stock_name}: {e}")
-                # 파일 이동
-                await move_files_to_images_folder()
-                await ctx.send(f'Completing stock: {stock_name}')
-            await asyncio.sleep(20)
+            plot_comparison_results(stock_name, config.START_DATE, config.END_DATE)
+            plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
+            await ctx.send(f'Results for {stock_name} displayed successfully.')
         except Exception as e:
-            await ctx.send(f'An error occurred while processing {stock_name}: {e}')
-            print(f'Error processing {stock_name}: {e}')
+            await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
+            print(f"Error plotting {stock_name}: {e}")
 
+        await asyncio.sleep(20)
 
 @bot.command()
 async def gemini(ctx, *, query: str = None):
@@ -134,15 +131,17 @@ async def gemini(ctx, *, query: str = None):
 
         if gemini_analysis_complete:
             report_file = f'report_{ticker}.txt'
-            destination_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
-            report_file_path = os.path.join(destination_dir, report_file)
+            report_file_url = f"{GITHUB_RAW_BASE_URL}/{report_file}"
 
-            if os.path.exists(report_file_path):
-                with open(report_file_path, 'r', encoding='utf-8') as file:
-                    report_text = file.read()
+            print(f"URL to the report file: {report_file_url}")
+
+            try:
+                response = requests.get(report_file_url)
+                response.raise_for_status()
+                report_text = response.text
                 await send_report_to_discord(report_text, ticker)
-            else:
-                await ctx.send(f"No existing report found for {ticker}.")
+            except requests.exceptions.RequestException as e:
+                await ctx.send(f"Error retrieving report for {ticker}: {e}")
         else:
             try:
                 result = await analyze_with_gemini(ticker)
@@ -151,7 +150,6 @@ async def gemini(ctx, *, query: str = None):
                 error_message = f'An error occurred while analyzing {ticker} with Gemini: {str(e)}'
                 await ctx.send(error_message)
                 print(error_message)
-
 
 @bot.command()
 async def buddy(ctx, *, query: str = None):
@@ -233,6 +231,7 @@ if __name__ == '__main__':
     
     # 봇 실행
     asyncio.run(run_bot())
+
 
 
 #  .\.venv\Scripts\activate
