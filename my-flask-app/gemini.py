@@ -183,35 +183,33 @@ load_dotenv()
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
 
-async def send_report_to_discord(report_text, ticker):
+async def send_report_to_discord(ticker):
     """기존에 생성된 보고서를 Discord로 전송합니다."""
     try:
+        report_file_url = f"{GITHUB_RAW_BASE_URL}/report_{ticker}.txt"
+        response = requests.get(report_file_url)
+        response.raise_for_status()
+        report_text = response.text
         success_message = f"Existing Gemini Analysis for {ticker}:\n{report_text}"
         print(success_message)
         requests.post(DISCORD_WEBHOOK_URL, data={'content': success_message})
+    except requests.exceptions.RequestException as e:
+        error_message = f"Error retrieving report for {ticker}: {e}"
+        print(error_message)
+        requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
     except Exception as e:
         error_message = f"Error sending report to Discord: {e}"
         print(error_message)
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
 
+
 if __name__ == '__main__':
     ticker = 'NVDA'
-    report_file_url = f"{GITHUB_RAW_BASE_URL}/report_{ticker}.txt"
-
-    try:
-        response = requests.get(report_file_url)
-        response.raise_for_status()
-        report_text = response.text
-        
-        # 읽어온 report_text를 Discord로 전송
-        asyncio.run(send_report_to_discord(report_text, ticker))
-    except requests.exceptions.RequestException as e:
-        print(f"Error retrieving report file for ticker {ticker}: {e}")
-    except Exception as e:
-        print(f"Error processing report file for ticker {ticker}: {e}")
+    asyncio.run(send_report_to_discord(ticker))
 
 
-    analyze_with_gemini(ticker)
+
+
 # source .venv/bin/activate
 # python gemini.py     
  

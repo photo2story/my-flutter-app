@@ -1,4 +1,5 @@
 # bot.py
+# bot.py
 import os
 import sys
 import asyncio
@@ -24,7 +25,7 @@ from Results_plot_mpl import plot_results_mpl
 from github_operations import ticker_path
 from backtest_send import backtest_and_send
 from get_ticker import is_valid_stock
-from gemini import analyze_with_gemini
+from gemini import analyze_with_gemini, send_report_to_discord
 from gpt import analyze_with_gpt
 from get_compare_stock_data import save_simplified_csv, read_and_process_csv  # 추가된 부분
 
@@ -35,6 +36,8 @@ CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
 H_APIKEY = os.getenv('H_APIKEY')
 H_SECRET = os.getenv('H_SECRET')
 H_ACCOUNT = os.getenv('H_ACCOUNT')
+
+GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -68,24 +71,6 @@ async def buddy_loop():
 processed_message_ids = set()
 
 @bot.command()
-async def start_buddy_loop(ctx):
-    """Starts the buddy loop task."""
-    if not buddy_loop.is_running():
-        buddy_loop.start()
-        await ctx.send("Buddy loop started.")
-    else:
-        await ctx.send("Buddy loop is already running.")
-
-@bot.command()
-async def stop_buddy_loop(ctx):
-    """Stops the buddy loop task."""
-    if buddy_loop.is_running():
-        buddy_loop.stop()
-        await ctx.send("Buddy loop stopped.")
-    else:
-        await ctx.send("Buddy loop is not running.")
-
-@bot.command()
 async def stock(ctx, *, query: str = None):
     if query:
         stock_names = [query.upper()]
@@ -93,34 +78,29 @@ async def stock(ctx, *, query: str = None):
         stock_names = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
 
     for stock_name in stock_names:
-        # stock_analysis_complete = config.is_stock_analysis_complete(stock_name)
-        stock_analysis_complete = False
-
-        # 스톡 분석 상태 출력
-        await ctx.send(f"Stock analysis complete for {stock_name}: {stock_analysis_complete}")
+        stock_analysis_complete = config.is_stock_analysis_complete(stock_name)
 
         if stock_analysis_complete:
-            await ctx.send(f"Stock analysis for {stock_name} is already complete. Skipping...")
-            continue
+            await ctx.send(f"Stock analysis for {stock_name} is already complete. Displaying results.")
+        else:
+            await ctx.send(f'Stock analysis for {stock_name} is not complete. Proceeding with analysis.')
+            try:
+                # Analysis logic
+                await backtest_and_send(ctx, stock_name, 'modified_monthly', bot)
+            except Exception as e:
+                await ctx.send(f'An error occurred while processing {stock_name}: {e}')
+                print(f'Error processing {stock_name}: {e}')
 
-        await ctx.send(f'Processing stock: {stock_name}')
+        # Display results
         try:
-            # 백테스팅 및 결과 플로팅
-            await backtest_and_send(ctx, stock_name, 'modified_monthly', bot)
-            if is_valid_stock(stock_name):
-                try:
-                    plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
-                except KeyError as e:
-                    await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
-                    print(f"Error plotting {stock_name}: {e}")
-                # 파일 이동
-                await move_files_to_images_folder()
-                await ctx.send(f'Completing stock: {stock_name}')
-            await asyncio.sleep(20)
+            plot_comparison_results(stock_name, config.START_DATE, config.END_DATE)
+            plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
+            await ctx.send(f'Results for {stock_name} displayed successfully.')
         except Exception as e:
-            await ctx.send(f'An error occurred while processing {stock_name}: {e}')
-            print(f'Error processing {stock_name}: {e}')
+            await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
+            print(f"Error plotting {stock_name}: {e}")
 
+        await asyncio.sleep(20)
 
 @bot.command()
 async def gemini(ctx, *, query: str = None):
@@ -129,31 +109,30 @@ async def gemini(ctx, *, query: str = None):
     else:
         tickers = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
 
-    for ticker in tickers:
+    for ticker in tickers: 
+        # 1) 제미니 분석 리포트 유효성 확인
         gemini_analysis_complete = config.is_gemini_analysis_complete(ticker)
 
-        if gemini_analysis_complete:
-            report_file = f'report_{ticker}.txt'
-            report_file_url = f"{GITHUB_RAW_BASE_URL}/{report_file}"
-
-            print(f"URL to the report file: {report_file_url}")
-
-            try:
-                response = requests.get(report_file_url)
-                response.raise_for_status()
-                report_text = response.text
-                await send_report_to_discord(report_text, ticker)
-            except requests.exceptions.RequestException as e:
-                await ctx.send(f"Error retrieving report for {ticker}: {e}")
-        else:
+        if not gemini_analysis_complete: # 1.1) 유효하지 않다면 분석 실행
+            await ctx.send(f'Gemini analysis for {ticker} is not complete. Proceeding with analysis.')
             try:
                 result = await analyze_with_gemini(ticker)
                 await ctx.send(result)
             except Exception as e:
-                error_message = f'An error occurred while analyzing {ticker} with Gemini: {str(e)}'
+                error_message = f'An error occurred while analyzing {ticker} with Gemini: {e}'
                 await ctx.send(error_message)
-                print(error_message)
+                print(f'Error analyzing {ticker} with Gemini: {e}')
+                continue  # 다음 티커로 넘어감
 
+        # 2) 레포트 전송
+        try:
+            await send_report_to_discord(ticker)
+            await ctx.send(f'Results for {ticker} displayed successfully.')
+        except Exception as e:
+            await ctx.send(f"Error displaying results for {ticker}: {e}")
+            print(f"Error displaying results for {ticker}: {e}")
+
+        await asyncio.sleep(20)  # 각 티커 처리 사이에 20초 대기
 
 
 @bot.command()
@@ -163,24 +142,14 @@ async def buddy(ctx, *, query: str = None):
     else:
         stock_names = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
 
-    # stock 명령 실행
     for stock_name in stock_names:
-        stock_analysis_complete = config.is_stock_analysis_complete(stock_name)
-        gemini_analysis_complete = config.is_gemini_analysis_complete(stock_name)
+        # stock 명령 호출
+        await ctx.invoke(bot.get_command("stock"), query=stock_name)
+        await asyncio.sleep(10)  # 각 명령 호출 사이에 10초 대기
 
-        # 주식 분석 상태 출력
-        await ctx.send(f"Stock analysis complete for {stock_name}: {stock_analysis_complete}")
-
-        if not stock_analysis_complete:
-            await ctx.invoke(bot.get_command("stock"), query=stock_name)
-            await asyncio.sleep(10)
-
-        # 제미니 분석 상태 출력
-        await ctx.send(f"Gemini analysis complete for {stock_name}: {gemini_analysis_complete}")
-
-        if not gemini_analysis_complete:
-            await ctx.invoke(bot.get_command("gemini"), query=stock_name)
-
+        # gemini 명령 호출
+        await ctx.invoke(bot.get_command("gemini"), query=stock_name)
+        await asyncio.sleep(10)  # 각 명령 호출 사이에 10초 대기
 
 @bot.command()
 async def ticker(ctx, *, query: str = None):

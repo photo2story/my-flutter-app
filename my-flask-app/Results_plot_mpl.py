@@ -2,141 +2,91 @@
 ## Results_plot_mpl.py
 
 
-import yfinance as yf
 import matplotlib.pyplot as plt
 from mplchart.chart import Chart
-from mplchart.primitives import Candlesticks, Volume, TradeMarker, TradeSpan
-from mplchart.indicators import SMA, EMA, RSI, MACD, PPO
-import yfinance as yf
-import pandas_ta as ta
+from mplchart.primitives import Candlesticks, Volume, TradeSpan
+from mplchart.indicators import SMA, PPO, RSI
 import pandas as pd
 import requests
-import numpy as np
 import FinanceDataReader as fdr
-from datetime import datetime
-from get_ticker import get_ticker_name, get_ticker_market, is_valid_stock
-from tradingview_ta import TA_Handler, Interval, Exchange
+from get_ticker import get_ticker_name
+import os
+from dotenv import load_dotenv
 
-import os, sys
-from github_operations import save_csv_to_github, save_image_to_github, ticker_path # ticker_path=stock_market.csv 파일 경로
-NaN = np.nan
-
-def convert_file_path_for_saving(file_path):
-  return file_path.replace('/', '-')
-
-def convert_file_path_for_reading(file_path):
-  return file_path.replace('-', '/')
+# 환경 변수 로드
+load_dotenv()
+DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 def save_figure(fig, file_path):
-  file_path = convert_file_path_for_saving(file_path)
-  fig.savefig(file_path)
-  plt.close(fig)  # 닫지 않으면 메모리를 계속 차지할 수 있음
+    """파일 경로를 처리하여 그림을 저장하고 닫습니다."""
+    file_path = file_path.replace('/', '-')
+    fig.savefig(file_path, bbox_inches='tight')
+    plt.close(fig)
 
-def get_tradingview_analysis(ticker):
-  # tv_symbol = f"{ticker.upper()}/USD"  # 트레이딩뷰에서 사용하는 심볼 형식
-  market = get_ticker_market(ticker, ticker_path) # file_path='stock_market.csv'
-  if market == 'KRX':
-    screener = "korea"
-  elif market == 'UPBIT' or market == 'BINANCE' :   
-    screener = "crypto"
-  else:   
-    screener = "america"
-
-  print(market)
-
-  tv_handler = TA_Handler(
-      symbol = ticker,
-      exchange = market,  # 해당 거래소로 설정
-      screener = screener,  # 예: "america" 또는 "crypto"
-      interval = Interval.INTERVAL_1_DAY,
-  )
-  tv_analysis = tv_handler.get_analysis().summary
-  return tv_analysis
-
-def plot_results_mpl(ticker,start_date, end_date):
-    # print(plt.style.available)
-
-    # ticker = 'AAPL'
-    prices = fdr.DataReader(ticker,start_date, end_date)
-    # print(prices)
-    max_bars = 250
+def plot_results_mpl(ticker, start_date, end_date):
+    """주어진 티커와 기간에 대한 데이터를 사용하여 차트를 생성하고, 결과를 Discord로 전송합니다."""
+    prices = fdr.DataReader(ticker, start_date, end_date)
     prices.dropna(inplace=True)
 
-    # Calculate SMA 20 and SMA 60
+    # 이동 평균과 PPO 계산
     SMA20 = prices['Close'].rolling(window=20).mean()
-    # print(SMA20)
     SMA60 = prices['Close'].rolling(window=60).mean()
-
-    # Define window spans for calculations
-    short_window = 12
-    long_window = 26
-    signal_window = 9
-
-    # 각 행에 대한 단기 및 장기 EMA 계산
-    short_ema = prices['Close'].ewm(span=short_window, adjust=False).mean()
-    long_ema = prices['Close'].ewm(span=long_window, adjust=False).mean()
-    # 각 행에 대한 PPO 계산
+    short_ema = prices['Close'].ewm(span=12, adjust=False).mean()
+    long_ema = prices['Close'].ewm(span=26, adjust=False).mean()
     ppo = ((short_ema - long_ema) / long_ema) * 100
-    # 각 행에 대한 PPO 시그널 계산
-    ppo_signal = ppo.ewm(span=signal_window, adjust=False).mean()
-    # 히스토그램 계산
+    ppo_signal = ppo.ewm(span=9, adjust=False).mean()
     ppo_histogram = ppo - ppo_signal
 
-    # Calculate PPO Histogram with error handling
-    try:
-        ppo_histogram = ppo - ppo_signal
-    except TypeError as e:
-        print(f"Error calculating PPO Histogram: {e}")
-        ppo_histogram = pd.Series(np.zeros(len(ppo)), index=ppo.index)  # Fallback to a series of zeros
-
+    # 차트 생성
     indicators = [
-      Candlesticks(), SMA(20), SMA(60), Volume(),
-      RSI(), PPO(), TradeSpan('ppohist>0')
+        Candlesticks(), SMA(20), SMA(60), Volume(),
+        RSI(), PPO(), TradeSpan('ppohist>0')
     ]
-
-    # 티커 이름 가져오기
     name = get_ticker_name(ticker)
-    
-    # 차트 제목을 티커 이름과 함께 설정
-    chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=max_bars)
+    chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=250)
     chart.plot(prices, indicators)
-
     fig = chart.figure
+    image_filename = f'result_mpl_{ticker}.png'
+    save_figure(fig, image_filename)
 
-    # 그래프를 PNG 파일로 저장
-    save_figure(fig, 'result_mpl_{}.png'.format(ticker))
-    
-    # Discord로 이미지 전송
-    import requests
+    # 메시지 작성
+    message = (f"Stock: {ticker} ({name})\n"
+               f"Close: {prices['Close'].iloc[-1]:,.2f}\n"
+               f"SMA 20: {SMA20.iloc[-1]:,.2f}\n"
+               f"SMA 60: {SMA60.iloc[-1]:,.2f}\n"
+               f"PPO Histogram: {ppo_histogram.iloc[-1]:,.2f}\n")
 
-    # Discord로 이미지 전송
-    DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-
-    # 결과 메시지 전송
-    message = f"Stock: {ticker} ({name})\n" \
-              f"Close: {prices['Close'].iloc[-1]:,.2f}\n" \
-              f"SMA 20: {SMA20.iloc[-1]:,.2f}\n" \
-              f"SMA 60: {SMA60.iloc[-1]:,.2f}\n" \
-              f"PPO Histogram: {ppo_histogram.iloc[-1]:,.2f}\n" \
-              # f"트레이딩뷰 BUY: {tv_analysis['BUY']}, NEUTRAL: {tv_analysis['NEUTRAL']}, SELL: {tv_analysis['SELL']}"
+    # Discord로 메시지 전송
     response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
     if response.status_code != 204:
-       print('Discord 메시지 전송 실패')
+        print('Discord 메시지 전송 실패')
+        print(f"Response: {response.status_code} {response.text}")
     else:
-       print('Discord 메시지 전송 성공')
+        print('Discord 메시지 전송 성공')
 
-    # 이미지 파일 전송
-    with open(image_filename, 'rb') as image_file:
-        response = requests.post(DISCORD_WEBHOOK_URL, files={'file': image_file})
-        if response.status_code != 204:
-            print(f'Graph 전송 실패: {ticker}')
-        else:
-            print(f'Graph 전송 성공: {ticker}')
-
+    # Discord로 이미지 전송
+    try:
+        with open(image_filename, 'rb') as image_file:
+            response = requests.post(DISCORD_WEBHOOK_URL, files={'file': image_file})
+            if response.status_code in [200, 204]:
+                print(f'Graph 전송 성공: {ticker}')
+            else:
+                print(f'Graph 전송 실패: {ticker}')
+                print(f"Response: {response.status_code} {response.text}")
+    except Exception as e:
+        print(f"Error occurred while sending image: {e}")
 
 if __name__ == "__main__":
-    # 사용 예시
-  ticker ='VOO'
-  start_date = "2022-01-01"
-  end_date = datetime.today().strftime('%Y-%m-%d')  # 오늘 날짜 문자열로 변환하기
-  plot_results_mpl(ticker,start_date , end_date)
+    print("Starting test for plotting results.")
+    ticker = "AAPL"
+    start_date = "2019-01-02"
+    end_date = "2024-07-28"
+    print(f"Plotting results for {ticker} from {start_date} to {end_date}")
+
+    try:
+        plot_results_mpl(ticker, start_date, end_date)
+        print("Plotting completed successfully.")
+    except Exception as e:
+        print(f"Error occurred while plotting results: {e}")
+
+## Results_plot_mpl.py
