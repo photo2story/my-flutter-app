@@ -134,15 +134,17 @@ async def gemini(ctx, *, query: str = None):
 
         if gemini_analysis_complete:
             report_file = f'report_{ticker}.txt'
-            destination_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
-            report_file_path = os.path.join(destination_dir, report_file)
+            report_file_url = f"{GITHUB_RAW_BASE_URL}/{report_file}"
 
-            if os.path.exists(report_file_path):
-                with open(report_file_path, 'r', encoding='utf-8') as file:
-                    report_text = file.read()
+            print(f"URL to the report file: {report_file_url}")
+
+            try:
+                response = requests.get(report_file_url)
+                response.raise_for_status()
+                report_text = response.text
                 await send_report_to_discord(report_text, ticker)
-            else:
-                await ctx.send(f"No existing report found for {ticker}.")
+            except requests.exceptions.RequestException as e:
+                await ctx.send(f"Error retrieving report for {ticker}: {e}")
         else:
             try:
                 result = await analyze_with_gemini(ticker)
@@ -151,6 +153,7 @@ async def gemini(ctx, *, query: str = None):
                 error_message = f'An error occurred while analyzing {ticker} with Gemini: {str(e)}'
                 await ctx.send(error_message)
                 print(error_message)
+
 
 
 @bot.command()
