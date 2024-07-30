@@ -214,6 +214,7 @@ if __name__ == '__main__':
 # docker push asia.gcr.io/my-flask-app-429017/bot
 # gcloud run deploy bot --image asia.gcr.io/my-flask-app-429017/bot --platform managed --region asia-northeast3 --allow-unauthenticated
 """
+원격저장소 내용으로 강제 업데이
 git fetch origin
 git checkout main
 git reset --hard origin/main
