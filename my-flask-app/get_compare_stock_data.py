@@ -90,7 +90,10 @@ async def collect_relative_divergence():
             print(f"Data for {ticker} is not available or missing 'Relative_Divergence' column.")
     
     # 결과를 CSV 파일로 저장
-    results.to_csv('collected_relative_divergence.csv', index=False)
+    folder_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
+    collect_relative_divergence_path = os.path.join(folder_path, f'collected_relative_divergence.csv')
+    results.to_csv(collect_relative_divergence_path, index=False)
+
     print(results)
     
     # 파일 이동 및 깃 커밋 푸시 작업
