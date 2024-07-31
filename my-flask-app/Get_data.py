@@ -101,7 +101,7 @@ def get_stock_data(ticker, start_date, end_date):
 
     # 데이터 프레임에서 최소 날짜를 얻습니다.
     min_stock_data_date = stock_data.index.min()
-    # print(stock_data)
+    print(stock_data)
     return stock_data, min_stock_data_date
 
 def get_price_info(ticker):

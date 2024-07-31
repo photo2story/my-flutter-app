@@ -7,12 +7,13 @@ import os
 from datetime import datetime
 import pandas as pd
 from git_operations import move_files_to_images_folder  # 함수 임포트 추가
+import config  # config 파일 임포트 추가
 
-async def estimate_stock(stock, start_date, end_date, initial_investment, monthly_investment, option_strategy):
+async def estimate_stock(stock, option_strategy):
     stock_data, min_stock_data_date = get_stock_data(stock, start_date, end_date)
     print('estimate_stock.1:', stock)
     
-    result_dict = My_strategy.my_strategy(stock_data, initial_investment, monthly_investment, option_strategy)
+    result_dict = My_strategy.my_strategy(stock_data, option_strategy)
 
     total_account_balance = result_dict['Total_account_balance']
     invested_amount = result_dict['Invested_amount']
@@ -28,14 +29,15 @@ async def estimate_stock(stock, start_date, end_date, initial_investment, monthl
     print('estimate_stock:', stock)
 
     # 파일 이동 및 깃헙 커밋/푸시
-    await move_files_to_images_folder()
+    # await move_files_to_images_folder()
 
-    return total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df
+    return result_df
 
-async def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investment, monthly_investment, option_strategy, result_df):
-    stock_data, min_stock_data_date = get_stock_data(stock2, min_stock_data_date, end_date)
+async def estimate_snp(stock1, stock2, option_strategy, result_df):
+    stock_data = get_stock_data(stock2)
 
-    result_dict2 = My_strategy.my_strategy(stock_data, initial_investment, monthly_investment, option_strategy)
+    result_dict2 = My_strategy.my_strategy(stock_data, option_strategy)
+
     # 결과 CSV 파일로 저장하기
     safe_ticker = stock1.replace('/', '-')
     file_path = 'result_VOO_{}.csv'.format(safe_ticker)  # VOO_TSLA(stock1).csv
@@ -53,7 +55,6 @@ async def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_in
     combined_df.to_csv(file_path, float_format='%.2f', index=False)
 
     # 파일 이동 및 깃헙 커밋/푸시
-    await move_files_to_images_folder()
+    # await move_files_to_images_folder()
 
-    return file_path
-
+    return file_path # 파일 경로 반환 'result_VOO_{stock1}.csv'

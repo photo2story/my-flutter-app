@@ -12,6 +12,7 @@ from datetime import datetime  # 추가된 부분
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from git_operations import move_files_to_images_folder
 from get_earning import get_recent_eps_and_revenue
 from get_earning_fmp import get_recent_eps_and_revenue_fmp

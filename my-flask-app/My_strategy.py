@@ -4,6 +4,8 @@ from typing import Union, Any
 import requests 
 import yaml
 import os, sys
+import pandas_ta as ta
+import pandas as pd
 
 # 경로 설정
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -14,13 +16,14 @@ from Strategy_buy import strategy_buy
 from get_signal import calculate_ppo_buy_sell_signals
 import config  # config.py 모듈 임포트
 
-def my_strategy(stock_data, initial_investment, monthly_investment, option_strategy):
+def my_strategy(stock_data, option_strategy):
     result = [] # 거래 결과를 초기화, 저장하는 용도
     # Initialize variables
     portfolio_value = 0 # 계좌 잔고
-    cash = initial_investment # 현금
+    cash = config.INITIAL_INVESTMENT # 현금
     deposit = 0 # 보관금,
-    invested_amount = initial_investment
+    invested_amount = 0
+    monthly_investment = config.MONTHLY_INVESTMENT
     account_balance = 0
     shares = 0
     recent_high = 0
@@ -157,35 +160,14 @@ def my_strategy(stock_data, initial_investment, monthly_investment, option_strat
             signal, rsi_ta, stochk_ta, stochd_ta, stock_ticker
         ])
 
-        if signal != '':
-            recent_signal = current_date.strftime('%Y-%m-%d') + ":" + signal
-        signal = ''
+    # result 리스트를 데이터프레임으로 변환하여 반환
+    result_df = pd.DataFrame(result, columns=[
+        'Date', 'price', 'Open', 'High', 'Low', 'Close', 'Volume', 
+        'bb_upper_ta', 'bb_lower_ta', 'sma05_ta', 'sma20_ta', 'sma60_ta', 'sma120_ta', 
+        'sma240_ta', 'Recent_high', 'aroon_up_ta', 'aroon_down_ta', 'ppo_histogram', 
+        'SMA_20_turn', 'SMA_60_turn', 'Recent_low', 'account_balance', 
+        'deposit', 'cash', 'portfolio_value', 'shares', 'rate', 'invested_amount', 
+        'signal', 'rsi_ta', 'stochk_ta', 'stochd_ta', 'stock_ticker'
+    ])
 
-        if current_date.weekday() == 0 and current_date >= first_trading_day:
-            first_trading_day = current_date + datetime.timedelta(days=7)
-            Invest_day = False
-
-    last_signal = {
-        "recent_signal": recent_signal,
-        "PPO Buy Signal": PPO_BUY,
-        "PPO Sell Signal": PPO_SELL,
-    }
-
-    total_account_balance = account_balance
-    total_rate = rate
-
-    last_signal_str = str(last_signal)
-    recent_signal = str(recent_signal)
-
-    result_dict = {
-        'result': result,
-        'Total_account_balance': total_account_balance,
-        'Total_rate': total_rate,
-        'Last_signal': last_signal,
-        'Strategy': recent_signal,
-        'Invested_amount': invested_amount
-    }
-
-    return result_dict
-
-
+    return result_df
