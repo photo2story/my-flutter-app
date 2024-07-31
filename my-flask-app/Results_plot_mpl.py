@@ -9,9 +9,14 @@ from mplchart.indicators import SMA, PPO, RSI
 import pandas as pd
 import requests
 import FinanceDataReader as fdr
-from get_ticker import get_ticker_name
-import os
+import os,sys
 from dotenv import load_dotenv
+import asyncio
+
+# 루트 디렉토리를 sys.path에 추가
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from git_operations import move_files_to_images_folder
+from get_ticker import get_ticker_name
 
 # 환경 변수 로드
 load_dotenv()
@@ -23,7 +28,7 @@ def save_figure(fig, file_path):
     fig.savefig(file_path, bbox_inches='tight')
     plt.close(fig)
 
-def plot_results_mpl(ticker, start_date, end_date):
+async def plot_results_mpl(ticker, start_date, end_date):
     """주어진 티커와 기간에 대한 데이터를 사용하여 차트를 생성하고, 결과를 Discord로 전송합니다."""
     prices = fdr.DataReader(ticker, start_date, end_date)
     prices.dropna(inplace=True)
@@ -73,20 +78,29 @@ def plot_results_mpl(ticker, start_date, end_date):
             else:
                 print(f'Graph 전송 실패: {ticker}')
                 print(f"Response: {response.status_code} {response.text}")
+                
+        await move_files_to_images_folder()              
     except Exception as e:
         print(f"Error occurred while sending image: {e}")
 
 if __name__ == "__main__":
     print("Starting test for plotting results.")
-    ticker = "AAPL"
+    ticker = "TSLA"
     start_date = "2019-01-02"
     end_date = "2024-07-28"
     print(f"Plotting results for {ticker} from {start_date} to {end_date}")
 
     try:
-        plot_results_mpl(ticker, start_date, end_date)
+        asyncio.run(plot_results_mpl(ticker, '2021-01-01', '2021-12-31'))
         print("Plotting completed successfully.")
     except Exception as e:
         print(f"Error occurred while plotting results: {e}")
 
-## Results_plot_mpl.py
+
+"""
+python3 -m venv .venv
+source .venv/bin/activate
+.\.venv\Scripts\activate
+cd my-flask-app
+python Results_plot_mpl.py
+"""
