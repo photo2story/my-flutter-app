@@ -6,8 +6,9 @@ from Data_export import export_csv
 import os
 from datetime import datetime
 import pandas as pd
+from git_operations import move_files_to_images_folder  # 함수 임포트 추가
 
-def estimate_stock(stock, start_date, end_date, initial_investment, monthly_investment, option_strategy):
+async def estimate_stock(stock, start_date, end_date, initial_investment, monthly_investment, option_strategy):
     stock_data, min_stock_data_date = get_stock_data(stock, start_date, end_date)
     print('estimate_stock.1:', stock)
     
@@ -26,9 +27,12 @@ def estimate_stock(stock, start_date, end_date, initial_investment, monthly_inve
     result_df = export_csv(file_path, result_dict)
     print('estimate_stock:', stock)
 
+    # 파일 이동 및 깃헙 커밋/푸시
+    await move_files_to_images_folder()
+
     return total_account_balance, total_rate, str_strategy, invested_amount, str_last_signal, min_stock_data_date, file_path, result_df
 
-def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investment, monthly_investment, option_strategy, result_df):
+async def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investment, monthly_investment, option_strategy, result_df):
     stock_data, min_stock_data_date = get_stock_data(stock2, min_stock_data_date, end_date)
 
     result_dict2 = My_strategy.my_strategy(stock_data, initial_investment, monthly_investment, option_strategy)
@@ -47,6 +51,9 @@ def estimate_snp(stock1, stock2, min_stock_data_date, end_date, initial_investme
     combined_df = result_df.join(result_df2['rate_vs'])
     combined_df.fillna(0, inplace=True)  # 누락된 값을 0으로 채우기
     combined_df.to_csv(file_path, float_format='%.2f', index=False)
+
+    # 파일 이동 및 깃헙 커밋/푸시
+    await move_files_to_images_folder()
 
     return file_path
 
