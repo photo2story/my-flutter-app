@@ -248,7 +248,7 @@ app/**/flutter_export_environment.sh
 
 *.csv
 !stock_market.csv
-!result_*.csv
+!result*.csv
 !20*.csv
 
 # Chrome Device Default 제외
