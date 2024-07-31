@@ -82,6 +82,8 @@ async def stock(ctx, *, query: str = None):
 
         if stock_analysis_complete:
             await ctx.send(f"Stock analysis for {stock_name} is already complete. Displaying results.")
+            await backtest_and_send(ctx, stock_name, 'modified_monthly', bot)
+
         else:
             await ctx.send(f'Stock analysis for {stock_name} is not complete. Proceeding with analysis.')
             try:
