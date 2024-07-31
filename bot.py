@@ -38,6 +38,7 @@ H_SECRET = os.getenv('H_SECRET')
 H_ACCOUNT = os.getenv('H_ACCOUNT')
 
 GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images"
+CSV_PATH = f"{GITHUB_RAW_BASE_URL}/stock_market.csv"
 
 intents = discord.Intents.default()
 intents.message_content = True
