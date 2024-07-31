@@ -134,7 +134,7 @@ async def gemini(ctx, *, query: str = None):
             await ctx.send(f"Error displaying results for {ticker}: {e}")
             print(f"Error displaying results for {ticker}: {e}")
 
-        await asyncio.sleep(20)  # 각 티커 처리 사이에 20초 대기
+        await asyncio.sleep(5)  # 각 티커 처리 사이에 5초 대기
 
 
 @bot.command()
