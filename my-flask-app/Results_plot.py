@@ -12,12 +12,13 @@ import asyncio
 import time
 from dotenv import load_dotenv
 
-from get_ticker import get_ticker_name, is_valid_stock
-from Results_plot_mpl import plot_results_mpl
+import asyncio
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from git_operations import move_files_to_images_folder
+from get_ticker import get_ticker_name, is_valid_stock
+from Results_plot_mpl import plot_results_mpl
 
 # 환경 변수 로드
 load_dotenv()
@@ -42,7 +43,7 @@ def load_image(file_path):
     image = Image.open(file_path)
     return image
 
-def plot_comparison_results(ticker, start_date, end_date):
+async def plot_comparison_results(ticker, start_date, end_date):
     stock2 ='VOO'
     fig, ax2 = plt.subplots(figsize=(8, 6))
 
@@ -126,23 +127,25 @@ def plot_comparison_results(ticker, start_date, end_date):
             else:
                 print(f'Graph 전송 실패: {ticker}')
                 print(f"Response: {response.status_code} {response.text}")
+        await move_files_to_images_folder()              
+    
     except Exception as e:
         print(f"Error occurred while sending image: {e}")
 
 
 if __name__ == "__main__":
     print("Starting test for plotting results.")
-    stock1 = "AAPL"
+    ticker = "TSLA"
     start_date = "2019-01-02"
     end_date = "2024-07-28"
-    print(f"Plotting results for {stock1} from {start_date} to {end_date}")
+    print(f"Plotting results for {ticker} from {start_date} to {end_date}")
 
     try:
-        plot_comparison_results(stock1, start_date, end_date)
+        asyncio.run(plot_comparison_results(ticker, '2021-01-01', '2021-12-31'))
         print("Plotting completed successfully.")
     except Exception as e:
         print(f"Error occurred while plotting results: {e}")
-
-
-    # python Results_plot.py
+        
+        
+# python Results_plot.py
 
