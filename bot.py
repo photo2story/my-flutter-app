@@ -208,13 +208,16 @@ if __name__ == '__main__':
     asyncio.run(run_bot())
 
 
-#  .\.venv\Scripts\activate
-# source .venv/bin/activate
-# #  python bot.py   
-# docker build -t asia.gcr.io/my-flask-app-429017/bot .
-# docker push asia.gcr.io/my-flask-app-429017/bot
-# gcloud run deploy bot --image asia.gcr.io/my-flask-app-429017/bot --platform managed --region asia-northeast3 --allow-unauthenticated
 """
+
+.\.venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate
+python bot.py   
+docker build -t asia.gcr.io/my-flask-app-429017/bot .
+docker push asia.gcr.io/my-flask-app-429017/bot
+gcloud run deploy bot --image asia.gcr.io/my-flask-app-429017/bot --platform managed --region asia-northeast3 --allow-unauthenticated
+
 원격저장소 내용으로 강제 업데이트
 git fetch origin
 git checkout main
