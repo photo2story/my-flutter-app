@@ -95,8 +95,8 @@ async def stock(ctx, *, query: str = None):
 
         # Display results
         try:
-            plot_comparison_results(stock_name, config.START_DATE, config.END_DATE)
-            plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
+            await plot_comparison_results(stock_name, config.START_DATE, config.END_DATE)
+            await plot_results_mpl(stock_name, config.START_DATE, config.END_DATE)
             await ctx.send(f'Results for {stock_name} displayed successfully.')
         except Exception as e:
             await ctx.send(f"An error occurred while plotting {stock_name}: {e}")
