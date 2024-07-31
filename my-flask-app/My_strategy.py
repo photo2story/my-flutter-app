@@ -22,7 +22,7 @@ def my_strategy(stock_data, option_strategy):
     portfolio_value = 0 # 계좌 잔고
     cash = config.INITIAL_INVESTMENT # 현금
     deposit = 0 # 보관금,
-    invested_amount = 0
+    invested_amount = config.INITIAL_INVESTMENT
     monthly_investment = config.MONTHLY_INVESTMENT
     account_balance = 0
     shares = 0
