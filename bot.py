@@ -151,7 +151,8 @@ async def buddy(ctx, *, query: str = None):
         # gemini 명령 호출
         await ctx.invoke(bot.get_command("gemini"), query=stock_name)
         await asyncio.sleep(5)  # 각 명령 호출 사이에 10초 대기
-
+        print(f'Results for {ticker} displayed successfully.')
+        
 @bot.command()
 async def ticker(ctx, *, query: str = None):
     print(f'Command received: ticker with query: {query}')
