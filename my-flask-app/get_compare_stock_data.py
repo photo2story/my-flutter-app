@@ -91,7 +91,7 @@ async def collect_relative_divergence():
     
     # 결과를 CSV 파일로 저장
     folder_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
-    collect_relative_divergence_path = os.path.join(folder_path, f'collected_relative_divergence.csv')
+    collect_relative_divergence_path = os.path.join(folder_path, f'results_relative_divergence.csv')
     results.to_csv(collect_relative_divergence_path, index=False)
 
     print(results)
