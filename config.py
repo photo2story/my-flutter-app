@@ -14,7 +14,7 @@ DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL', 'your_webhook_url_here')
 # Investment and backtest configuration
 START_DATE = os.getenv('START_DATE', '2019-01-02')
 END_DATE = datetime.today().strftime('%Y-%m-%d')
-INITIAL_INVESTMENT = int(os.getenv('INITIAL_INVESTMENT', 30000000))
+INITIAL_INVESTMENT = int(os.getenv('INITIAL_INVESTMENT', 0))
 MONTHLY_INVESTMENT = int(os.getenv('MONTHLY_INVESTMENT', 1000000))
 
 # Data URLs
