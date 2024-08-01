@@ -99,14 +99,21 @@ def my_strategy(stock_data, option_strategy):
             deposit += shares_to_sell * sell_price * 0.5 
             signal = 'sell 50 %' + ' ' + signal
 
-        if Sudden_fall and (SMA_60_turn or PPO_BUY):
-            shares_to_buy_depot = 0.5 * max(0, deposit) // buy_price 
-            shares_to_buy_cash = 1.0 * max(0, cash) // buy_price 
-            shares += shares_to_buy_depot + shares_to_buy_cash 
-            deposit -= shares_to_buy_depot * buy_price 
-            cash -= shares_to_buy_cash * buy_price 
-            signal = 'sudden fall + sma trend rise'
-            Sudden_fall = False
+        if Sudden_fall:
+            # "Sudden Fall" 이후 매수 신호가 발생한 경우에만 매수
+            if SMA_60_turn or PPO_BUY:
+                shares_to_buy_depot = 0.5 * max(0, deposit) // buy_price 
+                shares_to_buy_cash = 1.0 * max(0, cash) // buy_price 
+                shares += shares_to_buy_depot + shares_to_buy_cash 
+                deposit -= shares_to_buy_depot * buy_price 
+                cash -= shares_to_buy_cash * buy_price 
+                signal = 'sudden fall + sma trend rise'
+                Sudden_fall = False
+        elif Invest_day and PPO_BUY:
+            shares_to_buy = 0.5 * min(cash, monthly_investment) // buy_price
+            shares += shares_to_buy
+            cash -= shares_to_buy * buy_price
+            signal = 'weekly trade' + ' ' + signal
 
         if portfolio_value >= 2 * invested_amount and cash > invested_amount and not PPO_BUY:
             shares_to_sell = 0.5 * shares
@@ -137,12 +144,6 @@ def my_strategy(stock_data, option_strategy):
             perform_buy_amount = buy_result
             buy_signal = '' + signal
 
-        if Invest_day and PPO_BUY:
-            shares_to_buy = 0.5 * min(cash, monthly_investment) // buy_price
-            shares += shares_to_buy
-            cash -= shares_to_buy * buy_price
-            signal = 'weekly trade' + ' ' + signal
-
         if Invest_day and perform_buy_amount > 0:
             shares_to_buy = perform_buy_amount * cash // buy_price
             shares += shares_to_buy
@@ -163,7 +164,6 @@ def my_strategy(stock_data, option_strategy):
             deposit, cash, portfolio_value, shares, rate, invested_amount, 
             signal, rsi_ta, stochk_ta, stochd_ta, stock_ticker
         ])
-
     # result 리스트를 데이터프레임으로 변환하여 반환
     result_df = pd.DataFrame(result, columns=[
         'Date', 'price', 'Open', 'High', 'Low', 'Close', 'Volume', 
