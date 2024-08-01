@@ -164,4 +164,14 @@ def my_strategy(stock_data, option_strategy):
             signal, rsi_ta, stochk_ta, stochd_ta, stock_ticker
         ])
 
+    # result 리스트를 데이터프레임으로 변환하여 반환
+    result_df = pd.DataFrame(result, columns=[
+        'Date', 'price', 'Open', 'High', 'Low', 'Close', 'Volume', 
+        'bb_upper_ta', 'bb_lower_ta', 'sma05_ta', 'sma20_ta', 'sma60_ta', 'sma120_ta', 
+        'sma240_ta', 'Recent_high', 'aroon_up_ta', 'aroon_down_ta', 'ppo_histogram', 
+        'SMA_20_turn', 'SMA_60_turn', 'Recent_low', 'account_balance', 
+        'deposit', 'cash', 'portfolio_value', 'shares', 'rate', 'invested_amount', 
+        'signal', 'rsi_ta', 'stochk_ta', 'stochd_ta', 'stock_ticker'
+    ])
+
     return result_df
