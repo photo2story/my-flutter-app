@@ -25,3 +25,4 @@ tradingview_ta
 yfinance
 plotly
 google-cloud-secret-manager
+seaborn
