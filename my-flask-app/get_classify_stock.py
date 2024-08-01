@@ -29,16 +29,10 @@ async def fetch_csv(ticker):
         return None
 
 def classify_stock(rate_avg, divergence_avg, relative_divergence_high_freq):
-    if rate_avg > 50:
-        if divergence_avg > 10:
-            return "HighYieldHighVolatility"
-        else:
-            return "HighYieldLowVolatility"
-    else:
-        if divergence_avg > 10:
-            return "LowYieldHighVolatility"
-        else:
-            return "LowYieldLowVolatility"
+    yield_class = "HighYield" if rate_avg > 50 else "LowYield" if rate_avg < 0 else "MediumYield"
+    volatility_class = "HighVolatility" if divergence_avg > 0 else "LowVolatility" if divergence_avg < 0 else "MediumVolatility"
+    frequency_class = "HighFrequency" if relative_divergence_high_freq > 0.5 else "LowFrequency" if relative_divergence_high_freq < 0.1 else "MediumFrequency"
+    return f"{yield_class}_{volatility_class}_{frequency_class}"
 
 async def collect_and_classify_stocks():
     tickers = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
@@ -46,11 +40,10 @@ async def collect_and_classify_stocks():
     
     for ticker in tickers:
         df = await fetch_csv(ticker)
-        if df is not None and f'rate_{ticker}_5D' in df.columns:
+        if df is not None and f'rate_{ticker}_5D' in df.columns and 'Divergence' in df.columns and 'Relative_Divergence' in df.columns:
             rate_avg = df[f'rate_{ticker}_5D'].mean()
             divergence_avg = df['Divergence'].mean()
-            relative_divergence_high_freq = df[df['Relative_Divergence'] > 50].shape[0] / df.shape[0]
-
+            relative_divergence_high_freq = (df['Relative_Divergence'] > 50).mean()
             category = classify_stock(rate_avg, divergence_avg, relative_divergence_high_freq)
             classification_results = pd.concat([classification_results, pd.DataFrame({'Ticker': [ticker], 'Category': [category]})], ignore_index=True)
         else:
@@ -58,8 +51,8 @@ async def collect_and_classify_stocks():
     
     # 결과를 CSV 파일로 저장
     folder_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'images'))
-    classification_results_path = os.path.join(folder_path, f'classification_results.csv')
-    classification_results.to_csv(classification_results_path, index=False)
+    classify_results_path = os.path.join(folder_path, f'classified_stocks.csv')
+    classification_results.to_csv(classify_results_path, index=False)
 
     print(classification_results)
     
@@ -71,5 +64,7 @@ async def collect_and_classify_stocks():
 if __name__ == "__main__":
     import asyncio
     asyncio.run(collect_and_classify_stocks())
+
+
 
 # python get_classify_stock.py
