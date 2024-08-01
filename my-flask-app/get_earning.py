@@ -1,6 +1,18 @@
 # get_earning.py
+import os
 import requests
 from datetime import datetime
+from dotenv import load_dotenv
+
+# 환경 변수 로드
+load_dotenv()
+API_KEY = os.getenv('FMP_API_KEY')
+DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
+
+if not API_KEY:
+    raise ValueError("API 키가 설정되지 않았습니다. .env 파일을 확인하세요.")
+if not DISCORD_WEBHOOK_URL:
+    raise ValueError("DISCORD 웹훅 URL이 설정되지 않았습니다. .env 파일을 확인하세요.")
 
 def get_cik_by_ticker(ticker):
     search_url = "https://www.sec.gov/include/ticker.txt"
@@ -30,7 +42,7 @@ def get_recent_eps_and_revenue(ticker):
     cik = get_cik_by_ticker(ticker)
     if not cik:
         print(f"Error: CIK not found for ticker {ticker}.")
-        return
+        return None
 
     eps_data = get_financial_data(cik, "EarningsPerShareBasic")
     revenue_data = get_financial_data(cik, "RevenueFromContractWithCustomerExcludingAssessedTax")
@@ -45,7 +57,7 @@ def get_recent_eps_and_revenue(ticker):
 
     if not eps_data:
         print("No EPS data available.")
-        return
+        return None
     
     def extract_data(data, unit_key):
         if data and unit_key in data['units']:
@@ -86,32 +98,68 @@ def get_recent_eps_and_revenue(ticker):
 
     return quarterly_results
 
-if __name__ == '__main__':
-    # 주식 목록
-    STOCKS = {
-        # 'Technology': ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA'], 
-        # 'Financials': ['BAC'],
-        'Consumer Cyclical': ['TSLA', 'NFLX'],
-        # 'Healthcare': ['LLY','UNH'],
-        # 'Communication Services': ['META', 'VZ'],
-        # 'Industrials': ['GE','UPS'],
-        # 'Consumer Defensive': ['WMT', 'KO'],
-        # 'Energy': ['XOM'],
-        # 'Basic Materials': ['LIN','ALB'],
-        # 'Real Estate': ['DHI', 'ADSK'], 
-        # 'Utilities': ['EXC']
-    }
+def get_financial_data_fmp(ticker):
+    url = f'https://financialmodelingprep.com/api/v3/earnings-surprises/{ticker}?apikey={API_KEY}'
+    
+    response = requests.get(url)
+    if response.status_code != 200:
+        print(f"Error retrieving data for {ticker}. Status code: {response.status_code}")
+        return None
+    
+    try:
+        data = response.json()
+        return data
+    except ValueError as e:
+        print('Error parsing JSON:', e)
+        return None
 
-    for sector, tickers in STOCKS.items():
-        for ticker in tickers:
-            print(f"\nAnalyzing {ticker} from sector {sector}")
-            results = get_recent_eps_and_revenue(ticker)
-            if results:
-                print("Quarterly Results:")
-                for end, filed, eps_val, revenue_val in results:
-                    print(f"{end} (Filed: {filed}): EPS {eps_val}, Revenue {revenue_val / 1e9:.2f} B$" if revenue_val is not None else f"{end} (Filed: {filed}): EPS {eps_val}, Revenue: None")
+def get_recent_eps_and_revenue_fmp(ticker):
+    earnings_data = get_financial_data_fmp(ticker)
+    
+    if not earnings_data:
+        print(f"No earnings data found for {ticker}.")
+        return None
+    
+    recent_earnings = []
+    for data in earnings_data[:5]:
+        end_date = data['date']
+        actual_eps = data['actualEarningResult']
+        estimated_eps = data.get('estimatedEarning', 'N/A')
+        revenue = data.get('revenue', 'N/A')
+        estimated_revenue = data.get('estimatedRevenue', 'N/A')
+        
+        if revenue != 'N/A' and estimated_revenue != 'N/A':
+            recent_earnings.append((end_date, actual_eps, estimated_eps, revenue, estimated_revenue))
+        else:
+            recent_earnings.append((end_date, actual_eps, estimated_eps))
+    
+    return recent_earnings
+
+def get_combined_eps_and_revenue(ticker):
+    recent_earnings = get_recent_eps_and_revenue(ticker)
+    if recent_earnings is None or all(entry[3] is None for entry in recent_earnings):
+        print(f"Primary data source failed for {ticker}, attempting secondary source...")
+        recent_earnings = get_recent_eps_and_revenue_fmp(ticker)
+        if recent_earnings is None:
+            raise Exception("No recent earnings data found from secondary source.")
+    return recent_earnings
+
+if __name__ == "__main__":
+    # 테스트 코드
+    ticker = "TSM"
+    results = get_combined_eps_and_revenue(ticker)
+    if results:
+        print("\nQuarterly Results:")
+        for entry in results:
+            if len(entry) == 5:
+                end, actual_eps, estimated_eps, revenue, estimated_revenue = entry
+                print(f"{end}: EPS {actual_eps} (Estimated: {estimated_eps}), Revenue {revenue / 1e9:.2f} B$ (Estimated: {estimated_revenue / 1e9:.2f} B$)")
             else:
-                print(f"No data found for {ticker}")
+                end, actual_eps, estimated_eps = entry
+                print(f"{end}: EPS {actual_eps} (Estimated: {estimated_eps})")
+    else:
+        print("No data found for TSM")
+
 
 
 # python get_earning.py    
