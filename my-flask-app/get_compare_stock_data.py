@@ -10,6 +10,7 @@ import io
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import config
 from git_operations import move_files_to_images_folder  # git_operations 모듈에서 함수 가져오기
 
