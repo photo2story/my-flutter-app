@@ -61,7 +61,7 @@ def get_recent_eps_and_revenue_fmp(ticker):
 
 if __name__ == "__main__":
     # 테스트 코드
-    results = get_recent_eps_and_revenue_fmp("TSM")
+    results = get_recent_eps_and_revenue_fmp("NVDA")
     if results:
         print("\nQuarterly Results:")
         for entry in results:
