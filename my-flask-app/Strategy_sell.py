@@ -11,9 +11,9 @@ def strategy_sell(date_str, rsi_ta, PPO_SELL, stock_ticker, Sudden_fall, option_
     # 날짜 문자열을 datetime 객체로 변환
     date = date_str
 
-    # 매도 전략 적용 기간 설정 (예시: 8월 한 달)
-    sell_start = datetime(date.year, 8, 1)
-    sell_end = datetime(date.year, 8, 30)
+    # 매도 전략 적용 기간 설정 (예시: 5월 한 달)
+    sell_start = datetime(date.year, 5, 1)
+    sell_end = datetime(date.year, 5, 30)
 
     # 초기화
     ta_sell_amount = 0
@@ -42,6 +42,9 @@ def strategy_sell(date_str, rsi_ta, PPO_SELL, stock_ticker, Sudden_fall, option_
     if ta_sell_amount > 0:
         sell_percent = int(ta_sell_amount * 100)
         sell_signal = f'sell {sell_percent}%'
-
+        
+    # 매도 신호 없음(디폴트)
+    ta_sell_amount = 0
+    sell_signal = ''
     return ta_sell_amount, sell_signal, Sudden_fall
 
