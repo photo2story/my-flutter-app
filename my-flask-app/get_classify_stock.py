@@ -4,7 +4,6 @@ import sys
 import pandas as pd
 import requests
 import io
-import seaborn as sns
 import matplotlib.pyplot as plt
 
 # 루트 디렉토리를 sys.path에 추가
@@ -53,7 +52,7 @@ async def collect_and_classify_stocks():
                 frequency = (df['Relative_Divergence'] > 50).mean()
 
                 classification = classify_stock(rate_avg, divergence_avg, frequency)
-                classification_results.append({'Ticker': ticker, 'Classification': classification})
+                classification_results.append({'Ticker': ticker, 'Rate': rate_avg, 'Divergence': divergence_avg, 'Frequency': frequency, 'Classification': classification})
             else:
                 print(f"Data for {ticker} is not available or missing necessary columns.")
         else:
@@ -64,27 +63,26 @@ async def collect_and_classify_stocks():
     print(classification_df)
     
     # 히트맵 생성
-    create_heatmap(classification_df)
+    create_custom_plot(classification_df)
     
     # 파일 이동 및 깃 커밋 푸시 작업
     await move_files_to_images_folder()
 
-def create_heatmap(df):
-    # 각 분류를 count하여 피벗 테이블 생성
-    heatmap_data = df['Classification'].value_counts().reset_index()
-    heatmap_data.columns = ['Classification', 'Counts']
-    heatmap_data_pivot = heatmap_data.pivot(index='Classification', values='Counts', columns='Classification')
-
-    plt.figure(figsize=(10, 6))
-    sns.heatmap(heatmap_data_pivot, annot=True, fmt="d", cmap="YlGnBu", cbar=False)
-    plt.title('Stock Classification Heatmap')
-    plt.ylabel('Classification')
-    plt.xlabel('Counts')
+def create_custom_plot(df):
+    plt.figure(figsize=(12, 8))
+    for index, row in df.iterrows():
+        font_size = 10 + (row['Rate'] / df['Rate'].max()) * 20
+        plt.text(row['Frequency'], row['Divergence'], row['Ticker'], fontsize=font_size, ha='center', va='center')
+    
+    plt.xlabel('Frequency')
+    plt.ylabel('Divergence')
+    plt.title('Stocks Classification: Frequency vs Divergence with Rate Size')
+    plt.grid(True)
+    plt.savefig('stock_classification_plot.png')
     plt.show()
 
 if __name__ == "__main__":
     import asyncio
     asyncio.run(collect_and_classify_stocks())
-
 
 # python get_classify_stock.py
