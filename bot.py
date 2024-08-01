@@ -110,11 +110,11 @@ async def gemini(ctx, *, query: str = None):
         tickers = [query.upper()]
     else:
         tickers = [stock for sector, stocks in config.STOCKS.items() for stock in stocks]
-
+        
     for ticker in tickers: 
         # 1) 제미니 분석 리포트 유효성 확인
         gemini_analysis_complete = config.is_gemini_analysis_complete(ticker)
-
+        gemini_analysis_complete = False
         if not gemini_analysis_complete: # 1.1) 유효하지 않다면 분석 실행
             await ctx.send(f'Gemini analysis for {ticker} is not complete. Proceeding with analysis.')
             try:
