@@ -146,7 +146,7 @@ def get_combined_eps_and_revenue(ticker):
 
 if __name__ == "__main__":
     # 테스트 코드
-    ticker = "TSM"
+    ticker = "NVDA"
     results = get_combined_eps_and_revenue(ticker)
     if results:
         print("\nQuarterly Results:")
