@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, send_from_directory, jsonify, request
 from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
 from flask_cors import CORS
+import config  # config.py 임포트
 
 # Add my-flutter-app directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'my-flask-app')))
