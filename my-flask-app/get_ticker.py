@@ -7,8 +7,8 @@ import yfinance as yf
 import investpy
 
 
-ticker_path = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv')
-CSV_URL = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'
+ticker_path = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/stock_market.csv')
+CSV_URL = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/stock_market.csv'
 
 
 def get_ticker_name(ticker):
@@ -47,13 +47,13 @@ def update_stock_market_csv(file_path, tickers_to_update):
                 df.at[i, 'Stock'] = 'Unknown Stock'
                 df.at[i, 'Industry'] = 'Unknown Industry'
                 df.at[i, 'Beta'] = 0.0
-                
+                df.at[i, 'marketcap'] = 0.0                
     
     df.to_csv(ticker_path, index=False, encoding='utf-8-sig')  # Specify encoding
 
 def load_tickers():
     ticker_dict = {}
-    ticker_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'
+    ticker_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/stock_market.csv'
     response = requests.get(ticker_url)
     response.raise_for_status()
     csv_data = response.content.decode('utf-8')
@@ -152,7 +152,7 @@ async def search_tickers_and_respond(ctx, query):
 
 def is_valid_stock(stock):  # Check if the stock is in the stock market CSV
     try:
-        url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'
+        url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/stock_market.csv'
         stock_market_df = pd.read_csv(url)
         return stock in stock_market_df['Symbol'].values
     except Exception as e:
@@ -212,14 +212,14 @@ def update_market_cap_in_csv(csv_url):
 
 if __name__ == "__main__":
     # 시가총액 업데이트
-    update_market_cap_in_csv(CSV_URL)
+    # update_market_cap_in_csv(CSV_URL)
 
 
     
     
-    # tickers_to_update = ['TCTZF','asmlf']
-    # update_stock_market_csv(ticker_path, tickers_to_update)
-    # print("Stock information updated.")
+    tickers_to_update = ['BTC/KRW']
+    update_stock_market_csv(ticker_path, tickers_to_update)
+    print("Stock information updated.")
     
 #  .\.venv\Scripts\activate
 #  python get_ticker.py

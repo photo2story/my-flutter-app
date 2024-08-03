@@ -18,7 +18,7 @@ INITIAL_INVESTMENT = int(os.getenv('INITIAL_INVESTMENT', 1000000))
 MONTHLY_INVESTMENT = int(os.getenv('MONTHLY_INVESTMENT', 0))
 
 # Data URLs
-CSV_URL = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv')
+CSV_URL = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/stock_market.csv')
 GITHUB_API_URL = os.getenv('GITHUB_API_URL', 'https://api.github.com/repos/photo2story/my-flutter-app/contents/static/images')
 
 STOCKS = {
