@@ -1,8 +1,9 @@
 Symbol,Name,Market,Sector,Stock,Industry,Beta,marketCap
+BTC/KRW,BTC/KRW,KRX,Unknown Stock,Unknown Industry,0.0,0.0
 282330,BGF리테일,KRX,종합 소매업,Unknown Stock,Unknown Industry,0.0,0.0
 004840,DRB동일,KRX,고무제품 제조업,Unknown Stock,Unknown Industry,0.0,0.0
 017940,E1,KRX,기타 전문 도매업,Unknown Stock,Unknown Industry,0.0,0.0
-012630,HDC,KRX,기타 금융업,Unknown Stock,Unknown Industry,0.0,0.0
+012630,BTC/KRWHDC,KRX,기타 금융업,Unknown Stock,Unknown Industry,0.0,0.0
 329180,HD현대중공업,KRX,선박 및 보트 건조업,Unknown Stock,Unknown Industry,0.0,0.0
 234080,JW생명과학,KRX,의약품 제조업,Unknown Stock,Unknown Industry,0.0,0.0
 092230,KPX홀딩스,KRX,기초 화학물질 제조업,Unknown Stock,Unknown Industry,0.0,0.0
