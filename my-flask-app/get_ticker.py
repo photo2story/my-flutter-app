@@ -8,6 +8,8 @@ import investpy
 
 
 ticker_path = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv')
+CSV_URL = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv'
+
 
 def get_ticker_name(ticker):
     df = pd.read_csv(ticker_path)  # stock_market.csv 파일 경로
@@ -179,38 +181,38 @@ def get_market_cap(ticker):
         print(f"Error fetching market cap for {ticker}: {e}")
         return 0
 
-def update_market_cap_in_csv(csv_path):
+def update_market_cap_in_csv(csv_url):
     """
     CSV 파일을 읽어 티커의 시가총액을 업데이트하는 함수.
     NYSE와 NASDAQ 시장의 주식만 포함.
-    :param csv_path: CSV 파일 경로
+    :param csv_url: CSV 파일 URL
     """
-    df = pd.read_csv(csv_path)
+    response = requests.get(csv_url)
+    response.raise_for_status()
+    csv_data = response.content.decode('utf-8')
+    df = pd.read_csv(io.StringIO(csv_data))
 
     # NYSE와 NASDAQ 주식 필터링
     filtered_df = df[df['Market'].isin(['NYSE', 'NASDAQ'])]
 
-    if 'marketCap' not in filtered_df.columns:
-        filtered_df['marketCap'] = 0
+    # marketCap 열이 없으면 새로 추가
+    if 'marketCap' not in df.columns:
+        df['marketCap'] = 0.0
 
     total_tickers = len(filtered_df)
     for index, row in filtered_df.iterrows():
         ticker = row['Symbol']
         market_cap = get_market_cap(ticker)
-        filtered_df.at[index, 'marketCap'] = market_cap
+        df.at[index, 'marketCap'] = market_cap
         print(f"Processed {index + 1}/{total_tickers} - {ticker}")
 
-    # 업데이트된 데이터를 원래 데이터프레임에 반영
-    df.update(filtered_df)
-    df.to_csv(csv_path, index=False)
-    print(f"Updated CSV saved to {csv_path}")
+    # 업데이트된 데이터프레임을 로컬에 저장 (원격에 저장하려면 추가 작업 필요)
+    df.to_csv('updated_stock_market.csv', index=False)
+    print(f"Updated CSV saved to updated_stock_market.csv")
 
 if __name__ == "__main__":
-    # CSV 파일 경로 설정
-    csv_path = os.getenv('CSV_URL', 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/my-flask-app/stock_market.csv')
-
     # 시가총액 업데이트
-    update_market_cap_in_csv(csv_path)
+    update_market_cap_in_csv(CSV_URL)
 
 
     
