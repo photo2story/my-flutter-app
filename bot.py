@@ -119,7 +119,7 @@ async def gemini(ctx, *, query: str = None):
             await ctx.send(f'Gemini analysis for {ticker} is not complete. Proceeding with analysis.')
             try:
                 result = await analyze_with_gemini(ticker)
-                await ctx.send(result)
+                # await ctx.send(result)
             except Exception as e:
                 error_message = f'An error occurred while analyzing {ticker} with Gemini: {e}'
                 await ctx.send(error_message)
