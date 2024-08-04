@@ -8,8 +8,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import asyncio
-from datetime import datetime
-import re
+from datetime import datetime  # 추가된 부분
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -39,14 +38,14 @@ def create_ticker_to_name_dict(csv_path):
 ticker_to_name = create_ticker_to_name_dict(CSV_PATH)
 
 def download_csv(ticker):
-    voo_file_url = f"{GITHUB_RAW_BASE_URL}/result_VOO_{ticker}.csv"
-    simplified_file_url = f"{GITHUB_RAW_BASE_URL}/result_{ticker}.csv"
-    response_voo = requests.get(voo_file_url)
-    response_simplified = requests.get(simplified_file_url)
+    ticker_vs_voo_url = f"{GITHUB_RAW_BASE_URL}/result_VOO_{ticker}.csv"
+    simplified_ticker_url = f"{GITHUB_RAW_BASE_URL}/result_{ticker}.csv"
+    response_ticker = requests.get(ticker_vs_voo_url)
+    response_simplified = requests.get(simplified_ticker_url)
 
-    if response_voo.status_code == 200 and response_simplified.status_code == 200:
+    if response_ticker.status_code == 200 and response_simplified.status_code == 200:
         with open(f'result_VOO_{ticker}.csv', 'wb') as f:
-            f.write(response_voo.content)
+            f.write(response_ticker.content)
         with open(f'result_{ticker}.csv', 'wb') as f:
             f.write(response_simplified.content)
         return True
@@ -84,16 +83,6 @@ def format_earnings_text(earnings_data):
     
     return earnings_text
 
-def generate_report(ticker):
-    report_url = f"https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/report_{ticker}.txt"
-    response = requests.get(report_url)
-    if response.status_code == 200:
-        report_text = response.text
-    else:
-        report_text = "Report not available."
-    
-    return report_text
-
 async def analyze_with_gemini(ticker):
     try:
         start_message = f"Starting analysis for {ticker}"
@@ -111,23 +100,22 @@ async def analyze_with_gemini(ticker):
         df_voo = pd.read_csv(voo_file)
         df_simplified = pd.read_csv(simplified_file)
 
-        latest_rate = df_simplified[f'rate_{ticker}_5D'].iloc[-1]
-        latest_rate_VOO = df_simplified['rate_VOO_20D'].iloc[-1]
-        current_divergence = df_simplified['Divergence'].iloc[-1]
-        relative_divergence = df_simplified['Relative_Divergence'].iloc[-1]
-
-        close = df_voo['Close'].iloc[-1]
+        final_rate = df_voo['rate'].iloc[-1]
+        final_rate_vs = df_voo['rate_vs'].iloc[-1]
+        Close = df_voo['Close'].iloc[-1]
         sma_5 = df_voo['sma05_ta'].iloc[-1]
         sma_20 = df_voo['sma20_ta'].iloc[-1]
         sma_60 = df_voo['sma60_ta'].iloc[-1]
         rsi = df_voo['rsi_ta'].iloc[-1]
         ppo = df_voo['ppo_histogram'].iloc[-1]
 
-        try:
-            recent_earnings = get_recent_eps_and_revenue(ticker)
-            if recent_earnings is None or all(entry[3] is None for entry in recent_earnings):
-                raise Exception("Primary data source failed")
-        except Exception as e:
+        max_divergence = df_simplified['Divergence'].max()
+        min_divergence = df_simplified['Divergence'].min()
+        current_divergence = df_simplified['Divergence'].iloc[-1]
+        relative_divergence = df_simplified['Relative_Divergence'].iloc[-1]
+
+        recent_earnings = get_recent_eps_and_revenue(ticker)
+        if recent_earnings is None or all(entry[3] is None for entry in recent_earnings):
             print(f"Primary data source failed for {ticker}, attempting secondary source...")
             recent_earnings = get_recent_eps_and_revenue_fmp(ticker)
             if recent_earnings is None:
@@ -138,17 +126,15 @@ async def analyze_with_gemini(ticker):
         earnings_text = format_earnings_text(recent_earnings)
         print(f"Earnings Text for {ticker}: {earnings_text}")
 
-        report_text = generate_report(ticker)
-
         prompt_voo = f"""
         1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
            리뷰할 주식티커명 = {ticker}
            회사이름과 회사 개요 설명해줘(1줄로)
-           리뷰주식의 누적수익률 = {latest_rate}
-           기준이 되는 비교주식(S&P 500, VOO)의 누적수익율 = {latest_rate_VOO}
-           이격도 (현재: {current_divergence}, 상대이격도: {relative_divergence})
+           리뷰주식의 누적수익률 = {final_rate}
+           기준이 되는 비교주식(S&P 500, VOO)의 누적수익율 = {final_rate_vs}
+           이격도 (max: {max_divergence}, min: {min_divergence}, 현재: {current_divergence}, 상대이격도: {relative_divergence})
         2) 제공된 자료의 최근 주가 변동(간단하게: 5일, 20일, 60일 이동평균 수치로):
-           종가 = {close}
+           종가 = {Close}
            5일이동평균 = {sma_5}
            20일이동평균 = {sma_20}
            60일이동평균 = {sma_60}
@@ -161,14 +147,9 @@ async def analyze_with_gemini(ticker):
         5) 종합적으로 분석해줘(1~4번까지의 요약)
         6) 레포트는 한글로 만들어줘
         """
-
+        
         print(f"Sending prompt to Gemini API for {ticker}")
         response_ticker = model.generate_content(prompt_voo)
-        
-        if not response_ticker.text:
-            safety_ratings = response_ticker.candidate.get('safety_ratings', [])
-            print(f"Response blocked by safety settings: {safety_ratings}")
-            raise Exception("Response blocked by Gemini API safety settings.")
         
         report_text = f"{datetime.now().strftime('%Y-%m-%d')} - Analysis Report\n" + response_ticker.text
         print(report_text)
@@ -188,7 +169,6 @@ async def analyze_with_gemini(ticker):
         with open(report_file_path, 'w', encoding='utf-8') as file:
             file.write(report_text)
 
-        shutil.move(simplified_file, os.path.join(destination_dir, simplified_file))
         shutil.move(voo_file, os.path.join(destination_dir, voo_file))
         await move_files_to_images_folder()
 
@@ -198,7 +178,7 @@ async def analyze_with_gemini(ticker):
         error_message = f"{ticker} 분석 중 오류 발생: {e}"
         print(error_message)
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
-        
+
 # 환경 변수 로드
 load_dotenv()
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
@@ -222,10 +202,14 @@ async def send_report_to_discord(ticker):
         error_message = f"Error sending report to Discord: {e}"
         print(error_message)
         requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
-        
+
+
 if __name__ == '__main__':
-    ticker = 'AAPL'  # 예시 티커명
-    asyncio.run(analyze_with_gemini(ticker))
+    ticker = 'NVDA'
+    asyncio.run(send_report_to_discord(ticker))
+
+
+
 
 # source .venv/bin/activate
 # python gemini.py     
