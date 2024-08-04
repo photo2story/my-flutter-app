@@ -264,3 +264,7 @@ my_flutter_app/.dart_tool/chrome-device/Default/GCM Store/Encryption
 my_flutter_app/.dart_tool/chrome-device/Default/GCM Store/Extension
 my_flutter_app/.dart_tool/chrome-device/Default/Local Storage/leveldb
 *.gguf
+
+# google drive 제외
+storage.json
+client_secret_googledrive.json
