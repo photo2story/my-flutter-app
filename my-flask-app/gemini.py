@@ -152,7 +152,7 @@ async def analyze_with_gemini(ticker):
         response_ticker = model.generate_content(prompt_voo)
         
         report_text = f"{datetime.now().strftime('%Y-%m-%d')} - Analysis Report\n" + response_ticker.text
-        print(report_text)
+        # print(report_text)
 
         success_message = f"Gemini API 분석 완료: {ticker}\n{report_text}"
         print(success_message)
