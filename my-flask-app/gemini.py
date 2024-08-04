@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import shutil
 import asyncio
-from datetime import datetime  # 추가된 부분
+from datetime import datetime
+import re
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -38,10 +39,14 @@ def create_ticker_to_name_dict(csv_path):
 ticker_to_name = create_ticker_to_name_dict(CSV_PATH)
 
 def download_csv(ticker):
-    simplified_ticker_url = f"{GITHUB_RAW_BASE_URL}/result_{ticker}.csv"
-    response_simplified = requests.get(simplified_ticker_url)
+    voo_file_url = f"{GITHUB_RAW_BASE_URL}/result_VOO_{ticker}.csv"
+    simplified_file_url = f"{GITHUB_RAW_BASE_URL}/result_{ticker}.csv"
+    response_voo = requests.get(voo_file_url)
+    response_simplified = requests.get(simplified_file_url)
 
-    if response_simplified.status_code == 200:
+    if response_voo.status_code == 200 and response_simplified.status_code == 200:
+        with open(f'result_VOO_{ticker}.csv', 'wb') as f:
+            f.write(response_voo.content)
         with open(f'result_{ticker}.csv', 'wb') as f:
             f.write(response_simplified.content)
         return True
@@ -79,6 +84,16 @@ def format_earnings_text(earnings_data):
     
     return earnings_text
 
+def generate_report(ticker):
+    report_url = f"https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/report_{ticker}.txt"
+    response = requests.get(report_url)
+    if response.status_code == 200:
+        report_text = response.text
+    else:
+        report_text = "Report not available."
+    
+    return report_text
+
 async def analyze_with_gemini(ticker):
     try:
         start_message = f"Starting analysis for {ticker}"
@@ -91,13 +106,22 @@ async def analyze_with_gemini(ticker):
             requests.post(DISCORD_WEBHOOK_URL, data={'content': error_message})
             return
 
+        voo_file = f'result_VOO_{ticker}.csv'
         simplified_file = f'result_{ticker}.csv'
+        df_voo = pd.read_csv(voo_file)
         df_simplified = pd.read_csv(simplified_file)
 
         latest_rate = df_simplified[f'rate_{ticker}_5D'].iloc[-1]
         latest_rate_VOO = df_simplified['rate_VOO_20D'].iloc[-1]
         current_divergence = df_simplified['Divergence'].iloc[-1]
         relative_divergence = df_simplified['Relative_Divergence'].iloc[-1]
+
+        close = df_voo['Close'].iloc[-1]
+        sma_5 = df_voo['sma05_ta'].iloc[-1]
+        sma_20 = df_voo['sma20_ta'].iloc[-1]
+        sma_60 = df_voo['sma60_ta'].iloc[-1]
+        rsi = df_voo['rsi_ta'].iloc[-1]
+        ppo = df_voo['ppo_histogram'].iloc[-1]
 
         try:
             recent_earnings = get_recent_eps_and_revenue(ticker)
@@ -114,6 +138,8 @@ async def analyze_with_gemini(ticker):
         earnings_text = format_earnings_text(recent_earnings)
         print(f"Earnings Text for {ticker}: {earnings_text}")
 
+        report_text = generate_report(ticker)
+
         prompt_voo = f"""
         1) 제공된 자료의 수익율(rate)와 S&P 500(VOO)의 수익율(rate_vs)과 비교해서 이격된 정도를 알려줘 (간단하게 자료 맨마지막날의 누적수익율차이):
            리뷰할 주식티커명 = {ticker}
@@ -122,13 +148,13 @@ async def analyze_with_gemini(ticker):
            기준이 되는 비교주식(S&P 500, VOO)의 누적수익율 = {latest_rate_VOO}
            이격도 (현재: {current_divergence}, 상대이격도: {relative_divergence})
         2) 제공된 자료의 최근 주가 변동(간단하게: 5일, 20일, 60일 이동평균 수치로):
-           종가 = N/A
-           5일이동평균 = N/A
-           20일이동평균 = N/A
-           60일이동평균 = N/A
+           종가 = {close}
+           5일이동평균 = {sma_5}
+           20일이동평균 = {sma_20}
+           60일이동평균 = {sma_60}
         3) 제공된 자료의 RSI, PPO 인덱스 지표를 분석해줘 (간단하게):
-           RSI = N/A
-           PPO = N/A
+           RSI = {rsi}
+           PPO = {ppo}
         4) 최근 실적 및 전망: 제공된 자료의 실적을 분석해줘(간단하게)
            실적 = {earnings_text}
            가장 최근 실적은 예상치도 함께 포함해서 검토해줘
@@ -142,36 +168,8 @@ async def analyze_with_gemini(ticker):
         if not response_ticker.text:
             safety_ratings = response_ticker.candidate.get('safety_ratings', [])
             print(f"Response blocked by safety settings: {safety_ratings}")
-            default_report = f"""
-            2024-08-05 - Analysis Report
-            ## {ticker} 주식 분석 보고서
-
-            **1. 수익률 비교 분석**
-
-            주식의 누적 수익률은 {latest_rate}%로, S&P 500 지수(VOO)의 누적 수익률 {latest_rate_VOO}%를 크게 웃돌고 있습니다. 이격도는 {current_divergence}%이며 상대 이격도는 {relative_divergence}%입니다. 
-
-            **2. 주가 변동 분석**
-
-            최근 주가 변동에 대한 데이터가 없습니다.
-
-            **3. 기술적 지표 분석**
-
-            기술적 지표에 대한 데이터가 없습니다.
-
-            **4. 최근 실적 및 전망**
-
-            {earnings_text}
-
-            **5. 종합 분석**
-
-            종합 분석 내용을 여기에 적습니다.
-
-            **6. 결론**
-
-            결론을 여기에 적습니다.
-            """
-            response_ticker.text = default_report
-
+            raise Exception("Response blocked by Gemini API safety settings.")
+        
         report_text = f"{datetime.now().strftime('%Y-%m-%d')} - Analysis Report\n" + response_ticker.text
         print(report_text)
 
@@ -190,9 +188,11 @@ async def analyze_with_gemini(ticker):
         with open(report_file_path, 'w', encoding='utf-8') as file:
             file.write(report_text)
 
+        shutil.move(simplified_file, os.path.join(destination_dir, simplified_file))
+        shutil.move(voo_file, os.path.join(destination_dir, voo_file))
         await move_files_to_images_folder()
 
-        return f'Gemini Analysis for {ticker} has been sent to Discord and saved as a text file.'
+        return f'Gemini Analysis for {ticker} (VOO) has been sent to Discord and saved as a text file.'
 
     except Exception as e:
         error_message = f"{ticker} 분석 중 오류 발생: {e}"
