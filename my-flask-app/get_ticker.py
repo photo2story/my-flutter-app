@@ -12,13 +12,13 @@ CSV_URL = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/sta
 
 
 def get_ticker_name(ticker):
-    df = pd.read_csv(ticker_path)  # stock_market.csv 파일 경로
+    df = pd.read_csv(ticker_path, encoding='utf-8')  # stock_market.csv 파일 경로 인코딩 설정
     result = df.loc[df['Symbol'] == ticker, 'Name']
     name = result.iloc[0] if not result.empty else None
     return name
 
 def get_ticker_market(ticker):
-    df = pd.read_csv(ticker_path)  # stock_market.csv 파일 경로
+    df = pd.read_csv(ticker_path, encoding='utf-8')  # stock_market.csv 파일 경로 인코딩 설정
     result = df.loc[df['Symbol'] == ticker, 'Market']
     market = result.iloc[0] if not result.empty else None
     return market
@@ -53,8 +53,7 @@ def update_stock_market_csv(file_path, tickers_to_update):
 
 def load_tickers():
     ticker_dict = {}
-    ticker_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/stock_market.csv'
-    response = requests.get(ticker_url)
+    response = requests.get(CSV_URL)
     response.raise_for_status()
     csv_data = response.content.decode('utf-8')
     csv_reader = csv.reader(io.StringIO(csv_data))
@@ -153,7 +152,7 @@ async def search_tickers_and_respond(ctx, query):
 def is_valid_stock(stock):  # Check if the stock is in the stock market CSV
     try:
         url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/stock_market.csv'
-        stock_market_df = pd.read_csv(url)
+        stock_market_df = pd.read_csv(url, encoding='utf-8')  # Specify encoding
         return stock in stock_market_df['Symbol'].values
     except Exception as e:
         print(f"Error checking stock market CSV: {e}")
