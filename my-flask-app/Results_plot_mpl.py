@@ -32,7 +32,12 @@ async def plot_results_mpl(ticker, start_date, end_date):
     """주어진 티커와 기간에 대한 데이터를 사용하여 차트를 생성하고, 결과를 Discord로 전송합니다."""
     prices = fdr.DataReader(ticker, start_date, end_date)
     prices.dropna(inplace=True)
-
+    
+    # 최신 6개월 데이터로 필터링
+    end_date = pd.to_datetime(end_date)
+    start_date_6m = end_date - pd.DateOffset(months=6)
+    prices = prices[prices.index >= start_date_6m]
+    
     # 이동 평균과 PPO 계산
     SMA20 = prices['Close'].rolling(window=20).mean()
     SMA60 = prices['Close'].rolling(window=60).mean()
