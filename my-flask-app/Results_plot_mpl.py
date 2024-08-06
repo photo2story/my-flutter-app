@@ -36,9 +36,9 @@ async def plot_results_mpl(ticker, start_date, end_date):
     prices['SMA60'] = prices['Close'].rolling(window=60).mean()
     short_ema = prices['Close'].ewm(span=12, adjust=False).mean()
     long_ema = prices['Close'].ewm(span=26, adjust=False).mean()
-    prices['PPO'] = ((short_ema - long_ema) / long_ema) * 100
-    prices['PPO_signal'] = prices['PPO'].ewm(span=9, adjust=False).mean()
-    prices['PPO_histogram'] = prices['PPO'] - prices['PPO_signal']
+    prices['PPO_value'] = ((short_ema - long_ema) / long_ema) * 100
+    prices['PPO_signal'] = prices['PPO_value'].ewm(span=9, adjust=False).mean()
+    prices['PPO_histogram'] = prices['PPO_value'] - prices['PPO_signal']
 
     # 최신 6개월 데이터로 필터링
     end_date = pd.to_datetime(end_date)
@@ -98,7 +98,6 @@ if __name__ == "__main__":
         print("Plotting completed successfully.")
     except Exception as e:
         print(f"Error occurred while plotting results: {e}")
-
 
 """
 python3 -m venv .venv
