@@ -29,7 +29,9 @@ def save_figure(fig, file_path):
 async def plot_results_mpl(ticker, start_date, end_date):
     """주어진 티커와 기간에 대한 데이터를 사용하여 차트를 생성하고, 결과를 Discord로 전송합니다."""
     # 전체 기간의 데이터를 가져옵니다
-    prices = fdr.DataReader(ticker, start_date, end_date)
+    end_date = pd.to_datetime(end_date)
+    start_date_extended = end_date - pd.DateOffset(months=8)  # 8개월 전부터 데이터 가져오기
+    prices = fdr.DataReader(ticker, start_date_extended, end_date)
     
     # 이동 평균과 PPO 계산 (전체 데이터를 사용)
     prices['SMA20'] = prices['Close'].rolling(window=20).mean()
@@ -41,7 +43,6 @@ async def plot_results_mpl(ticker, start_date, end_date):
     prices['PPO_histogram'] = prices['PPO_value'] - prices['PPO_signal']
     
     # 최신 6개월 데이터로 필터링
-    end_date = pd.to_datetime(end_date)
     start_date_6m = end_date - pd.DateOffset(months=6)
     filtered_prices = prices[prices.index >= start_date_6m]
     
@@ -54,10 +55,15 @@ async def plot_results_mpl(ticker, start_date, end_date):
         RSI(), PPO(), TradeSpan('ppohist>0')
     ]
     name = get_ticker_name(ticker)
-    chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=len(filtered_prices))  # max_bars를 데이터 길이로 설정
+    chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=len(filtered_prices))
     chart.plot(filtered_prices, indicators)
     fig = chart.figure
-    fig.tight_layout()  # 레이아웃 조정 추가
+    fig.tight_layout()
+    
+    # x축 날짜 표시 조정
+    ax = fig.get_axes()[0]
+    ax.xaxis.set_major_locator(plt.AutoLocator())
+    ax.xaxis.set_major_formatter(plt.AutoDateFormatter(ax.xaxis.get_major_locator()))
     
     image_filename = f'result_mpl_{ticker}.png'
     save_figure(fig, image_filename)
