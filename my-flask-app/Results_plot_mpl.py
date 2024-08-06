@@ -35,8 +35,8 @@ async def plot_results_mpl(ticker, start_date, end_date):
     
     # 최신 6개월 데이터로 필터링
     end_date = pd.to_datetime(end_date)
-    start_date_2m = end_date - pd.DateOffset(months=2)
-    prices = prices[prices.index >= start_date_2m]
+    start_date_6m = end_date - pd.DateOffset(months=6)
+    prices = prices[prices.index >= start_date_6m]
     
     # 이동 평균과 PPO 계산
     SMA20 = prices['Close'].rolling(window=20).mean()
