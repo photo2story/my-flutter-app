@@ -61,9 +61,9 @@ async def plot_results_mpl(ticker, start_date, end_date):
     fig.tight_layout()
     
     # x축 날짜 표시 조정
-    ax = fig.get_axes()[0]
-    ax.xaxis.set_major_locator(plt.AutoLocator())
-    ax.xaxis.set_major_formatter(plt.AutoDateFormatter(ax.xaxis.get_major_locator()))
+    ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    fig.autofmt_xdate()
     
     image_filename = f'result_mpl_{ticker}.png'
     save_figure(fig, image_filename)
