@@ -1,4 +1,6 @@
+
 ## Results_plot_mpl.py
+
 
 import matplotlib.pyplot as plt
 from mplchart.chart import Chart
@@ -7,10 +9,9 @@ from mplchart.indicators import SMA, PPO, RSI
 import pandas as pd
 import requests
 import FinanceDataReader as fdr
-import os, sys
+import os,sys
 from dotenv import load_dotenv
 import asyncio
-import matplotlib.dates as mdates
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -29,57 +30,42 @@ def save_figure(fig, file_path):
 
 async def plot_results_mpl(ticker, start_date, end_date):
     """주어진 티커와 기간에 대한 데이터를 사용하여 차트를 생성하고, 결과를 Discord로 전송합니다."""
-    # 전체 기간의 데이터를 가져옵니다
-    end_date = pd.to_datetime(end_date)
-    start_date_extended = end_date - pd.DateOffset(months=8)  # 8개월 전부터 데이터 가져오기
-    prices = fdr.DataReader(ticker, start_date_extended, end_date)
+    prices = fdr.DataReader(ticker, start_date, end_date)
+    prices.dropna(inplace=True)
     
-    # 이동 평균과 PPO 계산 (전체 데이터를 사용)
-    prices['SMA20'] = prices['Close'].rolling(window=20).mean()
-    prices['SMA60'] = prices['Close'].rolling(window=60).mean()
+    # 최신 6개월 데이터로 필터링
+    end_date = pd.to_datetime(end_date)
+    start_date_6m = end_date - pd.DateOffset(months=6)
+    prices = prices[prices.index >= start_date_6m]
+    
+    # 이동 평균과 PPO 계산
+    SMA20 = prices['Close'].rolling(window=20).mean()
+    SMA60 = prices['Close'].rolling(window=60).mean()
     short_ema = prices['Close'].ewm(span=12, adjust=False).mean()
     long_ema = prices['Close'].ewm(span=26, adjust=False).mean()
-    prices['PPO_value'] = ((short_ema - long_ema) / long_ema) * 100
-    prices['PPO_signal'] = prices['PPO_value'].ewm(span=9, adjust=False).mean()
-    prices['PPO_histogram'] = prices['PPO_value'] - prices['PPO_signal']
-    
- # 최신 6개월 데이터로 필터링
-    start_date_6m = end_date - pd.DateOffset(months=6)
-    filtered_prices = prices[prices.index >= start_date_6m]
-    
-    # NaN 값 제거
-    filtered_prices.dropna(inplace=True)
-    
+    ppo = ((short_ema - long_ema) / long_ema) * 100
+    ppo_signal = ppo.ewm(span=9, adjust=False).mean()
+    ppo_histogram = ppo - ppo_signal
+
     # 차트 생성
     indicators = [
         Candlesticks(), SMA(20), SMA(60), Volume(),
         RSI(), PPO(), TradeSpan('ppohist>0')
     ]
     name = get_ticker_name(ticker)
-    chart = Chart(title=f'{ticker} ({name}) vs VOO')  # max_bars 제거
-    chart.plot(filtered_prices, indicators)
+    chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=250)
+    chart.plot(prices, indicators)
     fig = chart.figure
-    fig.tight_layout()
-    
-    # x축 범위를 최신 6개월로 제한
-    fig, ax = plt.subplots()
-    ax.set_xlim(start_date_6m, end_date)
-    
-    # x축 날짜 표시 조정
-    ax.xaxis.set_major_locator(mdates.AutoDateLocator())
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-    fig.autofmt_xdate()
-    
     image_filename = f'result_mpl_{ticker}.png'
     save_figure(fig, image_filename)
-    
+
     # 메시지 작성
     message = (f"Stock: {ticker} ({name})\n"
-               f"Close: {filtered_prices['Close'].iloc[-1]:,.2f}\n"
-               f"SMA 20: {filtered_prices['SMA20'].iloc[-1]:,.2f}\n"
-               f"SMA 60: {filtered_prices['SMA60'].iloc[-1]:,.2f}\n"
-               f"PPO Histogram: {filtered_prices['PPO_histogram'].iloc[-1]:,.2f}\n")
-    
+               f"Close: {prices['Close'].iloc[-1]:,.2f}\n"
+               f"SMA 20: {SMA20.iloc[-1]:,.2f}\n"
+               f"SMA 60: {SMA60.iloc[-1]:,.2f}\n"
+               f"PPO Histogram: {ppo_histogram.iloc[-1]:,.2f}\n")
+
     # Discord로 메시지 전송
     response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
     if response.status_code != 204:
@@ -87,7 +73,7 @@ async def plot_results_mpl(ticker, start_date, end_date):
         print(f"Response: {response.status_code} {response.text}")
     else:
         print('Discord 메시지 전송 성공')
-    
+
     # Discord로 이미지 전송
     try:
         with open(image_filename, 'rb') as image_file:
