@@ -48,7 +48,7 @@ async def plot_results_mpl(ticker, start_date, end_date):
     # 차트 생성
     indicators = [
         Candlesticks(), SMA(20), SMA(60), Volume(),
-        RSI(), PPO(), TradeSpan('PPO_histogram>0')
+        RSI(), PPO(), TradeSpan('ppohist>0')
     ]
     name = get_ticker_name(ticker)
     chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=250)
