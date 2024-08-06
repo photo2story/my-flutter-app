@@ -12,7 +12,6 @@ import FinanceDataReader as fdr
 import os,sys
 from dotenv import load_dotenv
 import asyncio
-import matplotlib.dates as mdates
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -34,10 +33,7 @@ async def plot_results_mpl(ticker, start_date, end_date):
     prices = fdr.DataReader(ticker, start_date, end_date)
     prices.dropna(inplace=True)
     
-    # 최신 6개월 데이터로 필터링
-    end_date = pd.to_datetime(end_date)
-    start_date_6m = end_date - pd.DateOffset(months=6)
-    prices = prices[prices.index >= start_date_6m]
+
     
     # 이동 평균과 PPO 계산
     SMA20 = prices['Close'].rolling(window=20).mean()
@@ -48,6 +44,11 @@ async def plot_results_mpl(ticker, start_date, end_date):
     ppo_signal = ppo.ewm(span=9, adjust=False).mean()
     ppo_histogram = ppo - ppo_signal
 
+    # 최신 6개월 데이터로 필터링
+    end_date = pd.to_datetime(end_date)
+    start_date_6m = end_date - pd.DateOffset(months=6)
+    prices = prices[prices.index >= start_date_6m]
+
     # 차트 생성
     indicators = [
         Candlesticks(), SMA(20), SMA(60), Volume(),
@@ -57,12 +58,6 @@ async def plot_results_mpl(ticker, start_date, end_date):
     chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=250)
     chart.plot(prices, indicators)
     fig = chart.figure
-    
-       # 최신 6개월 데이터로 필터링
-    start_date_6m = end_date - pd.DateOffset(months=6)
-    fig, ax = plt.subplots()
-    ax.set_xlim(start_date_6m, end_date)
-    
     image_filename = f'result_mpl_{ticker}.png'
     save_figure(fig, image_filename)
 
