@@ -37,8 +37,8 @@ async def plot_results_mpl(ticker, start_date, end_date):
     short_ema = prices['Close'].ewm(span=12, adjust=False).mean()
     long_ema = prices['Close'].ewm(span=26, adjust=False).mean()
     prices['PPO'] = ((short_ema - long_ema) / long_ema) * 100
-    prices['ppo_signal'] = prices['PPO'].ewm(span=9, adjust=False).mean()
-    prices['ppo_histogram'] = prices['PPO'] - prices['ppo_signal']
+    prices['PPO_signal'] = prices['PPO'].ewm(span=9, adjust=False).mean()
+    prices['PPO_histogram'] = prices['PPO'] - prices['PPO_signal']
 
     # 최신 6개월 데이터로 필터링
     end_date = pd.to_datetime(end_date)
@@ -48,7 +48,7 @@ async def plot_results_mpl(ticker, start_date, end_date):
     # 차트 생성
     indicators = [
         Candlesticks(), SMA(20), SMA(60), Volume(),
-        RSI(), PPO(), TradeSpan('ppohist>0')
+        RSI(), PPO(), TradeSpan('PPO_histogram>0')
     ]
     name = get_ticker_name(ticker)
     chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=250)
@@ -62,7 +62,7 @@ async def plot_results_mpl(ticker, start_date, end_date):
                f"Close: {filtered_prices['Close'].iloc[-1]:,.2f}\n"
                f"SMA 20: {filtered_prices['SMA20'].iloc[-1]:,.2f}\n"
                f"SMA 60: {filtered_prices['SMA60'].iloc[-1]:,.2f}\n"
-               f"PPO Histogram: {filtered_prices['ppo_histogram'].iloc[-1]:,.2f}\n")
+               f"PPO Histogram: {filtered_prices['PPO_histogram'].iloc[-1]:,.2f}\n")
 
     # Discord로 메시지 전송
     response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
