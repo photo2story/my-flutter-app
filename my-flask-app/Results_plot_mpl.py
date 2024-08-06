@@ -1,6 +1,4 @@
-
 ## Results_plot_mpl.py
-
 
 import matplotlib.pyplot as plt
 from mplchart.chart import Chart
@@ -9,7 +7,7 @@ from mplchart.indicators import SMA, PPO, RSI
 import pandas as pd
 import requests
 import FinanceDataReader as fdr
-import os,sys
+import os, sys
 from dotenv import load_dotenv
 import asyncio
 
@@ -32,13 +30,12 @@ async def plot_results_mpl(ticker, start_date, end_date):
     """주어진 티커와 기간에 대한 데이터를 사용하여 차트를 생성하고, 결과를 Discord로 전송합니다."""
     prices = fdr.DataReader(ticker, start_date, end_date)
     prices.dropna(inplace=True)
-    
-    # 최신 6개월 데이터로 필터링
+
+    # 최신 3개월 데이터로 필터링
     end_date = pd.to_datetime(end_date)
     start_date_3m = end_date - pd.DateOffset(months=3)
-    prices = prices[prices.index >= start_date_3m]
     
-    # 이동 평균과 PPO 계산
+    # 이동 평균과 PPO 계산 (전체 데이터를 사용)
     SMA20 = prices['Close'].rolling(window=20).mean()
     SMA60 = prices['Close'].rolling(window=60).mean()
     short_ema = prices['Close'].ewm(span=12, adjust=False).mean()
@@ -47,6 +44,9 @@ async def plot_results_mpl(ticker, start_date, end_date):
     ppo_signal = ppo.ewm(span=9, adjust=False).mean()
     ppo_histogram = ppo - ppo_signal
 
+    # 3개월 데이터로 필터링
+    filtered_prices = prices[prices.index >= start_date_3m]
+    
     # 차트 생성
     indicators = [
         Candlesticks(), SMA(20), SMA(60), Volume(),
@@ -54,14 +54,14 @@ async def plot_results_mpl(ticker, start_date, end_date):
     ]
     name = get_ticker_name(ticker)
     chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=250)
-    chart.plot(prices, indicators)
+    chart.plot(filtered_prices, indicators)
     fig = chart.figure
     image_filename = f'result_mpl_{ticker}.png'
     save_figure(fig, image_filename)
 
     # 메시지 작성
     message = (f"Stock: {ticker} ({name})\n"
-               f"Close: {prices['Close'].iloc[-1]:,.2f}\n"
+               f"Close: {filtered_prices['Close'].iloc[-1]:,.2f}\n"
                f"SMA 20: {SMA20.iloc[-1]:,.2f}\n"
                f"SMA 60: {SMA60.iloc[-1]:,.2f}\n"
                f"PPO Histogram: {ppo_histogram.iloc[-1]:,.2f}\n")
@@ -100,6 +100,7 @@ if __name__ == "__main__":
         print("Plotting completed successfully.")
     except Exception as e:
         print(f"Error occurred while plotting results: {e}")
+
 
 
 """
