@@ -46,9 +46,9 @@ async def plot_results_mpl(ticker, start_date, end_date):
     filtered_prices = prices[prices.index >= start_date_6m]
     
     # 필터링된 데이터에 이동 평균과 PPO 값을 추가
-    filtered_prices['SMA20'] = SMA20[prices.index >= start_date_3m]
-    filtered_prices['SMA60'] = SMA60[prices.index >= start_date_3m]
-    filtered_prices['ppo_histogram'] = ppo_histogram[prices.index >= start_date_3m]
+    filtered_prices['SMA20'] = SMA20[prices.index >= start_date_6m]
+    filtered_prices['SMA60'] = SMA60[prices.index >= start_date_6m]
+    filtered_prices['ppo_histogram'] = ppo_histogram[prices.index >= start_date_6m]
 
     # 차트 생성
     indicators = [
