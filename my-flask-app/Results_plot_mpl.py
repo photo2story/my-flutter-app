@@ -1,5 +1,3 @@
-## Results_plot_mpl.py
-
 import matplotlib.pyplot as plt
 from mplchart.chart import Chart
 from mplchart.primitives import Candlesticks, Volume, TradeSpan
@@ -54,6 +52,7 @@ async def plot_results_mpl(ticker, start_date, end_date):
     chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=250)
     chart.plot(filtered_prices, indicators)
     fig = chart.figure
+    fig.tight_layout()  # 레이아웃 조정 추가
     image_filename = f'result_mpl_{ticker}.png'
     save_figure(fig, image_filename)
 
@@ -98,6 +97,7 @@ if __name__ == "__main__":
         print("Plotting completed successfully.")
     except Exception as e:
         print(f"Error occurred while plotting results: {e}")
+
 
 
 """
