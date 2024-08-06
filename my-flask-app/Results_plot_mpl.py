@@ -30,10 +30,6 @@ async def plot_results_mpl(ticker, start_date, end_date):
     """주어진 티커와 기간에 대한 데이터를 사용하여 차트를 생성하고, 결과를 Discord로 전송합니다."""
     prices = fdr.DataReader(ticker, start_date, end_date)
     prices.dropna(inplace=True)
-
-    # 최신 3개월 데이터로 필터링
-    end_date = pd.to_datetime(end_date)
-    start_date_3m = end_date - pd.DateOffset(months=3)
     
     # 이동 평균과 PPO 계산 (전체 데이터를 사용)
     SMA20 = prices['Close'].rolling(window=20).mean()
@@ -44,9 +40,16 @@ async def plot_results_mpl(ticker, start_date, end_date):
     ppo_signal = ppo.ewm(span=9, adjust=False).mean()
     ppo_histogram = ppo - ppo_signal
 
-    # 3개월 데이터로 필터링
-    filtered_prices = prices[prices.index >= start_date_3m]
+    # 최신 3개월 데이터로 필터링
+    end_date = pd.to_datetime(end_date)
+    start_date_6m = end_date - pd.DateOffset(months=6)
+    filtered_prices = prices[prices.index >= start_date_6m]
     
+    # 필터링된 데이터에 이동 평균과 PPO 값을 추가
+    filtered_prices['SMA20'] = SMA20[prices.index >= start_date_3m]
+    filtered_prices['SMA60'] = SMA60[prices.index >= start_date_3m]
+    filtered_prices['ppo_histogram'] = ppo_histogram[prices.index >= start_date_3m]
+
     # 차트 생성
     indicators = [
         Candlesticks(), SMA(20), SMA(60), Volume(),
@@ -62,9 +65,9 @@ async def plot_results_mpl(ticker, start_date, end_date):
     # 메시지 작성
     message = (f"Stock: {ticker} ({name})\n"
                f"Close: {filtered_prices['Close'].iloc[-1]:,.2f}\n"
-               f"SMA 20: {SMA20.iloc[-1]:,.2f}\n"
-               f"SMA 60: {SMA60.iloc[-1]:,.2f}\n"
-               f"PPO Histogram: {ppo_histogram.iloc[-1]:,.2f}\n")
+               f"SMA 20: {filtered_prices['SMA20'].iloc[-1]:,.2f}\n"
+               f"SMA 60: {filtered_prices['SMA60'].iloc[-1]:,.2f}\n"
+               f"PPO Histogram: {filtered_prices['ppo_histogram'].iloc[-1]:,.2f}\n")
 
     # Discord로 메시지 전송
     response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
@@ -100,6 +103,7 @@ if __name__ == "__main__":
         print("Plotting completed successfully.")
     except Exception as e:
         print(f"Error occurred while plotting results: {e}")
+
 
 
 
