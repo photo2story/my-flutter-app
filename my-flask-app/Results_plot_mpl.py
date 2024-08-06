@@ -26,6 +26,8 @@ def save_figure(fig, file_path):
     fig.savefig(file_path, bbox_inches='tight')
     plt.close(fig)
 
+import matplotlib.dates as mdates
+
 async def plot_results_mpl(ticker, start_date, end_date):
     """주어진 티커와 기간에 대한 데이터를 사용하여 차트를 생성하고, 결과를 Discord로 전송합니다."""
     # 전체 기간의 데이터를 가져옵니다
@@ -57,16 +59,16 @@ async def plot_results_mpl(ticker, start_date, end_date):
     name = get_ticker_name(ticker)
     chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=len(filtered_prices))
     chart.plot(filtered_prices, indicators)
-    fig = chart.figure
-    fig.tight_layout()
     
     # x축 날짜 표시 조정
-    ax.xaxis.set_major_locator(mdates.AutoDateLocator())
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-    fig.autofmt_xdate()
+    chart.xaxis.set_major_locator(mdates.AutoDateLocator())
+    chart.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    chart.figure.autofmt_xdate()  # 날짜 레이블 자동 포맷팅
+    
+    chart.figure.tight_layout()
     
     image_filename = f'result_mpl_{ticker}.png'
-    save_figure(fig, image_filename)
+    save_figure(chart.figure, image_filename)
     
     # 메시지 작성
     message = (f"Stock: {ticker} ({name})\n"
@@ -75,16 +77,15 @@ async def plot_results_mpl(ticker, start_date, end_date):
                f"SMA 60: {filtered_prices['SMA60'].iloc[-1]:,.2f}\n"
                f"PPO Histogram: {filtered_prices['PPO_histogram'].iloc[-1]:,.2f}\n")
     
-    # Discord로 메시지 전송
-    response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
-    if response.status_code != 204:
-        print('Discord 메시지 전송 실패')
-        print(f"Response: {response.status_code} {response.text}")
-    else:
-        print('Discord 메시지 전송 성공')
-    
-    # Discord로 이미지 전송
+    # Discord로 메시지 및 이미지 전송
     try:
+        response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
+        if response.status_code != 204:
+            print('Discord 메시지 전송 실패')
+            print(f"Response: {response.status_code} {response.text}")
+        else:
+            print('Discord 메시지 전송 성공')
+        
         with open(image_filename, 'rb') as image_file:
             response = requests.post(DISCORD_WEBHOOK_URL, files={'file': image_file})
             if response.status_code in [200, 204]:
@@ -95,7 +96,7 @@ async def plot_results_mpl(ticker, start_date, end_date):
                 
         await move_files_to_images_folder()              
     except Exception as e:
-        print(f"Error occurred while sending image: {e}")
+        print(f"Error occurred while sending message or image: {e}")
 
 if __name__ == "__main__":
     print("Starting test for plotting results.")
