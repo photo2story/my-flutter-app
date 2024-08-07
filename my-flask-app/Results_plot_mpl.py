@@ -15,20 +15,20 @@ import asyncio
 import matplotlib.font_manager as fm
 
 # 한글 폰트 설정
-font_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/MALGUN.ttf'
+# font_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/MALGUN.ttf'
 
-# 폰트를 로컬에 다운로드하지 않고 직접 사용
-response = requests.get(font_url)
-with open('MALGUN.ttf', 'wb') as f:
-    f.write(response.content)
+# # 폰트를 로컬에 다운로드하지 않고 직접 사용
+# response = requests.get(font_url)
+# with open('MALGUN.ttf', 'wb') as f:
+#     f.write(response.content)
 
-fontprop = fm.FontProperties(fname='MALGUN.ttf', size=10)
-plt.rcParams['font.family'] = fontprop.get_name()
+# fontprop = fm.FontProperties(fname='MALGUN.ttf', size=10)
+# plt.rcParams['font.family'] = fontprop.get_name()
 
-# 루트 디렉토리를 sys.path에 추가
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from git_operations import move_files_to_images_folder
-from get_ticker import get_ticker_name
+# # 루트 디렉토리를 sys.path에 추가
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# from git_operations import move_files_to_images_folder
+# from get_ticker import get_ticker_name
 
 # 환경 변수 로드
 load_dotenv()
