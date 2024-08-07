@@ -16,13 +16,13 @@ import matplotlib.font_manager as fm
 
 # 한글 폰트 설정
 font_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/MALGUN.ttf'
-font_path = '/usr/share/fonts/truetype/malgun/MALGUN.ttf'
-if not os.path.exists(font_path):
-    response = requests.get(font_url)
-    with open(font_path, 'wb') as f:
-        f.write(response.content)
 
-fontprop = fm.FontProperties(fname=font_path, size=10)
+# 폰트를 로컬에 다운로드하지 않고 직접 사용
+response = requests.get(font_url)
+with open('MALGUN.ttf', 'wb') as f:
+    f.write(response.content)
+
+fontprop = fm.FontProperties(fname='MALGUN.ttf', size=10)
 plt.rcParams['font.family'] = fontprop.get_name()
 
 # 루트 디렉토리를 sys.path에 추가
