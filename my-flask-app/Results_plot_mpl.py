@@ -15,7 +15,13 @@ import asyncio
 import matplotlib.font_manager as fm
 
 # 한글 폰트 설정
-font_path = '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'  # 폰트 파일 경로 (시스템에 설치된 한글 폰트 경로를 입력하세요)
+font_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/MALGUN.ttf'
+font_path = '/usr/share/fonts/truetype/malgun/MALGUN.ttf'
+if not os.path.exists(font_path):
+    response = requests.get(font_url)
+    with open(font_path, 'wb') as f:
+        f.write(response.content)
+
 fontprop = fm.FontProperties(fname=font_path, size=10)
 plt.rcParams['font.family'] = fontprop.get_name()
 
