@@ -65,7 +65,8 @@ async def plot_results_mpl(ticker, start_date, end_date):
         RSI(), PPO(), TradeSpan('ppohist>0')
     ]
     name = get_ticker_name(ticker)
-    chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=250)
+    chart_title = f'{ticker} ({name}) vs VOO'.encode('utf-8').decode('utf-8')
+    chart = Chart(title=chart_title, max_bars=250)
     chart.plot(filtered_prices, indicators)
     fig = chart.figure
     fig.tight_layout()  # 레이아웃 조정 추가
