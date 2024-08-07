@@ -9,9 +9,15 @@ from mplchart.indicators import SMA, PPO, RSI
 import pandas as pd
 import requests
 import FinanceDataReader as fdr
-import os,sys
+import os, sys
 from dotenv import load_dotenv
 import asyncio
+import matplotlib.font_manager as fm
+
+# 한글 폰트 설정
+font_path = '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'  # 폰트 파일 경로 (시스템에 설치된 한글 폰트 경로를 입력하세요)
+fontprop = fm.FontProperties(fname=font_path, size=10)
+plt.rcParams['font.family'] = fontprop.get_name()
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -33,21 +39,19 @@ async def plot_results_mpl(ticker, start_date, end_date):
     prices = fdr.DataReader(ticker, start_date, end_date)
     prices.dropna(inplace=True)
     
-
-    
-    # 이동 평균과 PPO 계산
-    SMA20 = prices['Close'].rolling(window=20).mean()
-    SMA60 = prices['Close'].rolling(window=60).mean()
+    # 이동 평균과 PPO 계산 (전체 데이터를 사용)
+    prices['SMA20'] = prices['Close'].rolling(window=20).mean()
+    prices['SMA60'] = prices['Close'].rolling(window=60).mean()
     short_ema = prices['Close'].ewm(span=12, adjust=False).mean()
     long_ema = prices['Close'].ewm(span=26, adjust=False).mean()
-    ppo = ((short_ema - long_ema) / long_ema) * 100
-    ppo_signal = ppo.ewm(span=9, adjust=False).mean()
-    ppo_histogram = ppo - ppo_signal
+    prices['PPO_value'] = ((short_ema - long_ema) / long_ema) * 100
+    prices['PPO_signal'] = prices['PPO_value'].ewm(span=9, adjust=False).mean()
+    prices['PPO_histogram'] = prices['PPO_value'] - prices['PPO_signal']
 
     # 최신 6개월 데이터로 필터링
     end_date = pd.to_datetime(end_date)
     start_date_6m = end_date - pd.DateOffset(months=6)
-    prices = prices[prices.index >= start_date_6m]
+    filtered_prices = prices[prices.index >= start_date_6m]
 
     # 차트 생성
     indicators = [
@@ -56,17 +60,18 @@ async def plot_results_mpl(ticker, start_date, end_date):
     ]
     name = get_ticker_name(ticker)
     chart = Chart(title=f'{ticker} ({name}) vs VOO', max_bars=250)
-    chart.plot(prices, indicators)
+    chart.plot(filtered_prices, indicators)
     fig = chart.figure
+    fig.tight_layout()  # 레이아웃 조정 추가
     image_filename = f'result_mpl_{ticker}.png'
     save_figure(fig, image_filename)
 
     # 메시지 작성
     message = (f"Stock: {ticker} ({name})\n"
-               f"Close: {prices['Close'].iloc[-1]:,.2f}\n"
-               f"SMA 20: {SMA20.iloc[-1]:,.2f}\n"
-               f"SMA 60: {SMA60.iloc[-1]:,.2f}\n"
-               f"PPO Histogram: {ppo_histogram.iloc[-1]:,.2f}\n")
+               f"Close: {filtered_prices['Close'].iloc[-1]:,.2f}\n"
+               f"SMA 20: {filtered_prices['SMA20'].iloc[-1]:,.2f}\n"
+               f"SMA 60: {filtered_prices['SMA60'].iloc[-1]:,.2f}\n"
+               f"PPO Histogram: {filtered_prices['PPO_histogram'].iloc[-1]:,.2f}\n")
 
     # Discord로 메시지 전송
     response = requests.post(DISCORD_WEBHOOK_URL, data={'content': message})
