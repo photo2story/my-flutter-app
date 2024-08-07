@@ -26,9 +26,9 @@ import matplotlib.font_manager as fm
 # plt.rcParams['font.family'] = fontprop.get_name()
 
 # # 루트 디렉토리를 sys.path에 추가
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-# from git_operations import move_files_to_images_folder
-# from get_ticker import get_ticker_name
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from git_operations import move_files_to_images_folder
+from get_ticker import get_ticker_name
 
 # 환경 변수 로드
 load_dotenv()
