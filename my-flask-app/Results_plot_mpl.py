@@ -12,20 +12,26 @@ import FinanceDataReader as fdr
 import os, sys
 from dotenv import load_dotenv
 import asyncio
+import tempfile
 import matplotlib.font_manager as fm
 
 # 한글 폰트 설정
 font_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/MALGUN.ttf'
+font_dir = 'fonts'  # 폰트를 저장할 로컬 디렉토리
+if not os.path.exists(font_dir):
+    os.makedirs(font_dir)
+font_path = os.path.join(font_dir, 'MALGUN.ttf')
 
-# # 폰트를 로컬에 다운로드하지 않고 직접 사용
-response = requests.get(font_url)
-with open('MALGUN.ttf', 'wb') as f:
-    f.write(response.content)
+# 폰트를 로컬에 다운로드
+if not os.path.exists(font_path):
+    response = requests.get(font_url)
+    with open(font_path, 'wb') as f:
+        f.write(response.content)
 
-fontprop = fm.FontProperties(fname='MALGUN.ttf', size=10)
+fontprop = fm.FontProperties(fname=font_path, size=10)
 plt.rcParams['font.family'] = fontprop.get_name()
 
-# # 루트 디렉토리를 sys.path에 추가
+# 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from git_operations import move_files_to_images_folder
 from get_ticker import get_ticker_name
@@ -65,7 +71,9 @@ async def plot_results_mpl(ticker, start_date, end_date):
         RSI(), PPO(), TradeSpan('ppohist>0')
     ]
     name = get_ticker_name(ticker)
-    chart_title = f'{ticker} ({name}) vs VOO'.encode('utf-8').decode('utf-8')
+    
+    # Chart 객체의 제목에 한글을 사용
+    chart_title = f'{ticker} ({name}) vs VOO'
     chart = Chart(title=chart_title, max_bars=250)
     chart.plot(filtered_prices, indicators)
     fig = chart.figure
