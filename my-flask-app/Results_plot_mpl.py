@@ -1,6 +1,7 @@
 
 ## Results_plot_mpl.py
 
+
 import matplotlib.pyplot as plt
 from mplchart.chart import Chart
 from mplchart.primitives import Candlesticks, Volume, TradeSpan
@@ -11,24 +12,20 @@ import FinanceDataReader as fdr
 import os, sys
 from dotenv import load_dotenv
 import asyncio
-import tempfile
 import matplotlib.font_manager as fm
 
 # 한글 폰트 설정
 # font_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/MALGUN.ttf'
 
-# 임시 디렉토리에 폰트 파일 저장
-# with tempfile.NamedTemporaryFile(delete=False, suffix='.ttf') as tmp_font_file:
-#     response = requests.get(font_url)
-#     tmp_font_file.write(response.content)
-#     font_path = tmp_font_file.name
+# # 폰트를 로컬에 다운로드하지 않고 직접 사용
+# response = requests.get(font_url)
+# with open('MALGUN.ttf', 'wb') as f:
+#     f.write(response.content)
 
-# matplotlib에 폰트 설정
-# fontprop = fm.FontProperties(fname=font_path)
+# fontprop = fm.FontProperties(fname='MALGUN.ttf', size=10)
 # plt.rcParams['font.family'] = fontprop.get_name()
-# plt.rcParams['axes.unicode_minus'] = False  # 마이너스 폰트 설정
 
-# 루트 디렉토리를 sys.path에 추가
+# # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from git_operations import move_files_to_images_folder
 from get_ticker import get_ticker_name
@@ -68,9 +65,7 @@ async def plot_results_mpl(ticker, start_date, end_date):
         RSI(), PPO(), TradeSpan('ppohist>0')
     ]
     name = get_ticker_name(ticker)
-    
-    # Chart 객체의 제목에 한글을 사용
-    chart_title = f'{ticker} ({name}) vs VOO'
+    chart_title = f'{ticker} ({name}) vs VOO'.encode('utf-8').decode('utf-8')
     chart = Chart(title=chart_title, max_bars=250)
     chart.plot(filtered_prices, indicators)
     fig = chart.figure
@@ -106,9 +101,10 @@ async def plot_results_mpl(ticker, start_date, end_date):
         await move_files_to_images_folder()              
     except Exception as e:
         print(f"Error occurred while sending image: {e}")
+
 if __name__ == "__main__":
     print("Starting test for plotting results.")
-    ticker = "457480" #"TSLA"
+    ticker = "TSLA"
     start_date = "2019-01-02"
     end_date = "2024-07-28"
     print(f"Plotting results for {ticker} from {start_date} to {end_date}")
