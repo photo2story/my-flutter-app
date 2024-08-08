@@ -22,7 +22,7 @@ response = requests.get(font_url)
 with open('MALGUN.ttf', 'wb') as f:
     f.write(response.content)
 
-# fontprop = fm.FontProperties(fname='MALGUN.ttf', size=10)
+fontprop = fm.FontProperties(fname='MALGUN.ttf', size=10)
 plt.rcParams['font.family'] = fontprop.get_name()
 
 # # 루트 디렉토리를 sys.path에 추가
