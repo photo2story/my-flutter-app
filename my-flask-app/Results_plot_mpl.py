@@ -15,15 +15,15 @@ import asyncio
 import matplotlib.font_manager as fm
 
 # 한글 폰트 설정
-# font_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/MALGUN.ttf'
+font_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/MALGUN.ttf'
 
 # # 폰트를 로컬에 다운로드하지 않고 직접 사용
-# response = requests.get(font_url)
-# with open('MALGUN.ttf', 'wb') as f:
-#     f.write(response.content)
+response = requests.get(font_url)
+with open('MALGUN.ttf', 'wb') as f:
+    f.write(response.content)
 
 # fontprop = fm.FontProperties(fname='MALGUN.ttf', size=10)
-# plt.rcParams['font.family'] = fontprop.get_name()
+plt.rcParams['font.family'] = fontprop.get_name()
 
 # # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -104,7 +104,7 @@ async def plot_results_mpl(ticker, start_date, end_date):
 
 if __name__ == "__main__":
     print("Starting test for plotting results.")
-    ticker = "TSLA"
+    ticker = "457480" #"TSLA"
     start_date = "2019-01-02"
     end_date = "2024-07-28"
     print(f"Plotting results for {ticker} from {start_date} to {end_date}")
