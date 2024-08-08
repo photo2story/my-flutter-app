@@ -1,7 +1,6 @@
 
 ## Results_plot_mpl.py
 
-
 import matplotlib.pyplot as plt
 from mplchart.chart import Chart
 from mplchart.primitives import Candlesticks, Volume, TradeSpan
@@ -16,20 +15,18 @@ import tempfile
 import matplotlib.font_manager as fm
 
 # 한글 폰트 설정
-font_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/MALGUN.ttf'
-font_dir = 'fonts'  # 폰트를 저장할 로컬 디렉토리
-if not os.path.exists(font_dir):
-    os.makedirs(font_dir)
-font_path = os.path.join(font_dir, 'MALGUN.ttf')
+# font_url = 'https://raw.githubusercontent.com/photo2story/my-flutter-app/main/static/images/MALGUN.ttf'
 
-# 폰트를 로컬에 다운로드
-if not os.path.exists(font_path):
-    response = requests.get(font_url)
-    with open(font_path, 'wb') as f:
-        f.write(response.content)
+# 임시 디렉토리에 폰트 파일 저장
+# with tempfile.NamedTemporaryFile(delete=False, suffix='.ttf') as tmp_font_file:
+#     response = requests.get(font_url)
+#     tmp_font_file.write(response.content)
+#     font_path = tmp_font_file.name
 
-fontprop = fm.FontProperties(fname=font_path, size=10)
-plt.rcParams['font.family'] = fontprop.get_name()
+# matplotlib에 폰트 설정
+# fontprop = fm.FontProperties(fname=font_path)
+# plt.rcParams['font.family'] = fontprop.get_name()
+# plt.rcParams['axes.unicode_minus'] = False  # 마이너스 폰트 설정
 
 # 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -109,7 +106,6 @@ async def plot_results_mpl(ticker, start_date, end_date):
         await move_files_to_images_folder()              
     except Exception as e:
         print(f"Error occurred while sending image: {e}")
-
 if __name__ == "__main__":
     print("Starting test for plotting results.")
     ticker = "457480" #"TSLA"
